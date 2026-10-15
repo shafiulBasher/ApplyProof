@@ -1,0 +1,12 @@
+[
+  { "label": "CV is required", "category": "required_document", "docType": "cv" },
+  { "label": "CV max 2 pages", "category": "page_limit", "docType": "cv", "max": 2 },
+  { "label": "Motivation letter is required", "category": "required_document", "docType": "motivation_letter" },
+  { "label": "Motivation letter 500-800 words", "category": "word_limit", "docType": "motivation_letter", "min": 500, "max": 800 },
+  { "label": "Transcript is required", "category": "required_document", "docType": "transcript" },
+  { "label": "Two recommendation letters", "category": "required_document", "docType": "recommendation_letter", "count": 2 },
+  { "label": "GPA at least 3.0 on a 4.0 scale", "category": "eligibility", "field": "gpa", "minGpa": 3, "scale": 4 },
+  { "label": "Bachelor's degree", "category": "eligibility", "field": "degree" },
+  { "label": "Strong English proficiency (ambiguous)", "category": "eligibility", "field": "other", "clear": false },
+  { "label": "Deadline October 20", "category": "deadline" }
+]

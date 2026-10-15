@@ -43,3 +43,34 @@ export interface StoredDocument extends ParsedPdf {
   confirmedType?: DocType;
   uploadedAt: number;
 }
+
+export type RequirementCategory = "required_document" | "page_limit" | "word_limit" | "eligibility" | "deadline" | "formatting" | "other";
+
+export interface Requirement {
+  id: string;
+  category: RequirementCategory;
+  title: string;
+  docType?: DocType;
+  count?: number;
+  min?: number;
+  max?: number;
+  unit?: "pages" | "words";
+  eligibility?: {
+    field: "gpa" | "degree" | "nationality" | "other";
+    minGpa?: number;
+    scale?: number;
+    allowedValues?: string[];
+    clear: boolean;
+  };
+  quote: string;
+  page: number;
+  quoteVerified: boolean;
+}
+
+export interface Extraction {
+  guidelineHash: string;
+  pages: string[];
+  requirements: Requirement[];
+  model: string;
+  createdAt: number;
+}

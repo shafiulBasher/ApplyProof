@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "samples": "tsx scripts/make-samples.ts",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test:extraction": "tsx --env-file=.env.local scripts/test-extraction.ts"
   },
   "dependencies": {
     "@google/genai": "^2.30.0",

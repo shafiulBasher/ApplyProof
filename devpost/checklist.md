@@ -19,7 +19,7 @@ Build mode: fast
   Learner check: Run `npm run dev`, open http://localhost:3000, create "Global Future Scholars Scholarship", upload the guideline and the four applicant sample files. Each shows the right page count and suggested type. Reload the page: everything is still there.
   Commit: `Scaffold app with applications, PDF upload, and page/word counts`
 
-- [ ] **2. Gemini reads the guideline and every requirement comes with a verified quote**
+- [x] **2. Gemini reads the guideline and every requirement comes with a verified quote**
   Becomes usable: Clicking Run Readiness Check (after the AI disclosure) shows the list of requirements Gemini found in the guideline, each with its exact quote and confirmed page number. You can also run the accuracy test from the terminal.
   Why now: This is the biggest risk and your stated question: "Is a free model good enough at extracting requirements?" If it falls short, we find out before building on top of it, and we can tighten the prompt or switch models through the adapter.
   PRD ref: `prd.md > Requirement Extraction`, `prd.md > AI Disclosure`, `prd.md > States and Boundaries` (no guideline, check in progress, check fails)
@@ -82,3 +82,5 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 
 ## Revisions
 
+- Default model set to `gemini-3.5-flash` (in `.env.local`, no code change) — `gemini-3.8-flash` returned "high demand" (HTTP 503) twice during the slice 2 accuracy test; 3.5 Flash then found 10/10 expected requirements with 10/10 quotes verified.
+- Expected-requirements list grew from 8 rules to 10 checks — the guideline lists the CV and motivation letter as required documents as well as length-limited ones, so each gets a "required" check and a length check, matching the extraction prompt's one-item-per-rule design.

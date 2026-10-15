@@ -54,26 +54,32 @@ List every requirement the applicant must meet. Rules:
 
 export function gemini(): AiProvider {
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = process.env.GEMINI_MODEL;
-  if (!apiKey || !model) throw new AiUnavailableError("GEMINI_API_KEY and GEMINI_MODEL must be set in .env.local.");
+  // A comma-separated list of free models, tried in order only when one is busy (503) or out of quota (429).
+  const models = (process.env.GEMINI_MODEL ?? "").split(",").map((m) => m.trim()).filter(Boolean);
+  if (!apiKey || models.length === 0) throw new AiUnavailableError("GEMINI_API_KEY and GEMINI_MODEL must be set in .env.local.");
   const ai = new GoogleGenAI({ apiKey });
 
-  return {
-    model,
+  const provider: AiProvider = {
+    model: models[0],
     async extractRequirements(pages) {
       const contents = `${PROMPT}\n\n${pages.map((p, i) => `[[PAGE ${i + 1}]]\n${p}`).join("\n\n")}`;
       let text: string | undefined;
-      try {
-        const res = await ai.models.generateContent({
-          model,
-          contents,
-          config: { temperature: 0, responseMimeType: "application/json", responseJsonSchema: SCHEMA },
-        });
-        text = res.text;
-      } catch (e) {
-        // Quota (429), auth, or network problems: stop, never fall back to anything paid.
-        const status = e instanceof ApiError ? ` (HTTP ${e.status})` : "";
-        throw new AiUnavailableError(`Gemini request failed${status}: ${(e as Error).message}`);
+      for (const [i, model] of models.entries()) {
+        try {
+          const res = await ai.models.generateContent({
+            model,
+            contents,
+            config: { temperature: 0, responseMimeType: "application/json", responseJsonSchema: SCHEMA },
+          });
+          text = res.text;
+          provider.model = model;
+          break;
+        } catch (e) {
+          const status = e instanceof ApiError ? e.status : undefined;
+          if ((status === 503 || status === 429) && i < models.length - 1) continue;
+          // Out of free models, or an auth/network problem: stop. Never fall back to anything paid.
+          throw new AiUnavailableError(`Gemini request failed${status ? ` (HTTP ${status})` : ""}: ${(e as Error).message}`);
+        }
       }
       try {
         const parsed = JSON.parse(text ?? "");
@@ -84,4 +90,5 @@ export function gemini(): AiProvider {
       }
     },
   };
+  return provider;
 }

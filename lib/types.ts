@@ -74,3 +74,32 @@ export interface Extraction {
   model: string;
   createdAt: number;
 }
+
+export type FindingStatus = "passed" | "action_needed" | "needs_verification";
+
+export interface Finding {
+  requirementId: string;
+  status: FindingStatus;
+  title: string;
+  explanation: string;
+  quote: string;
+  page: number;
+  evidence?: string;
+  measured?: number;
+  correction?: string;
+}
+
+export interface CheckResult {
+  ranAt: number;
+  guidelineHash: string;
+  findings: Finding[];
+  status: FindingStatus;
+  outstanding: number;
+}
+
+export interface StoredResults {
+  applicationId: string;
+  current?: CheckResult;
+  previous?: CheckResult;
+  lastError?: string;
+}

@@ -1,10 +1,11 @@
 import Dexie, { type EntityTable } from "dexie";
-import type { Application, Extraction, StoredDocument } from "./types";
+import type { Application, Extraction, StoredDocument, StoredResults } from "./types";
 
 export const db = new Dexie("applyproof") as Dexie & {
   applications: EntityTable<Application, "id">;
   documents: EntityTable<StoredDocument, "id">;
   extractions: EntityTable<Extraction, "guidelineHash">;
+  results: EntityTable<StoredResults, "applicationId">;
 };
 
 db.version(1).stores({
@@ -13,6 +14,9 @@ db.version(1).stores({
 });
 db.version(2).stores({
   extractions: "guidelineHash",
+});
+db.version(3).stores({
+  results: "applicationId",
 });
 
 // Runs a save and turns a storage failure (e.g. quota exceeded) into a message naming the item.

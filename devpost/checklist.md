@@ -29,7 +29,7 @@ Build mode: fast
   Learner check: Get a free Gemini key from Google AI Studio and put it in `.env.local` (I'll walk you through it). In your application, click Run Readiness Check. You should see about eight requirements, such as "CV max 2 pages", each with a quote and "Guideline · p. N" that you can find in the guideline PDF.
   Commit: `Extract guideline requirements with Gemini and verify quotes`
 
-- [ ] **3. The readiness check flags the 3-page CV, with the rule quoted beside it**
+- [x] **3. The readiness check flags the 3-page CV, with the rule quoted beside it**
   Becomes usable: Enter your GPA, degree, and nationality, then run the check. Results appear in fix-first groups (Action Needed, Needs Verification, Passed), each finding with an explanation, the highlighted quote and page, your file's evidence, and a correction. The 3-page CV is Action Needed against the 2-page rule; one of two recommendation letters is Action Needed; the 620-word letter is Passed; the ambiguous English rule is Needs Verification.
   Why now: This is your unique kernel, real files checked against official rules with evidence. It comes right after extraction is proven, so the rest of the build adds to a working core.
   PRD ref: `prd.md > The Core Journey` (steps 4–6), `prd.md > Readiness Checks`, `prd.md > Evidence-Linked Findings`, `prd.md > Fix-First Results`
@@ -82,5 +82,5 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 
 ## Revisions
 
-- Default model set to `gemini-3.5-flash` (in `.env.local`, no code change) — `gemini-3.8-flash` returned "high demand" (HTTP 503) twice during the slice 2 accuracy test; 3.5 Flash then found 10/10 expected requirements with 10/10 quotes verified.
+- Model is now a short list of free Flash models (`GEMINI_MODEL=gemini-3.8-flash,gemini-3.5-flash`), tried in order only on "busy" (503) or "quota" (429) — both models passed the accuracy test (10/10 found, 10/10 quotes verified), but each returned "high demand" at different moments during slices 2–3. Still free only; no paid fallback.
 - Expected-requirements list grew from 8 rules to 10 checks — the guideline lists the CV and motivation letter as required documents as well as length-limited ones, so each gets a "required" check and a length check, matching the extraction prompt's one-item-per-rule design.

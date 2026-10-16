@@ -134,3 +134,31 @@ h1, h2, .font-display {
 @keyframes intro-out {
   to { opacity: 0; visibility: hidden; }
 }
+
+/* Smoother motion: transform/opacity only, long eased curves. */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes fade-away {
+  to { opacity: 0; transform: translateY(-10px) scale(0.98); }
+}
+@keyframes ken-burns {
+  from { opacity: 0; transform: scale(1.08); }
+  25% { opacity: 1; }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes glide {
+  from { opacity: 0; transform: translate(-40px, 18px) rotate(-6deg); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes soft-write {
+  from { clip-path: inset(0 100% 0 0); opacity: 0.4; }
+  to { clip-path: inset(0 0 0 0); opacity: 1; }
+}
+
+/* The intro waits (paused) until its artwork has loaded, so nothing pops in half-drawn. */
+.intro[data-ready="false"],
+.intro[data-ready="false"] * {
+  animation-play-state: paused !important;
+}

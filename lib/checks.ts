@@ -107,8 +107,28 @@ function lengthLimit(req: Requirement, docs: Docs): Verdict {
   };
 }
 
-function eligibility(req: Requirement, facts: ApplicantFacts): Verdict {
+// The AI sometimes mislabels a measurable rule (a GPA rule marked unclear, missing numbers, a degree rule as "other").
+// Fill the gaps from the verified quote itself, so the check stays grounded in the guideline's own words.
+export function readEligibility(req: Requirement): Requirement["eligibility"] {
   const e = req.eligibility;
+  if (!e) return e;
+  const quote = req.quote;
+  if (e.field === "gpa" || (e.field === "other" && /\bGPA\b|grade point average/i.test(quote))) {
+    const m = quote.match(/(\d+(?:\.\d+)?)\s*(?:\/|out of|on an?)\s*(\d+(?:\.\d+)?)/i);
+    const minGpa = e.minGpa ?? (m ? Number(m[1]) : undefined);
+    const scale = e.scale ?? (m ? Number(m[2]) : undefined);
+    return { ...e, field: "gpa", minGpa, scale, clear: minGpa !== undefined && scale !== undefined };
+  }
+  const level = quote.match(/\b(bachelor|master|doctorate|doctoral|ph\.?d)/i)?.[1];
+  if (e.field === "degree" || (e.field === "other" && level && /degree/i.test(quote))) {
+    const allowedValues = e.allowedValues?.filter(Boolean).length ? e.allowedValues : level ? [level] : [];
+    return { ...e, field: "degree", allowedValues, clear: allowedValues!.length > 0 };
+  }
+  return e;
+}
+
+function eligibility(req: Requirement, facts: ApplicantFacts): Verdict {
+  const e = readEligibility(req);
   const unclear: Verdict = {
     status: "needs_verification",
     explanation: "The quoted rule doesn't state a measurable standard or what proof is accepted.",

@@ -1,13 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
-import { PaperPlane, Sparkle, University } from "./Illustrations";
+import Image from "next/image";
+import { LoopPlane, Sparkle } from "./Illustrations";
 
 const SEEN_KEY = "applyproof-intro-seen";
-const FLIGHT = "path('M 10 96 C 70 20, 160 120, 290 24')";
+const EASE = "cubic-bezier(.22,1,.36,1)";
 
-// ~6.5s CSS/SVG intro. Plays once per browser, skippable, and never for reduced-motion users.
+// ~7s intro in three scenes, transform/opacity only. Plays once per browser, skippable,
+// never for reduced-motion users, and starts only once the artwork is ready.
 export default function Intro() {
   const [show, setShow] = useState(false);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let seen = true;
@@ -15,50 +18,85 @@ export default function Intro() {
       seen = localStorage.getItem(SEEN_KEY) === "1";
       localStorage.setItem(SEEN_KEY, "1");
     } catch {}
-    if (!seen && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) setShow(true);
+    if (seen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    setShow(true);
+    const t = setTimeout(() => setReady(true), 1500); // don't wait forever on a slow connection
+    return () => clearTimeout(t);
   }, []);
 
   if (!show) return null;
   return (
     <div
-      className="fixed inset-0 z-50 grid place-items-center bg-oat px-4 animate-[intro-out_600ms_ease-in_6.2s_forwards]"
+      className="intro fixed inset-0 z-50 grid place-items-center overflow-hidden bg-oat px-4"
+      data-ready={ready}
+      style={{ animation: `fade-away 700ms ${EASE} 6.5s forwards` }}
       onAnimationEnd={(e) => e.target === e.currentTarget && setShow(false)}
       role="dialog"
       aria-label="ApplyProof intro"
     >
-      <button className="btn-ghost absolute right-4 top-4 border border-line bg-white" onClick={() => setShow(false)} autoFocus>
+      <button className="btn-ghost absolute right-4 top-4 z-10 border border-line bg-white" onClick={() => setShow(false)} autoFocus>
         Skip intro
       </button>
 
-      <div className="ruled relative w-full max-w-[560px] rounded-[20px] border border-line bg-[#fffaf1] px-6 py-10 shadow-[0_30px_60px_-30px_rgba(48,43,64,0.45)] animate-[paper-in_800ms_cubic-bezier(.2,.8,.2,1)_both]">
-        {/* Scene one: the dream */}
-        <div className="animate-[intro-out_400ms_ease-in_4.3s_forwards]">
-          <p className="font-hand text-center text-3xl text-ink sm:text-4xl animate-[write-in_1600ms_steps(34)_700ms_both]">
-            Every big dream starts somewhere…
-          </p>
-          <div className="relative mx-auto mt-6 h-[120px] w-[300px]">
-            <University variant={0} className="absolute inset-x-6 bottom-0 animate-[pop-in_700ms_ease-out_2.3s_both]" />
-            <Sparkle className="absolute left-2 top-2 h-6 w-6 animate-[pop-in_400ms_ease-out_2.6s_both]" />
-            <Sparkle className="absolute right-4 top-0 h-5 w-5 animate-[pop-in_400ms_ease-out_2.8s_both]" />
-            <svg viewBox="0 0 300 120" className="absolute inset-0 animate-[pop-in_300ms_ease-out_3s_both]" fill="none" aria-hidden>
-              <path d="M 10 96 C 70 20, 160 120, 290 24" stroke="#7861CF" strokeWidth="1.6" strokeDasharray="2 6" strokeLinecap="round" />
-            </svg>
-            <div className="absolute left-0 top-0 h-6 w-9 animate-[fly_1400ms_ease-in-out_3s_both]" style={{ offsetPath: FLIGHT, offsetRotate: "auto" }}>
-              <PaperPlane className="h-6 w-9" />
+      <div className="relative aspect-[16/10] w-full max-w-[720px]">
+        {/* Scene 1: a paper with a dream */}
+        <div className="absolute inset-0" style={{ animation: `fade-away 600ms ${EASE} 2.7s forwards` }}>
+          <div
+            className="ruled absolute inset-[6%] grid place-items-center rounded-[22px] border border-line bg-[#fffaf1] shadow-[0_30px_60px_-30px_rgba(48,43,64,0.45)]"
+            style={{ animation: `paper-in 1000ms ${EASE} both` }}
+          >
+            <div className="text-center">
+              <p className="font-hand text-4xl text-ink sm:text-6xl" style={{ animation: `soft-write 1500ms ease-in-out 500ms both` }}>
+                A bigger chapter awaits…
+              </p>
+              <LoopPlane
+                className="mx-auto mt-4 h-24 w-56 sm:h-28 sm:w-64"
+                trailClass="animate-[draw_1500ms_cubic-bezier(.22,1,.36,1)_1.1s_both]"
+                style={{ animation: `glide 1400ms ${EASE} 1.1s both` }}
+              />
             </div>
+            <Sparkle className="absolute left-[10%] top-[14%] h-7 w-7" style={{ animation: `pop-in 600ms ${EASE} 1.4s both` }} />
+            <Sparkle className="absolute bottom-[16%] right-[12%] h-6 w-6" style={{ animation: `pop-in 600ms ${EASE} 1.7s both` }} />
           </div>
         </div>
 
-        {/* Scene two: the reveal */}
-        <div className="absolute inset-0 grid place-items-center animate-[pop-in_600ms_ease-out_4.6s_both]">
-          <div className="text-center">
-            <p className="inline-flex items-center gap-3 font-display text-5xl font-semibold text-ink">
-              <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary text-white">
-                <svg viewBox="0 0 16 16" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M3.5 8.5l3 3 6-7" /></svg>
+        {/* Scene 2: the dream behind the application */}
+        <div className="absolute inset-0" style={{ animation: `fade-up 900ms ${EASE} 2.9s both, fade-away 600ms ${EASE} 5s forwards` }}>
+          <div className="absolute inset-0 overflow-hidden rounded-[22px] shadow-[0_30px_60px_-30px_rgba(48,43,64,0.45)]">
+            <Image
+              src="/illustrations/dream-board.webp"
+              alt=""
+              fill
+              priority
+              sizes="720px"
+              className="object-cover"
+              style={{ animation: `ken-burns 2600ms ${EASE} 2.9s both` }}
+              onLoad={() => setReady(true)}
+            />
+          </div>
+          <p
+            className="font-hand absolute inset-x-0 -bottom-12 text-center text-3xl text-ink sm:text-4xl"
+            style={{ animation: `fade-up 800ms ${EASE} 3.4s both` }}
+          >
+            Every big dream starts somewhere…
+          </p>
+        </div>
+
+        {/* Scene 3: the reveal */}
+        <div className="absolute inset-0 grid place-items-center" style={{ animation: `fade-up 900ms ${EASE} 5.2s both` }}>
+          <div className="ruled rounded-[22px] border border-line bg-[#fffaf1] px-10 py-12 text-center shadow-[0_30px_60px_-30px_rgba(48,43,64,0.45)] sm:px-16">
+            <p className="inline-flex items-center gap-3 font-display text-5xl font-semibold text-ink sm:text-6xl">
+              <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary text-white" style={{ animation: `pop-in 700ms ${EASE} 5.4s both` }}>
+                <svg viewBox="0 0 16 16" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                  <path d="M3.5 8.5l3 3 6-7" pathLength="1" strokeDasharray="1" style={{ animation: `draw 600ms ${EASE} 5.8s both` }} />
+                </svg>
               </span>
               ApplyProof
             </p>
-            <p className="font-hand mt-3 text-2xl text-primary-ink">Turn requirements into clarity.</p>
+            <p className="font-hand mt-3 text-3xl text-primary-ink" style={{ animation: `fade-up 700ms ${EASE} 5.8s both` }}>Turn requirements into clarity.</p>
+            <svg viewBox="0 0 240 12" className="mx-auto mt-1 h-3 w-56" fill="none" stroke="#7861CF" strokeWidth="2.4" strokeLinecap="round" aria-hidden>
+              <path d="M4 8c50-6 120-8 232-2" pathLength="1" strokeDasharray="1" style={{ animation: `draw 700ms ${EASE} 6s both` }} />
+            </svg>
           </div>
         </div>
       </div>

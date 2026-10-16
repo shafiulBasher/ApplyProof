@@ -26,7 +26,7 @@ export function Sparkle(p: P) {
 export function PaperPlane(p: P) {
   return (
     <svg viewBox="0 0 48 32" {...base(p)} strokeWidth={1.6}>
-      <path d="M2 14 46 2 30 30l-8-10L2 14Z" fill="#fff" />
+      <path d="M2 14 46 2 30 30l-8-10L2 14Z" fill="#C9B8F5" />
       <path d="M46 2 22 20l-2 9 2-9" />
       <path d="m22 20 8 10" />
     </svg>
@@ -101,37 +101,21 @@ export function University({ variant = 0, ...p }: P & { variant?: number }) {
   );
 }
 
-// Landing hero: a desk under a window with a university skyline and a plane on a dotted path.
-export function DeskScene(p: P) {
+// Lilac paper plane with a looping hand-drawn trail. Pass trailClass to animate the trail drawing in.
+export function LoopPlane({ trailClass = "", planeClass = "", ...p }: P & { trailClass?: string; planeClass?: string }) {
   return (
-    <svg viewBox="0 0 520 330" {...base(p)} strokeWidth={1.6}>
-      <defs><Wobble id="wob-desk" /></defs>
-      <g filter="url(#wob-desk)">
-        <rect x="70" y="24" width="380" height="220" rx="18" fill="#EAE2FF" />
-        <path d="M260 24v220M70 134h380" stroke="#fff" strokeWidth={6} />
-        <path d="M96 244V186l16-24 16 24v58M330 244V172c0-26 70-26 70 0v72" fill="#fff" />
-        <path d="M140 244v-40h70v40M150 214h10v12h-10zM190 214h10v12h-10z" fill="#FAE9B9" />
-        <path d="M352 196h26M352 212h26" />
-        <path d="M120 88c40-46 140-58 240-18" strokeDasharray="2 7" stroke="#7861CF" />
-        <path d="M356 64l26-8-8 26-6-7-12-11z" fill="#fff" />
-        <circle cx="410" cy="62" r="14" fill="#FAE9B9" />
-        <path d="M30 262h460" strokeWidth={2} />
-        <path d="M40 262l-6 60M480 262l6 60" />
-        <path d="M150 256c30-14 80-14 110 0 30-14 80-14 110 0v-48c-30-14-80-14-110 0-30-14-80-14-110 0z" fill="#fff" />
-        <path d="M260 208v48" />
-        {[0, 1, 2, 3].map((i) => <path key={i} d={`M168 ${222 + i * 8}h70M282 ${222 + i * 8}h${i === 3 ? 40 : 70}`} stroke="#9a92b3" strokeWidth={1} />)}
-        <path d="M296 230l6 6 12-14" stroke="#5fae86" strokeWidth={2.2} />
-        <path d="M56 256h70v-14H56zM62 242h60v-12H62zM58 230h66v-12H58z" fill="#FAE9B9" />
-        <path d="M418 256c-6-20 30-20 24 0" fill="#fff" />
-        <path d="M430 236v-46l-22-10M408 180l-18 22h36z" fill="#F4D8D0" />
-        <path d="M394 256h52" />
-        <path d="M458 252v-26h22v26c0 4-22 4-22 0z" fill="#BFE8DE" />
-        <path d="M480 232c8 0 8 12 0 12" />
-      </g>
-      <g fill="#FAE9B9">
-        <path d="M60 60l2 5 5 1-5 2-2 5-2-5-5-2 5-1z" />
-        <path d="M470 120l3 7 7 2-7 3-3 7-3-7-7-3 7-2z" />
-        <path d="M230 300l2 5 5 1-5 2-2 5-2-5-5-2 5-1z" />
+    <svg viewBox="0 0 320 160" {...base(p)} strokeWidth={2.2}>
+      <path
+        d="M6 120c40 8 70-2 92-18 20-15 10-38-6-30-18 9-4 40 26 38 34-2 52-30 78-44 22-12 50-14 70-10"
+        pathLength="1"
+        strokeDasharray="1"
+        className={trailClass}
+      />
+      <g className={planeClass} strokeWidth={2}>
+        <path d="M262 60 316 18 296 88 278 72 262 60Z" fill="#C9B8F5" />
+        <path d="M316 18 278 72l-4 22 4-22" fill="#A893EA" />
+        <path d="M316 18 262 60l16 12" />
+        <path d="M268 64l-6-4M300 40l-8 6" strokeWidth={1.2} />
       </g>
     </svg>
   );

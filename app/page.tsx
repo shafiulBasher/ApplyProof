@@ -1,8 +1,15 @@
 import Link from "next/link";
-import { ArrowRight, ClipboardList, FileSearch, FileUp, Quote, ShieldCheck, Sparkles } from "lucide-react";
+import Image from "next/image";
+import { ArrowRight, ClipboardList, FileSearch, FileUp, Lock, Quote, ShieldCheck, Sparkles, Sprout } from "lucide-react";
 import Logo from "@/components/Logo";
 import Intro from "@/components/Intro";
-import { DeskScene, PaperPlane, Sparkle } from "@/components/Illustrations";
+import { LoopPlane, Sparkle } from "@/components/Illustrations";
+
+const BADGES = [
+  { icon: Lock, text: "Your files stay on your device" },
+  { icon: Quote, text: "Clear, evidence-based results" },
+  { icon: Sprout, text: "Free to use (no paid APIs)" },
+];
 
 const STEPS = [
   { icon: FileSearch, title: "Add the official guideline", text: "Upload the PDF, or paste the requirements straight from the program's or employer's website." },
@@ -25,26 +32,56 @@ export default function Landing() {
           </nav>
         </header>
 
-        <section className="grid items-center gap-10 py-10 md:grid-cols-[1.05fr_1fr] md:py-16">
-          <div>
-            <p className="hand-note text-2xl text-primary-ink">A bigger chapter awaits…</p>
-            <h1 className="mt-3 text-5xl font-semibold leading-[1.02] sm:text-6xl">
-              Apply with <em className="font-display italic text-primary">confidence</em>
+        <section className="relative grid items-center gap-12 py-8 md:grid-cols-[1fr_1.05fr] md:py-14">
+          <Sparkle className="absolute -left-2 top-6 hidden h-7 w-7 animate-[twinkle_3s_ease-in-out_infinite] md:block" />
+          <div className="animate-[fade-up_800ms_cubic-bezier(.22,1,.36,1)_both]">
+            <p className="hand-note text-3xl text-primary-ink">A bigger chapter awaits…</p>
+            <h1 className="mt-3 text-5xl font-semibold leading-[1.02] sm:text-7xl">
+              Apply with
+              <span className="relative block w-fit">
+                <em className="font-display italic text-primary">confidence</em>
+                <svg viewBox="0 0 300 16" className="absolute -bottom-3 left-0 h-4 w-full" fill="none" stroke="#FAE9B9" strokeWidth="9" strokeLinecap="round" aria-hidden>
+                  <path d="M6 10c80-8 190-9 288-3" />
+                </svg>
+              </span>
             </h1>
-            <p className="mt-5 max-w-md text-lg text-muted">
+            <p className="mt-7 max-w-md text-lg text-muted">
               Turn scholarship and job requirements into a clear, source-linked checklist, and know what&apos;s missing before you submit.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/applications" className="btn-primary px-5 py-3 text-base">Get started <ArrowRight className="h-4 w-4" /></Link>
-              <a href="#how" className="btn-secondary px-5 py-3 text-base">How it works</a>
+              <Link href="/applications" className="btn-primary px-6 py-3.5 text-base">Get started <ArrowRight className="h-4 w-4" /></Link>
+              <a href="#how" className="btn-secondary px-6 py-3.5 text-base">See how it works</a>
             </div>
-            <p className="mt-4 text-sm text-muted">Free. No account needed. Your files stay on your device.</p>
+            <ul className="mt-8 grid max-w-lg grid-cols-3 gap-3">
+              {BADGES.map((b) => (
+                <li key={b.text} className="flex items-center gap-2 text-xs leading-snug text-muted">
+                  <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-lilac text-primary-ink"><b.icon className="h-4 w-4" aria-hidden /></span>
+                  {b.text}
+                </li>
+              ))}
+            </ul>
           </div>
-          <div className="relative">
-            <DeskScene className="w-full" />
-            <PaperPlane className="absolute -top-2 right-6 h-8 w-12 animate-[float_5s_ease-in-out_infinite]" />
-            <Sparkle className="absolute bottom-10 left-2 h-6 w-6 animate-[twinkle_3s_ease-in-out_infinite]" />
-            <p className="hand-note absolute -bottom-2 right-4 hidden rotate-[-4deg] sm:block">Same applications. Bigger opportunities.</p>
+
+          <div className="relative mx-auto w-full max-w-[520px] animate-[fade-up_1000ms_cubic-bezier(.22,1,.36,1)_150ms_both]">
+            {/* Scrapbook photo: white border, washi tape, slight tilt. */}
+            <div className="relative rotate-[1.5deg] rounded-[26px] bg-white p-3 shadow-[0_30px_60px_-28px_rgba(48,43,64,0.5)] transition duration-500 hover:rotate-0">
+              <Image
+                src="/illustrations/hero-student.webp"
+                alt="A student in a purple hoodie smiling up at a university, with a plane flying overhead"
+                width={776}
+                height={928}
+                priority
+                sizes="(min-width: 768px) 520px, 100vw"
+                className="h-auto w-full rounded-[18px]"
+              />
+              <span className="absolute -top-3 left-10 h-7 w-28 -rotate-6 rounded-sm bg-lilac/80 shadow-sm" aria-hidden />
+              <span className="absolute -bottom-3 right-12 h-7 w-24 rotate-3 rounded-sm bg-butter/90 shadow-sm" aria-hidden />
+            </div>
+            <LoopPlane className="pointer-events-none absolute -left-16 -top-8 hidden h-28 w-56 animate-[float_6s_ease-in-out_infinite] lg:block" />
+            <div className="absolute -bottom-8 -left-6 hidden -rotate-6 rounded-md bg-butter px-4 py-3 shadow-[0_10px_20px_-12px_rgba(48,43,64,0.5)] sm:block" aria-hidden>
+              <p className="font-hand text-xl leading-tight text-ink">Plan · Prepare<br />Apply · Grow ✦</p>
+            </div>
+            <Sparkle className="absolute -right-3 top-1/3 h-7 w-7 animate-[twinkle_3.5s_ease-in-out_infinite]" />
           </div>
         </section>
 

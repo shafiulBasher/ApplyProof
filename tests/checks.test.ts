@@ -104,3 +104,16 @@ test("a 1-page limit reads in the singular", () => {
   expect(f.evidence).toBe("Official limit: 1 page · Uploaded CV/résumé: 2 pages");
   expect(f.correction).toBe("Upload a revised CV/résumé of no more than 1 page.");
 });
+
+test("a GPA or degree rule mislabeled by the AI is still checked from its verified quote", () => {
+  const facts = { gpa: 3.6, gpaScale: 4, degree: "Bachelor of Science" };
+  const gpaQuote = "Applicants must have a minimum GPA of 3.0 on a 4.0 scale.";
+  expect(one({ category: "eligibility", quote: gpaQuote, eligibility: { field: "gpa", clear: false } }, [], facts).status).toBe("passed");
+  expect(one({ category: "eligibility", quote: gpaQuote, eligibility: { field: "other", clear: false } }, [], facts).status).toBe("passed");
+  expect(one({ category: "eligibility", quote: gpaQuote, eligibility: { field: "gpa", clear: false } }, [], { ...facts, gpa: 2.8 }).status).toBe("action_needed");
+  const degreeQuote = "Applicants must hold a bachelor's degree, or expect to complete one before the program starts.";
+  expect(one({ category: "eligibility", quote: degreeQuote, eligibility: { field: "degree", clear: false } }, [], facts).status).toBe("passed");
+  expect(one({ category: "eligibility", quote: degreeQuote, eligibility: { field: "other", clear: false } }, [], facts).status).toBe("passed");
+  // A genuinely unclear rule stays unclear.
+  expect(one({ category: "eligibility", quote: "Applicants must demonstrate strong English proficiency.", eligibility: { field: "other", clear: false } }, [], facts).status).toBe("needs_verification");
+});

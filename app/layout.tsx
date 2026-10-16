@@ -9,7 +9,7 @@ const kalam = Kalam({ variable: "--font-kalam", subsets: ["latin"], weight: "700
 
 export const metadata: Metadata = {
   title: "ApplyProof",
-  description: "Turn application requirements into a clear, source-linked checklist.",
+  description: "Turn official application guidelines into a clear checklist. Find missing documents, catch issues, and see the evidence behind every finding.",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

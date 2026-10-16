@@ -9,7 +9,7 @@ import ReplayIntroButton from "@/components/ReplayIntroButton";
 const BADGES = [
   { icon: Lock, text: "Your files stay on your device" },
   { icon: Quote, text: "Clear, evidence-based results" },
-  { icon: Sprout, text: "Free to use (no paid APIs)" },
+  { icon: Sprout, text: "Free to use" },
 ];
 
 const STEPS = [
@@ -83,7 +83,7 @@ export default function Landing() {
 
           <div className="absolute left-[11.2%] top-[16%] w-[40%]">
             <Headline className="text-[7.2cqw]" />
-            <p className="mt-[1.4cqw] max-w-[32cqw] text-[1.65cqw] leading-snug text-ink">Turn application requirements into a clear, source-linked checklist.</p>
+            <p className="mt-[1.4cqw] max-w-[35cqw] text-[1.45cqw] leading-snug text-ink">Turn official application guidelines into a clear checklist. Find missing documents, catch issues, and see the evidence behind every finding.</p>
             <div className="mt-[2.4cqw] flex gap-[1.7cqw] text-[1.3cqw]">
               <Link href="/applications" className="btn-primary rounded-[0.55em] px-[2.4em] py-[1em] text-[1em]">Get Started <ArrowRight className="h-[1.1em] w-[1.1em]" aria-hidden /></Link>
               <a href="#how" className="btn-secondary rounded-[0.55em] border-line px-[1.8em] py-[1em] text-[1em] text-[#1d1a33]">See how it works</a>
@@ -104,7 +104,7 @@ export default function Landing() {
           <Link href="/applications" className="btn-primary">Get Started</Link>
         </header>
         <Headline className="mt-4 text-[15vw]" />
-        <p className="mt-5 text-lg text-ink">Turn application requirements into a clear, source-linked checklist.</p>
+        <p className="mt-5 text-lg text-ink">Turn official application guidelines into a clear checklist. Find missing documents, catch issues, and see the evidence behind every finding.</p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/applications" className="btn-primary px-5 py-3 text-base">Get Started <ArrowRight className="h-4 w-4" aria-hidden /></Link>
           <a href="#how" className="btn-secondary px-5 py-3 text-base">See how it works</a>

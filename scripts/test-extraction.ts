@@ -35,6 +35,8 @@ async function main() {
   const extra = requirements.filter((r) => !used.has(r.id));
   for (const r of extra) console.log(`EXTRA   ${r.title} [${r.category}] "${r.quote}" (p. ${r.page})`);
 
+  for (const r of requirements.filter((r) => r.category === "deadline")) console.log(`DEADLINE PARTS  ${JSON.stringify(r.deadline ?? {})}`);
+
   const unverified = requirements.filter((r) => !r.quoteVerified);
   for (const r of unverified) console.log(`UNVERIFIED QUOTE  ${r.title}: "${r.quote}"`);
 

@@ -62,6 +62,7 @@ export interface Requirement {
     allowedValues?: string[];
     clear: boolean;
   };
+  deadline?: { date?: string; time?: string; timezone?: string };
   quote: string;
   page: number;
   quoteVerified: boolean;
@@ -72,6 +73,7 @@ export interface Extraction {
   pages: string[];
   requirements: Requirement[];
   model: string;
+  version?: number;
   createdAt: number;
 }
 

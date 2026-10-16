@@ -4,14 +4,15 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, CalendarDays } from "lucide-react";
 import { db, save } from "@/lib/db";
-import { runCheck } from "@/lib/runCheck";
-import type { Application, StoredDocument, StoredResults } from "@/lib/types";
+import { cachedExtraction, getExtraction, runCheck } from "@/lib/runCheck";
+import type { Application, Extraction, StoredDocument, StoredResults } from "@/lib/types";
 import StatusBadge from "@/components/StatusBadge";
 import DocumentManager from "@/components/DocumentManager";
 import DisclosureDialog from "@/components/DisclosureDialog";
 import RunButton from "@/components/RunButton";
 import ApplicantInfoForm from "@/components/ApplicantInfoForm";
 import ResultsPanel from "@/components/ResultsPanel";
+import RequirementsChecklist from "@/components/RequirementsChecklist";
 
 export default function ApplicationPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,11 +22,17 @@ export default function ApplicationPage() {
   const [asking, setAsking] = useState(false);
   const answer = useRef<(ok: boolean) => void>(() => {});
   const [running, setRunning] = useState(false);
+  const [extraction, setExtraction] = useState<Extraction>();
+  const [reading, setReading] = useState(false);
+  const [readError, setReadError] = useState("");
 
   const load = useCallback(async () => {
     setApp((await db.applications.get(id)) ?? null);
-    setDocs(await db.documents.where("applicationId").equals(id).sortBy("uploadedAt"));
+    const documents = await db.documents.where("applicationId").equals(id).sortBy("uploadedAt");
+    setDocs(documents);
     setResults((await db.results.get(id)) ?? { applicationId: id });
+    const g = documents.find((d) => d.role === "guideline" && d.readable);
+    setExtraction(g ? await cachedExtraction(g) : undefined);
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
@@ -41,6 +48,22 @@ export default function ApplicationPage() {
     if (ok) await save("your acknowledgment", () => db.applications.update(id, { disclosureAccepted: true }));
     await load();
     return ok;
+  }
+
+  // Reads the guideline's requirements right after upload (or on Retry). Only after the disclosure was accepted.
+  async function readRequirements() {
+    const fresh = await db.applications.get(id);
+    const g = (await db.documents.where("applicationId").equals(id).toArray()).find((d) => d.role === "guideline" && d.readable);
+    if (!g || !fresh?.disclosureAccepted) return;
+    setReading(true);
+    setReadError("");
+    try {
+      setExtraction(await getExtraction(g));
+    } catch (e) {
+      setReadError((e as Error).message);
+    } finally {
+      setReading(false);
+    }
   }
 
   async function run() {
@@ -68,10 +91,17 @@ export default function ApplicationPage() {
             {results.current && <span className="tabular-nums">{results.current.outstanding} outstanding</span>}
           </div>
         </div>
-        <RunButton canRun={!!guideline} running={running} onRun={run} />
+        <RunButton canRun={!!guideline} running={running || reading} onRun={run} />
       </header>
 
-      <DocumentManager applicationId={id} documents={docs} onChange={load} beforeUpload={beforeUpload} />
+      <DocumentManager
+        applicationId={id}
+        documents={docs}
+        onChange={load}
+        beforeUpload={beforeUpload}
+        onGuidelineUploaded={readRequirements}
+        guidelineExtra={<RequirementsChecklist extraction={extraction} documents={docs} reading={reading} error={readError} onRetry={readRequirements} />}
+      />
       <ApplicantInfoForm applicationId={id} initial={app.applicant} onSaved={load} />
       <ResultsPanel results={results} />
 

@@ -30,13 +30,13 @@ PRD ref: `prd.md > The Core Journey`.
 
 1. **Arrive.** The browser opens `localhost:3000`. The **Dashboard** reads all applications from IndexedDB and shows a card for each, or the empty state.
 2. **Create.** **+ New Application** opens a dialog. Saving writes a new application record to IndexedDB with status Not Checked, then opens `/applications/[id]`.
-3. **Upload.** Before the first upload in an application, the **AI disclosure dialog** appears. Each PDF then goes from the page to the helper's **parse route**, which does two things (no AI involved):
+3. **Upload.** Before the first upload in an application, the **AI disclosure dialog** appears. Right after a readable guideline is saved, the page runs the **extraction** (steps 5.1–5.3 below) and shows the **Requirements Checklist**. Each PDF then goes from the page to the helper's **parse route**, which does two things (no AI involved):
    - It extracts the text page by page and counts the pages and words.
    - It flags an unreadable PDF (almost no text).
 
    The page computes a **content fingerprint** (a hash of the file's bytes), suggests a type from the filename, and saves the file, page texts, counts, and fingerprint in IndexedDB. The user confirms the type in a dropdown.
 4. **Enter facts.** The Applicant Information form saves GPA, grading scale, degree, and nationality to IndexedDB as they're typed.
-5. **Run.**
+5. **Run.** (The extraction normally already happened at guideline upload, so this step makes no AI call.)
    1. If this guideline hasn't been read before (its fingerprint is built from its page-by-page text), the page sends its page texts to the helper's **extract route**. This is the only data that goes to Google.
    2. The extract route asks Gemini for the requirements, then runs the **quote check** against the guideline text.
    3. It returns verified requirements, each with its confirmed page, and the page saves them together with the exact page texts they were verified against.
@@ -136,9 +136,18 @@ PRD ref: `prd.md > Readiness Checks` (basic eligibility).
 
 ### Run Button and Disclosure Dialog
 - The Run button is disabled with the hint "Upload an official application guideline first." until a readable guideline exists. It's also disabled while a check is running.
-- The disclosure appears before the first upload in an application (learner-confirmed timing). It reads: "When you run a check, the text of the official guideline you upload is sent to Google's Gemini API to extract its requirements. On the free tier, Google may use this data to improve its products. Your own documents (CV, letters, transcripts) are never sent; they're read and checked on this device. Use sample or non-sensitive guidelines if you're unsure." The user picks **Continue** or **Cancel**, and the acknowledgment is stored per application. Nothing is sent to Google until a check runs.
+- The disclosure appears before the first upload in an application (learner-confirmed timing). It reads: "When you upload an official guideline, its text is sent to Google's Gemini API to extract its requirements. On the free tier, Google may use this data to improve its products. Your own documents (CV, letters, transcripts) are never sent; they're read and checked on this device. Use sample or non-sensitive guidelines if you're unsure." The user picks **Continue** or **Cancel**, and the acknowledgment is stored per application. Nothing is sent to Google before it's accepted; the guideline's text is sent right after the guideline upload.
 
 PRD ref: `prd.md > AI Disclosure`, `prd.md > States and Boundaries`.
+
+### Requirements Checklist
+`components/RequirementsChecklist.tsx`, shown under the guideline in the **Document Manager**. The page calls `getExtraction` right after a guideline upload (only when the disclosure is accepted), and `cachedExtraction` (no network) when the page opens.
+- Lists every `required_document` requirement with its count and any verified page/word limit for the same document type.
+- Ticks an item when the count of readable files with that confirmed type reaches the required count ("1 of 2" otherwise). It uses the same `countDocs` helper as the **Checker**, so the two never disagree. A tick means uploaded, not passed.
+- Notes unconfirmed files that aren't counted, and flags requirements whose quote couldn't be confirmed.
+- While reading: a spinner. On failure, or before any read: "Couldn't read the requirements yet" with **Retry**. The Run button is disabled while reading, so the guideline is never sent twice at once.
+
+PRD ref: `prd.md > Required-Documents Checklist`.
 
 ### Check Orchestrator
 `lib/runCheck.ts`, called by the Run button. Its steps:
@@ -192,7 +201,8 @@ PRD ref: `prd.md > Evidence-Linked Findings`, `scope.md > The Unique Kernel`.
   - Degree and nationality: compare against the rule's listed values (case-insensitive). No clear list, or a missing value, means Needs Verification.
   - Rules the AI marked `clear: false` are always Needs Verification.
 - **Deadline, formatting, other:** always Needs Verification, with the quote.
-- Every Action Needed finding gets a `correction` string.
+- Every Action Needed finding gets a `correction` string, and so does every Needs Verification finding. `explanation` holds facts (from the quote, the files, or the applicant info); `correction` holds the suggested next step, shown as **Next step:**. Examples: "Upload a revised CV of no more than 2 pages.", "Upload the second recommendation letter.", "Confirm the accepted evidence with the program organizer."
+- **Deadline:** the AI returns `deadline: {date?, time?, timezone?}` copied from the quote, and code keeps only the parts that literally appear in the quote. All three → "Submit by October 20, 2027, 23:59 CET." A missing time or timezone is named and flagged for confirmation, never filled in.
 - Requirements with an unverified quote are always Needs Verification.
 
 PRD ref: `prd.md > Readiness Checks`, `prd.md > Evidence-Linked Findings`.
@@ -251,10 +261,10 @@ All of this is in IndexedDB, via Dexie, in the user's browser. Nothing is stored
 |---|---|---|---|
 | `applications` | `id, name, organization?, deadline?, applicant: {gpa?, gpaScale?, degree?, nationality?}, disclosureAccepted, createdAt` | creating; editing applicant info; accepting the disclosure | all still there |
 | `documents` | `id, applicationId, role: 'guideline' \| 'applicant', fileName, blob, contentHash, pages: string[], pageCount, wordCount, readable, suggestedType?, confirmedType?, uploadedAt` | upload, type confirmation, replace (overwrites the same row), remove | all still there |
-| `extractions` | `guidelineHash (key), pages: string[], requirements: Requirement[], model, createdAt` | first run with a new guideline | reused, so no new AI call |
+| `extractions` | `guidelineHash (key), pages: string[], requirements: Requirement[], model, version, createdAt` (a cached row with an older `version` is re-read after a prompt or schema change) | first run with a new guideline | reused, so no new AI call |
 | `results` | `applicationId (key), current: CheckResult?, previous: CheckResult?, lastError?` | each run; on failure only `lastError` changes | all still there |
 
-**Requirement:** `{ id, category: 'required_document'|'page_limit'|'word_limit'|'eligibility'|'deadline'|'formatting'|'other', title, docType?, count?, min?, max?, unit?: 'pages'|'words', eligibility?: { field: 'gpa'|'degree'|'nationality'|'other', minGpa?, scale?, allowedValues?: string[], clear: boolean }, quote, page, quoteVerified }`
+**Requirement:** `{ id, category: 'required_document'|'page_limit'|'word_limit'|'eligibility'|'deadline'|'formatting'|'other', title, docType?, count?, min?, max?, unit?: 'pages'|'words', eligibility?: { field: 'gpa'|'degree'|'nationality'|'other', minGpa?, scale?, allowedValues?: string[], clear: boolean }, deadline?: { date?, time?, timezone? }, quote, page, quoteVerified }`
 
 **CheckResult:** `{ ranAt, inputHash, guidelineHash, findings: Finding[], status, outstanding }`
 
@@ -281,6 +291,7 @@ build-with-ai-basics/            # repo root = the app
 │   ├── ApplicantInfoForm.tsx
 │   ├── RunButton.tsx
 │   ├── DisclosureDialog.tsx     # shown before the first upload
+│   ├── RequirementsChecklist.tsx # required documents, ticked off as files arrive
 │   ├── ResultsPanel.tsx
 │   ├── FindingCard.tsx
 │   ├── WhatChanged.tsx
@@ -347,7 +358,9 @@ build-with-ai-basics/            # repo root = the app
 - **JavaScript PDF reading** (unpdf) instead of PyMuPDF, and **no OCR**. Tradeoff: scanned PDFs are rejected.
 - **Local app plus a recorded video.** Hosting comes after the MVP.
 - **Synthetic demo documents.** The API key lives server-side in `.env.local` only.
-- **Disclosure before the first upload** (learner-confirmed). It accurately says only the guideline's text goes to Google, at check time, and that free-tier data may be used.
+- **Disclosure before the first upload** (learner-confirmed). It accurately says only the guideline's text goes to Google, at guideline upload, and that free-tier data may be used.
+- **Requirements read at guideline upload** (learner change after the slice 3 review), so the Requirements Checklist appears before the applicant uploads their files. Cached, so Run and reruns make no AI call; Retry on failure; never a paid fallback.
+- **Specific next steps instead of generic lines** (learner change after the slice 3 review): facts and suggestions are shown separately and grounded in the quote; deadlines show only the date, time, and timezone the quote states.
 - **No AI for document types** (learner change in review): types come from the filename and the user confirms them. Only the guideline goes to Gemini. The PRD was updated to match.
 - **Stronger input fingerprint** (learner change in review): it uses content hashes and the page-by-page guideline text, so Outdated appears even when counts are unchanged. Cached requirements are stored together with the exact page texts they were verified against.
 - **Build priority:** the demo path first: upload → run → 3-page CV flagged → replace with the 2-page CV → rerun → Action Needed → Passed. Multiple applications and persistence come after, but must not delay it.

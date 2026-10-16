@@ -4,12 +4,21 @@ import { runChecks } from "./checks";
 import { outstanding, overallStatus } from "./status";
 import type { Application, CheckResult, Extraction, StoredDocument } from "./types";
 
+// Bump when the extraction prompt or schema changes, so cached requirements are re-read.
+const EXTRACTION_VERSION = 2;
+
+// The saved requirements for this guideline, if it has been read already. No network call.
+export async function cachedExtraction(guideline: StoredDocument): Promise<Extraction | undefined> {
+  const cached = await db.extractions.get(await guidelineHash(guideline.pages));
+  return cached?.version === EXTRACTION_VERSION ? cached : undefined;
+}
+
 // Returns the cached extraction for this guideline, asking the Extract Route only the first time.
 // Only the guideline's page texts are sent.
 export async function getExtraction(guideline: StoredDocument): Promise<Extraction> {
-  const hash = await guidelineHash(guideline.pages);
-  const cached = await db.extractions.get(hash);
+  const cached = await cachedExtraction(guideline);
   if (cached) return cached;
+  const hash = await guidelineHash(guideline.pages);
 
   const res = await fetch("/api/extract", {
     method: "POST",
@@ -19,7 +28,7 @@ export async function getExtraction(guideline: StoredDocument): Promise<Extracti
   const body = await res.json();
   if (!res.ok) throw new Error(body.error);
 
-  const extraction: Extraction = { guidelineHash: hash, pages: body.pages, requirements: body.requirements, model: body.model, createdAt: Date.now() };
+  const extraction: Extraction = { guidelineHash: hash, pages: body.pages, requirements: body.requirements, model: body.model, version: EXTRACTION_VERSION, createdAt: Date.now() };
   await save("the guideline's requirements", () => db.extractions.put(extraction));
   return extraction;
 }

@@ -39,7 +39,17 @@ Build mode: fast
   Learner check: With the sample package and your facts entered, run the check. The CV finding is at the top under Action Needed, showing "Official limit: 2 pages · Uploaded CV: 3 pages" and the guideline quote with its page. Tell me whether the results read clearly and look the way you pictured.
   Commit: `Run readiness check with evidence-linked, fix-first findings`
 
-- [ ] **4. Replace the CV, rerun, and watch Action Needed flip to Passed**
+- [x] **4. Upload the guideline and see a checklist of required documents; every finding gets a specific next step**
+  Becomes usable: Right after you upload the guideline, a checklist appears ("This guideline asks for: CV · max 2 pages, Motivation letter · 500–800 words, Transcript, 2 recommendation letters") and ticks items off as you upload matching files. If Google is busy, it says "Couldn't read the requirements yet" with a Retry button. In the results, the generic "check it yourself" lines are replaced with facts plus a labeled Next step, and the deadline shows only the date, time, and timezone the guideline states.
+  Why now: Your slice 3 feedback. It changes when the guideline is sent (at upload instead of at Run) and how findings read, so it belongs before What Changed builds on top of the results.
+  PRD ref: `prd.md > Required-Documents Checklist`, `prd.md > Requirement Extraction`, `prd.md > Evidence-Linked Findings`, `prd.md > AI Disclosure`, `prd.md > States and Boundaries` (requirements can't be read yet)
+  Spec ref: `spec.md > Components` (Requirements Checklist, Run Button and Disclosure Dialog, Checker), `spec.md > Data Model` (Requirement `deadline`, `extractions.version`)
+  Build: Read the requirements right after a guideline upload (only after the disclosure is accepted), cached and versioned; the RequirementsChecklist under the guideline, sharing the Checker's document counting; Retry on failure; Run disabled while reading; new disclosure wording; Checker explanations rewritten as facts plus a Next step for every Action Needed and Needs Verification finding; deadline fields extracted and kept only where they appear in the quote.
+  Verify (mechanical): Vitest for the new next steps (second letter, revised CV, unclear eligibility, every Needs Verification has a next step) and the deadline rule (an invented timezone isn't shown); `npx tsc --noEmit` passes; `npm run test:extraction` still finds 10/10 with all quotes verified, and the deadline comes back with date, time, and timezone.
+  Learner check: Create a new application and upload `guideline.pdf`. The checklist appears under it. Add your documents one by one and watch items tick off; recommendation letters show "1 of 2". Run the check: each Needs Verification card shows a specific Next step, and the deadline reads "Submit by October 20, 2027, 23:59 CET."
+  Commit: `Add required-documents checklist and specific next steps`
+
+- [ ] **5. Replace the CV, rerun, and watch Action Needed flip to Passed**
   Becomes usable: Replacing a file or editing your info marks the results Outdated. Rerunning is instant and makes no AI call, because the guideline's requirements are remembered. A "What Changed since your last check" summary shows "CV length: Action Needed → Passed", "CV pages: 3 → 2", and the issue count change, with a mint pulse on the finding that passed. If a check fails, your previous results stay and the error shows separately.
   Why now: This completes the demo path, your "oh, that's cool" moment. It needs a working check (slice 3) to compare against.
   PRD ref: `prd.md > The Core Journey` (steps 7–8), `prd.md > Recheck and What Changed`, `prd.md > States and Boundaries` (inputs changed, check fails)
@@ -49,7 +59,7 @@ Build mode: fast
   Learner check: Replace `cv-3-pages.pdf` with `cv-2-pages.pdf`. The Outdated notice appears. Rerun: What Changed shows the CV going from Action Needed to Passed, and the check finishes almost instantly.
   Commit: `Add recheck with Outdated notice and What Changed summary`
 
-- [ ] **5. A dashboard of applications that shows where each one stands**
+- [ ] **6. A dashboard of applications that shows where each one stands**
   Becomes usable: The dashboard shows a polished card per application: name, organization, deadline chip, status pill, issue count, and a progress bar. First use shows a friendly empty state. If the browser can't save something, you're told which item wasn't kept. The README explains setup and the demo steps.
   Why now: Multiple applications and polish were kept in scope as long as they don't delay the demo path, which is now done.
   PRD ref: `prd.md > The Core Journey` (steps 1, 9), `prd.md > Screens and Layout > Application Dashboard`, `prd.md > Application Management`, `prd.md > States and Boundaries` (first use, persistence fallback), `prd.md > Look and Feel`
@@ -61,7 +71,7 @@ Build mode: fast
 
 ## Hands-on Checkpoints
 
-- [ ] Early usable behavior explored — after slice 3 (the first real findings; your feedback can still shape the What Changed view and the dashboard)
+- [x] Early usable behavior explored — after slice 3 (the first real findings; your feedback can still shape the What Changed view and the dashboard). Learner tried slices 1–3; feedback (generic "check it yourself" lines, wanted a required-documents list after the guideline upload) became slice 4, which they retried and confirmed in the app (checklist ticks, Next steps, deadline "Submit by October 20, 2027, 23:59 CET.").
 - [ ] Final kick-the-tires exploration and feedback completed
 
 ## Final Review
@@ -83,4 +93,5 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 ## Revisions
 
 - Model is now a short list of free Flash models (`GEMINI_MODEL=gemini-3.8-flash,gemini-3.5-flash`), tried in order only on "busy" (503) or "quota" (429) — both models passed the accuracy test (10/10 found, 10/10 quotes verified), but each returned "high demand" at different moments during slices 2–3. Still free only; no paid fallback.
+- Added slice 4 (required-documents checklist + specific next steps) and renumbered What Changed to 5 and the dashboard to 6 — learner feedback at the slice 3 checkpoint: the generic "check it yourself" lines looked odd, and they want to see required documents right after uploading the guideline. The guideline's text is now sent at upload (after the disclosure) instead of at Run; PRD and spec updated to match.
 - Expected-requirements list grew from 8 rules to 10 checks — the guideline lists the CV and motivation letter as required documents as well as length-limited ones, so each gets a "required" check and a length check, matching the extraction prompt's one-item-per-rule design.

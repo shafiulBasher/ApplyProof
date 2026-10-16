@@ -11,7 +11,7 @@ test("3-page CV against a 2-page limit is Action Needed with evidence and correc
   const f = one({ category: "page_limit", docType: "cv", max: 2, unit: "pages" }, [doc("cv", 3)]);
   expect(f.status).toBe("action_needed");
   expect(f.evidence).toBe("Official limit: 2 pages · Uploaded CV: 3 pages");
-  expect(f.correction).toBeTruthy();
+  expect(f.correction).toBe("Upload a revised CV of no more than 2 pages.");
   expect(one({ category: "page_limit", docType: "cv", max: 2, unit: "pages" }, [doc("cv", 2)]).status).toBe("passed");
 });
 
@@ -25,7 +25,7 @@ test("1 of 2 recommendation letters is Action Needed", () => {
   const f = one({ category: "required_document", docType: "recommendation_letter", count: 2 }, [doc("recommendation_letter"), doc("cv")]);
   expect(f.status).toBe("action_needed");
   expect(f.explanation).toBe("Two required; only one uploaded.");
-  expect(f.correction).toBe("Upload one more recommendation letter.");
+  expect(f.correction).toBe("Upload the second recommendation letter.");
 });
 
 test("unconfirmed file types and unreadable files", () => {
@@ -70,4 +70,31 @@ test("overall status and outstanding count", () => {
   expect(overallStatus([f("passed"), f("needs_verification")])).toBe("needs_verification"); // never Passed with anything unverified
   expect(overallStatus([f("passed")])).toBe("passed");
   expect(outstanding([f("passed"), f("needs_verification"), f("action_needed")])).toBe(2);
+});
+
+test("deadline shows only the parts that appear in the quote", () => {
+  const quote = "The application deadline is October 20, 2027, at 23:59 CET.";
+  const full = one({ category: "deadline", quote, deadline: { date: "October 20, 2027", time: "23:59", timezone: "CET" } });
+  expect(full.status).toBe("needs_verification");
+  expect(full.correction).toBe("Submit by October 20, 2027, 23:59 CET.");
+  // A timezone the AI made up isn't in the quote, so it's flagged instead of shown.
+  const invented = one({ category: "deadline", quote: "Apply by October 20, 2027.", deadline: { date: "October 20, 2027", time: "23:59", timezone: "UTC" } });
+  expect(invented.explanation).toBe("Deadline: October 20, 2027. The quoted deadline doesn't give a closing time or timezone.");
+  expect(invented.correction).toMatch(/Confirm a closing time or timezone/);
+  expect(one({ category: "deadline", quote }).correction).toMatch(/Confirm the deadline/);
+});
+
+test("unclear eligibility gives a grounded next step", () => {
+  const f = one({ category: "eligibility", eligibility: { field: "other", clear: false } });
+  expect(f.status).toBe("needs_verification");
+  expect(f.correction).toBe("Confirm the accepted evidence with the program organizer.");
+});
+
+test("every Needs Verification finding has a next step", () => {
+  const reqs = [
+    req({ id: "a", category: "deadline" }), req({ id: "b", category: "formatting" }),
+    req({ id: "c", category: "eligibility", eligibility: { field: "gpa", minGpa: 3, scale: 4, clear: true } }),
+    req({ id: "d", category: "page_limit", docType: "cv", max: 2, quoteVerified: false }),
+  ];
+  expect(runChecks(reqs, [], {}).filter((f) => !f.correction)).toHaveLength(0);
 });

@@ -9,7 +9,7 @@ export default function DisclosureDialog({ onAnswer }: { onAnswer: (ok: boolean)
           <ShieldCheck className="h-5 w-5 text-violet" /> What gets sent, and where
         </h2>
         <p className="text-slate">
-          When you run a check, the text of the official guideline you upload is sent to Google&apos;s Gemini API to extract its requirements. On the free tier, Google may use this data to improve its products. Your own documents (CV, letters, transcripts) are never sent; they&apos;re read and checked on this device. Use sample or non-sensitive guidelines if you&apos;re unsure.
+          When you upload an official guideline, its text is sent to Google&apos;s Gemini API to extract its requirements. On the free tier, Google may use this data to improve its products. Your own documents (CV, letters, transcripts) are never sent; they&apos;re read and checked on this device. Use sample or non-sensitive guidelines if you&apos;re unsure.
         </p>
         <div className="flex justify-end gap-2">
           <button className="btn-ghost" onClick={() => onAnswer(false)}>Cancel</button>

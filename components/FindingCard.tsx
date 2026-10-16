@@ -14,7 +14,9 @@ export default function FindingCard({ finding }: { finding: Finding }) {
       </figure>
       {finding.evidence && <p className="mt-3 text-sm font-medium tabular-nums">{finding.evidence}</p>}
       {finding.correction && (
-        <p className="mt-2 flex items-start gap-2 text-sm text-rose"><Wrench className="mt-0.5 h-4 w-4 shrink-0" /> {finding.correction}</p>
+        <p className={`mt-2 flex items-start gap-2 text-sm ${finding.status === "action_needed" ? "text-rose" : "text-[#9a6a17]"}`}>
+          <Wrench className="mt-0.5 h-4 w-4 shrink-0" /> <span><span className="font-semibold">Next step:</span> {finding.correction}</span>
+        </p>
       )}
     </article>
   );

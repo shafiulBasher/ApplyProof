@@ -13,9 +13,9 @@ Source: `scope.md > The Core Loop`, `scope.md > What "Working" Looks Like`.
 
 1. **Arrive.** The user opens ApplyProof and sees the **Application Dashboard**. On first use it's empty, with a prompt to create an application.
 2. **Create.** They click **+ New Application** and enter the program name (required), plus the university/organization and deadline (optional). The new application opens.
-3. **Upload.** On the **Single Application Page**, they upload the official guideline PDF and their documents. ApplyProof suggests a type for each file from its filename, and the user confirms or changes it. Before the first upload, they see the AI disclosure.
+3. **Upload.** On the **Single Application Page**, they upload the official guideline PDF. Before the first upload, they see the AI disclosure. Right after the guideline is uploaded, its text is read by the AI and a **required-documents checklist** appears ("This guideline asks for: …"). They then upload their documents; ApplyProof suggests a type for each file from its filename, the user confirms or changes it, and the checklist ticks each item off as matching files arrive.
 4. **Enter facts.** They fill in Applicant Information: GPA, grading scale, degree, nationality.
-5. **Run.** They click **Run Readiness Check**. Only the official guideline's text goes to the AI service.
+5. **Run.** They click **Run Readiness Check**. The requirements were already read at upload, so no new AI call is made.
 6. **Read results.** Findings appear grouped fix-first: **Action Needed**, then **Needs Verification**, then **Passed** (collapsed). Each finding shows the requirement, an explanation, the exact quote and source page, and a recommended correction where applicable.
 7. **Fix.** They replace a document (for example a 3-page CV with a 2-page version) or update their applicant info.
 8. **Rerun.** They run the check again. A **What Changed** summary appears at the top, for example "CV length: Action Needed → Passed".
@@ -71,9 +71,18 @@ Source: `scope.md > The POC Boundary` (multiple applications).
 
 ### Requirement Extraction
 Source: `scope.md > The POC Boundary` (extraction and checklist).
-- [ ] Running a check pulls requirements from the guideline: required documents (with counts), page limits, word limits, eligibility rules, deadlines, and formatting rules.
+- [ ] Uploading the guideline (after the disclosure is accepted) pulls requirements from it: required documents (with counts), page limits, word limits, eligibility rules, deadlines, and formatting rules.
 - [ ] Every extracted requirement keeps its exact quote and page number from the guideline.
 - [ ] ApplyProof never invents a requirement that has no source passage.
+- [ ] The requirements are read once per guideline and reused: running or rerunning a check makes no new AI call.
+
+### Required-Documents Checklist
+Added after the slice 3 hands-on review (learner request).
+- As an applicant, I want to see what the guideline requires before I upload my files, so that I can track what's still missing as I go.
+  - [ ] Right after a readable guideline is uploaded, a checklist lists each required document with its count and any page/word limit ("CV · max 2 pages", "2 recommendation letters").
+  - [ ] Each item ticks off as files of that confirmed type are uploaded ("1 of 2"). A tick means uploaded, not that it passes the rules; the readiness check judges that.
+  - [ ] Files with no confirmed type aren't counted, and the checklist says so.
+  - [ ] If the requirements can't be read (service busy, free quota exhausted), it shows "Couldn't read the requirements yet" with a **Retry** button. No paid fallback.
 
 ### Readiness Checks
 Each extracted requirement becomes a finding. The finding list is the checklist.
@@ -93,7 +102,9 @@ Source: `scope.md > The Unique Kernel`.
 - As an applicant, I want to see why each finding was made so that I can trust it and act on it.
   - [ ] Every finding shows the requirement, a plain explanation, the exact quote from the guideline, and its page number.
   - [ ] Where relevant, it also shows evidence from the applicant's side (for example "Uploaded CV: 3 pages").
-  - [ ] Every Action Needed finding has a recommended correction.
+  - [ ] Every Action Needed finding has a recommended correction, and every Needs Verification finding has a specific next step (for example "Upload a revised CV of no more than 2 pages", "Confirm the accepted evidence with the program organizer"). No generic "check it yourself" lines.
+  - [ ] Facts (the explanation and evidence) are shown separately from suggestions (labeled **Next step**). Next steps are grounded in the quoted rule and never invent requirements, deadlines, or evidence.
+  - [ ] A deadline shows its date, time, and timezone only where the quote states them; a missing closing time or timezone is flagged for verification, never filled in.
   - [ ] No finding is shown without a source quote.
 
 ### Fix-First Results
@@ -113,7 +124,7 @@ Source: `scope.md > What "Working" Looks Like` (the "oh, that's cool" beat).
   - [ ] A finding changing to Passed gets a satisfying visual transition.
 
 ### AI Disclosure
-- [ ] Before the first upload in an application, the user is told that when a check runs, the official guideline's text is sent to Google's Gemini API to extract requirements, and that on the free tier Google may use this data to improve its products. Applicant documents are never sent. They can proceed or cancel.
+- [ ] Before the first upload in an application, the user is told that when the guideline is uploaded, its text is sent to Google's Gemini API to extract requirements, and that on the free tier Google may use this data to improve its products. Applicant documents are never sent. They can proceed or cancel.
 
 ## States and Boundaries
 - **First use (empty dashboard):** a friendly empty state explains what ApplyProof does, with a **+ New Application** button.
@@ -121,6 +132,7 @@ Source: `scope.md > What "Working" Looks Like` (the "oh, that's cool" beat).
 - **Run clicked without a guideline:** the button stays disabled. If it's somehow triggered, the message is "Upload an official application guideline first."
 - **Unreadable PDF:** the message is "We couldn't extract readable text from this PDF. It may be scanned or image-based." It suggests uploading a text-readable PDF and keeps the file visible so it can be replaced. No checks run against unreadable content, and nothing is extracted from it.
 - **Unreadable guideline:** treated like a missing guideline. The Run button stays disabled until a readable one is uploaded.
+- **Requirements can't be read yet:** the checklist shows "Couldn't read the requirements yet" with a Retry button. Run still works later (it retries the read).
 - **Check in progress:** a clear progress indicator, and the Run button can't be clicked twice.
 - **Inputs changed since the last check:** whenever the guideline, a supporting document, or the applicant info changes after the last successful check, a clear notice appears, and the previous results are labeled **Outdated** until the user reruns.
 - **Check fails (for example the AI service is unreachable):** the previous successful results are kept, not overwritten, and the error is shown separately. If the inputs have changed, the Outdated notice stays so the user knows the results don't reflect their latest files.
@@ -136,6 +148,7 @@ Source: `scope.md > What "Working" Looks Like` (the "oh, that's cool" beat).
 - **What Changed only claims changes it can support:** an honest before-and-after is the main demo moment.
 - **Run is disabled until a readable guideline exists:** there's nothing to check against without one.
 - **Work persists on the device without login:** the MVP is single-user, and login comes right after the MVP (`scope.md > Later`). The learner prefers browser-local storage, which is passed to `4-spec`.
+- **Requirements are read at guideline upload, not at Run:** so the user sees the required-documents checklist before uploading their files (learner change after the slice 3 review). Still only the guideline's text, still only after the disclosure, and cached so Run and reruns make no AI call.
 - **Only the guideline goes to the AI, after disclosure:** applicant documents stay on the device, and the user is told before the first upload what is sent and how free-tier data may be used.
 - **Visual identity is colorful and premium but evidence-first:** see Look and Feel.
 - **The demo path comes first:** upload the guideline and documents → run the check → the 3-page CV is flagged against the 2-page limit → upload the corrected CV → rerun → What Changed shows Action Needed → Passed. The learner asked to put this flow ahead of secondary features.
@@ -147,6 +160,7 @@ Build priority: the demo path first (see Product Decisions), then everything els
 - Application Dashboard with cards, statuses, issue counts, and New Application
 - Single Application Page: header, Documents, Applicant Information, Results
 - PDF upload, with file types suggested from the filename and confirmed by the user
+- Required-documents checklist shown right after the guideline is read, ticking off uploads
 - Requirement extraction with quotes and page numbers
 - Missing-document, page-limit, and word-limit checks
 - Basic eligibility check against typed-in facts

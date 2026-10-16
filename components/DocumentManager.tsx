@@ -23,9 +23,13 @@ interface Props {
   onChange: () => void;
   // Called before the first upload; resolves false if the user cancels.
   beforeUpload?: () => Promise<boolean>;
+  // Called after a guideline is uploaded or replaced.
+  onGuidelineUploaded?: () => Promise<void>;
+  // Shown under the guideline (the requirements checklist).
+  guidelineExtra?: React.ReactNode;
 }
 
-export default function DocumentManager({ applicationId, documents, onChange, beforeUpload }: Props) {
+export default function DocumentManager({ applicationId, documents, onChange, beforeUpload, onGuidelineUploaded, guidelineExtra }: Props) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const guideline = documents.find((d) => d.role === "guideline");
@@ -64,6 +68,10 @@ export default function DocumentManager({ applicationId, documents, onChange, be
         };
         await save(`"${file.name}"`, () => db.documents.put(doc));
       }
+      if (role === "guideline") {
+        onChange();
+        await onGuidelineUploaded?.();
+      }
     });
   }
 
@@ -82,6 +90,7 @@ export default function DocumentManager({ applicationId, documents, onChange, be
       ) : (
         <PickFiles label="Upload guideline PDF" onPick={(f) => upload(f, "guideline")} busy={busy} />
       )}
+      {guideline?.readable && guidelineExtra}
 
       <h3 className="mt-6 text-sm font-semibold uppercase tracking-wide text-slate">Your documents</h3>
       <div className="space-y-2">

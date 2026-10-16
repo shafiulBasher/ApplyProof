@@ -39,17 +39,20 @@ Organized top to bottom:
 3. **Applicant Information:** a simple form for GPA, grading scale, degree, and nationality.
 4. **Results:** appears after the first check. If there was a previous check, the **What Changed** summary comes first, followed by the grouped findings.
 
-Movement: Dashboard ↔ Single Application Page. There are no other screens.
+### Landing Page (added with the Dream Journal redesign)
+- An expressive headline ("Apply with confidence"), an illustrated desk-and-university scene, **Get started** and **How it works** actions, four illustrated workflow steps, and accurate privacy and evidence messaging. The intro plays here on the first visit.
+
+Movement: Landing → Dashboard (`/applications`) ↔ Single Application Page. A sidebar (desktop) or top bar (mobile) links Home and Applications. There are no other screens.
 
 ## Look and Feel
-"Colorful and memorable on the surface, precise and trustworthy at the core." A premium indie-hacker SaaS aesthetic: bold, modern, energetic, polished.
-- **Colors:** deep navy, electric blue or violet, mint green, and warm off-white. **Amber** = Needs Verification, **muted red** = Action Needed, **mint green** = Passed.
-- **Typography:** Inter or a similar modern sans-serif, with bold headings and a clear hierarchy.
-- **Dashboard:** distinctive application cards, colorful status indicators, compact progress visuals, and a prominent New Application button.
-- **Results:** clean and evidence-focused. Highlighted source passages, findings that are easy to scan, and clear next actions.
-- **Interactions:** smooth transitions when results change, subtle hover effects, and a satisfying status transition when a corrected document passes.
-- **Identity:** subtle gradients, tasteful accent colors, custom icons, and selective use of rounded cards.
-- **Avoid:** generic AI landing-page looks, excessive gradients, glassmorphism everywhere, unnecessary animation, and cluttered dashboards.
+"Dream Journal": a warm, illustrated, paper-inspired indie SaaS look that carries the applicant's ambitions while keeping trust, evidence, and usability first (learner's design brief and visual reference, added during the final review).
+- **Colors:** oat-paper background #FBF5EB, primary lavender #7861CF, ink text #302B40, lilac #EAE2FF, sage #DDEBDD (passed / ready), butter #FAE9B9 (evidence panels, needs verification), peach #F4D8D0 (action needed), mint #BFE8DE, white cards. Status colors are always paired with a text label.
+- **Type:** Fraunces for display headings, DM Sans for all interface text, Caveat only for tiny decorative handwritten notes.
+- **Illustration:** hand-drawn-style SVG line art (universities, stars, a paper plane on a dotted flight path, paper clips, notebook ruling) and a faint paper grain. Decorative elements are aria-hidden and never cover controls. Painted artwork from the reference isn't produced; it could be swapped in later.
+- **Intro:** a ~6.5-second CSS/SVG opening (paper sheet, handwritten "Every big dream starts somewhere…", university and stars, a plane along a dotted path, then the ApplyProof brand and "Turn requirements into clarity."). It plays once per browser, has **Skip intro**, never plays with reduced motion, and never blocks the app.
+- **Results:** warm butter quote panels with the source page, applicant measurements as labeled boxes, and a labeled **Next step**. "Uploaded" in the checklist is lilac with a file icon, visibly different from the green "Passed".
+- **Motion:** CSS only (fade/slide, hover lift, a sage pulse and checkmark draw when a finding passes). Respects `prefers-reduced-motion`.
+- **Avoid:** generic AI landing-page looks, heavy gradients, glassmorphism, decorative animation that slows the work, cluttered dashboards.
 
 ## Features and Behavior
 
@@ -169,6 +172,7 @@ Build priority: the demo path first (see Product Decisions), then everything els
 - Missing-document, page-limit, and word-limit checks
 - Basic eligibility check against typed-in facts
 - Evidence-linked findings in three fix-first groups
+- Dream Journal visual design: landing page with a one-time intro, illustrated dashboard cards with filters, a four-step progress tracker in the application workspace
 - Recheck with a What Changed summary
 - AI disclosure, empty and error states, persistence on the device
 

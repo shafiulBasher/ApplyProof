@@ -82,31 +82,23 @@ PRD ref: `prd.md > The Core Journey`.
 - **Secrets:** `.env.local` is git-ignored, and only `.env.example` (no real key) is committed. Check this before every push.
 
 ## Look and Feel
-From `prd.md > Look and Feel`: "Colorful and memorable on the surface, precise and trustworthy at the core."
-
-- **Palette (Tailwind theme tokens):**
-  - `navy` #14193A (headings, dark surfaces)
-  - `violet` #5B4CF0 (primary actions, accents)
-  - `mint` #3CCF9A (**Passed**)
-  - `amber` #E0A23A (**Needs Verification**)
-  - `rose` #C0544E (muted red, **Action Needed**)
-  - `paper` #FAF8F3 (warm off-white background)
-  - `slate` #5D6480 (secondary text)
-  - A subtle violet-to-mint gradient is used only on the logo and the primary button hover.
-- **Type:** Inter. Bold, tight headings (dashboard title around 32px, section titles around 20px), 15–16px body text, tabular numbers for counts.
-- **Surfaces:** white cards with rounded corners (12–16px), a soft border, and very light shadow. The status color shows as a left accent bar and a pill badge. No glassmorphism.
-- **Dashboard:** a card grid. Each card has the program name, organization, a deadline chip, a status pill, an issue count, and a compact progress bar (share of requirements Passed). The **+ New Application** button sits top right, in violet, with an icon.
-- **Results:**
-  - Each finding card shows the requirement as its title, a one-line explanation, a highlighted quote (amber-tinted block, with "Guideline · p. 3" below), evidence from the applicant's side ("Your CV: 3 pages"), and a correction for Action Needed findings.
-  - Group headers show counts, and each group can be collapsed.
-- **Motion:** CSS transitions only. A 150–250ms fade and slide when results update, hover lift on cards, and on Passed a brief mint pulse and checkmark draw. Respects `prefers-reduced-motion`.
-- **Copy tone:** plain, calm, specific. "Upload an official application guideline first." No hype, and no AI-sounding filler.
-- **Avoid:** generic AI landing-page layouts, heavy gradients, glass effects, decorative animation, crowded dashboards.
+From `prd.md > Look and Feel` (Dream Journal).
+- **Tokens** in `app/globals.css` (`@theme`): oat, primary, primary-ink, ink, muted, lilac, sage(+ink), butter(+ink), peach(+ink), mintsoft, line. Older token names (navy, violet, slate, paper, rose, amber, mint) map onto the new palette. Shared classes (`card`, `btn-primary`, `btn-secondary`, `btn-ghost`, `input`, `eyebrow`, `hand-note`, `ruled`) live in `@layer components` so utilities can override them.
+- **Fonts** via `next/font/google` (self-hosted at build, free): Fraunces, DM Sans, Caveat.
+- **Illustrations:** `components/Illustrations.tsx` (inline SVG with a small turbulence "wobble" filter; no image downloads). Paper grain is an inline SVG data URI.
+- **Intro:** `components/Intro.tsx`, CSS keyframes plus a CSS motion path for the plane. Shown only when `localStorage` has no "seen" flag and reduced motion is off; Skip intro; fades out on its own.
+- **Status labels:** overall Passed shows as **Ready**; findings keep **Passed**. Every status color has a text label.
 
 ## Components
 
+### Landing Page
+`app/page.tsx`: hero, workflow steps, privacy and evidence cards, plus the **Intro**.
+
+### App Shell
+`app/applications/layout.tsx` wraps the dashboard and workspace in `components/AppShell.tsx` (sidebar on desktop, top bar on mobile).
+
 ### Dashboard Page
-`app/page.tsx` loads all applications from the **Storage Layer** and renders an **Application Card** for each, plus the empty state and the **New Application Dialog**.
+`app/applications/page.tsx` loads all applications from the **Storage Layer** and renders an **Application Card** for each, plus the empty state and the **New Application Dialog**.
 PRD ref: `prd.md > Application Management`, `prd.md > Screens and Layout > Application Dashboard`, `prd.md > States and Boundaries` (first use).
 
 ### Application Card
@@ -280,7 +272,9 @@ build-with-ai-basics/            # repo root = the app
 ├── app/
 │   ├── layout.tsx               # Inter font, page frame, colors
 │   ├── globals.css              # Tailwind + small custom transitions
-│   ├── page.tsx                 # Dashboard Page
+│   ├── page.tsx                 # Landing Page (+ Intro)
+│   ├── applications/layout.tsx  # App Shell
+│   ├── applications/page.tsx    # Dashboard Page
 │   ├── applications/[id]/page.tsx   # Single Application Page
 │   └── api/
 │       ├── parse/route.ts       # Parse Route: PDF → pages, counts (no AI)
@@ -296,7 +290,10 @@ build-with-ai-basics/            # repo root = the app
 │   ├── ResultsPanel.tsx
 │   ├── FindingCard.tsx
 │   ├── WhatChanged.tsx
-│   └── StatusBadge.tsx          # status pill + custom icons
+│   ├── StatusBadge.tsx          # status pill
+│   ├── AppShell.tsx             # sidebar / top bar
+│   ├── Intro.tsx                # one-time CSS/SVG intro
+│   └── Illustrations.tsx        # hand-drawn-style SVG art
 ├── lib/
 │   ├── types.ts                 # Requirement, Finding, CheckResult…
 │   ├── db.ts                    # Storage Layer (Dexie)

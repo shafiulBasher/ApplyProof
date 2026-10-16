@@ -41,16 +41,17 @@ export default function ApplicantInfoForm({ applicationId, initial, onSaved }: {
   );
 
   return (
-    <section className="card p-6">
-      <h2 className="text-xl font-bold">Applicant information</h2>
-      <p className="mt-1 text-sm text-slate">Used only for the eligibility checks. It stays on this device.</p>
+    <section id="details" className="card scroll-mt-6 p-5 sm:p-6">
+      <p className="eyebrow">Step 3</p>
+      <h2 className="mt-1 text-2xl font-semibold">Your details</h2>
+      <p className="mt-1 text-sm text-muted">Used only for the eligibility checks. Saved as you type, and it stays on this device. Leave blank anything the guideline doesn&apos;t ask about.</p>
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         {field("gpa", "GPA", { inputMode: "decimal", placeholder: "3.6" })}
         {field("gpaScale", "Grading scale (max GPA)", { inputMode: "decimal", placeholder: "4.0" })}
         {field("degree", "Degree", { placeholder: "Bachelor of Science" })}
         {field("nationality", "Nationality", { placeholder: "Kenyan" })}
       </div>
-      {error && <p className="mt-3 text-sm text-rose">{error}</p>}
+      {error && <p className="mt-3 rounded-xl bg-peach/60 px-3 py-2 text-sm text-peach-ink">{error}</p>}
     </section>
   );
 }

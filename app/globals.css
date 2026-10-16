@@ -1,35 +1,83 @@
 @import "tailwindcss";
 
+/* Dream Journal palette. Older names (navy, violet, slate, paper, rose, amber, mint) map onto it. */
 @theme {
-  --color-navy: #14193a;
-  --color-violet: #5b4cf0;
-  --color-mint: #3ccf9a;
-  --color-amber: #e0a23a;
-  --color-rose: #c0544e;
-  --color-paper: #faf8f3;
-  --color-slate: #5d6480;
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --color-oat: #fbf5eb;
+  --color-primary: #7861cf;
+  --color-primary-ink: #5a46b0;
+  --color-ink: #302b40;
+  --color-muted: #6b6580;
+  --color-lilac: #eae2ff;
+  --color-sage: #ddebdd;
+  --color-sage-ink: #3d6a49;
+  --color-butter: #fae9b9;
+  --color-butter-ink: #7a5a12;
+  --color-peach: #f4d8d0;
+  --color-peach-ink: #9a4636;
+  --color-mintsoft: #bfe8de;
+  --color-line: #e9dfcf;
+
+  --color-navy: #302b40;
+  --color-violet: #7861cf;
+  --color-slate: #6b6580;
+  --color-paper: #fbf5eb;
+  --color-rose: #9a4636;
+  --color-amber: #c9971f;
+  --color-mint: #5fae86;
+
+  --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), Georgia, serif;
+  --font-hand: var(--font-caveat), "Comic Sans MS", cursive;
 }
 
 body {
-  background: var(--color-paper);
-  color: var(--color-navy);
+  background-color: var(--color-oat);
+  /* Faint paper grain, drawn inline so there's no image download. */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .38 0 0 0 0 .28 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  color: var(--color-ink);
 }
 
-.card {
-  @apply rounded-2xl border border-navy/10 bg-white shadow-[0_1px_3px_rgba(20,25,58,0.06)];
+h1, h2, .font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.01em;
 }
 
-.btn-primary {
-  @apply inline-flex items-center gap-2 rounded-xl bg-violet px-4 py-2 text-sm font-semibold text-white transition hover:bg-linear-to-r hover:from-violet hover:to-mint disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-none disabled:hover:bg-violet;
-}
+/* In the components layer so utilities (w-auto, text-2xl, border-2…) can still override these. */
+@layer components {
+  .card {
+    @apply rounded-2xl border border-line bg-white shadow-[0_1px_2px_rgba(48,43,64,0.04),0_8px_24px_-12px_rgba(48,43,64,0.12)];
+  }
 
-.btn-ghost {
-  @apply inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-slate transition hover:bg-navy/5 hover:text-navy;
-}
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-sm font-semibold text-white shadow-[0_6px_16px_-8px_rgba(120,97,207,0.8)] transition hover:-translate-y-px hover:bg-primary-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:bg-primary;
+  }
 
-.input {
-  @apply w-full rounded-lg border border-navy/15 bg-white px-3 py-2 text-sm outline-none focus:border-violet focus:ring-2 focus:ring-violet/20;
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-primary/30 bg-white px-4 py-2.5 text-sm font-semibold text-primary-ink transition hover:bg-lilac focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary disabled:opacity-50;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-medium text-muted transition hover:bg-lilac/60 hover:text-ink focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50;
+  }
+
+  .input {
+    @apply w-full rounded-xl border border-line bg-white px-3 py-2.5 text-sm text-ink outline-none placeholder:text-muted/70 focus:border-primary focus:ring-4 focus:ring-lilac;
+  }
+
+  .eyebrow {
+    @apply text-xs font-semibold uppercase tracking-[0.12em] text-muted;
+  }
+
+  /* Tiny handwritten notes. Decorative only: never the only place information lives. */
+  .hand-note {
+    font-family: var(--font-hand);
+    @apply pointer-events-none select-none text-lg leading-tight text-muted;
+  }
+
+  /* Notebook ruling for quote panels. */
+  .ruled {
+    background-image: repeating-linear-gradient(transparent 0 23px, rgba(122, 90, 18, 0.12) 23px 24px);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -37,16 +85,52 @@ body {
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
 }
 
 @keyframes pass-pulse {
-  0% { box-shadow: 0 0 0 0 rgba(60, 207, 154, 0.55); }
-  100% { box-shadow: 0 0 0 14px rgba(60, 207, 154, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(95, 174, 134, 0.55); }
+  100% { box-shadow: 0 0 0 16px rgba(95, 174, 134, 0); }
 }
 
 @keyframes draw-check {
   from { stroke-dashoffset: 1; }
   to { stroke-dashoffset: 0; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  50% { transform: translateY(-6px) rotate(-2deg); }
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.55; transform: scale(0.85); }
+}
+
+/* Intro sequence */
+@keyframes paper-in {
+  from { opacity: 0; transform: translateY(40px) rotate(-4deg) scale(0.96); }
+  to { opacity: 1; transform: rotate(-1.5deg); }
+}
+@keyframes write-in {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 0); }
+}
+@keyframes draw {
+  from { stroke-dashoffset: 1; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes fly {
+  from { offset-distance: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  to { offset-distance: 100%; opacity: 1; }
+}
+@keyframes pop-in {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+@keyframes intro-out {
+  to { opacity: 0; visibility: hidden; }
 }

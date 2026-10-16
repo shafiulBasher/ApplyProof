@@ -13,6 +13,8 @@ import RunButton from "@/components/RunButton";
 import ApplicantInfoForm from "@/components/ApplicantInfoForm";
 import ResultsPanel from "@/components/ResultsPanel";
 import RequirementsChecklist from "@/components/RequirementsChecklist";
+import { University } from "@/components/Illustrations";
+import { countDocs } from "@/lib/checks";
 
 export default function ApplicationPage() {
   const { id } = useParams<{ id: string }>();
@@ -60,11 +62,12 @@ export default function ApplicationPage() {
 
   // Reads the guideline's requirements right after upload (or on Retry). Only after the disclosure was accepted.
   async function readRequirements() {
-    const fresh = await db.applications.get(id);
-    const g = (await db.documents.where("applicationId").equals(id).toArray()).find((d) => d.role === "guideline" && d.readable);
-    if (!g || !fresh?.disclosureAccepted) return;
+    // Set before any await, so the checklist never flashes "Couldn't read" while the read is starting.
     setReading(true);
     setReadError("");
+    const fresh = await db.applications.get(id);
+    const g = (await db.documents.where("applicationId").equals(id).toArray()).find((d) => d.role === "guideline" && d.readable);
+    if (!g || !fresh?.disclosureAccepted) return setReading(false);
     try {
       setExtraction(await getExtraction(g));
     } catch (e) {
@@ -84,22 +87,50 @@ export default function ApplicationPage() {
   }
 
   if (app === undefined) return null;
-  if (app === null) return <p>This application wasn&apos;t found. <Link className="text-violet underline" href="/">Back to dashboard</Link></p>;
+  if (app === null) return <p>This application wasn&apos;t found. <Link className="text-primary underline" href="/applications">Back to your applications</Link></p>;
+
+  // Progress tracker: each step reflects real state, not just page position.
+  const required = extraction?.requirements.filter((r) => r.category === "required_document") ?? [];
+  const applicantDocs = docs.filter((d) => d.role === "applicant");
+  const steps = [
+    { href: "#guideline", label: "Guideline", done: !!extraction },
+    { href: "#documents", label: "Documents", done: required.length > 0 && required.every((r) => countDocs(applicantDocs, r.docType) >= (r.count ?? 1)) },
+    { href: "#details", label: "Details", done: Object.values(app.applicant).some((v) => v !== undefined && v !== "") },
+    { href: "#results", label: "Results", done: !!results.current && !outdated },
+  ];
 
   return (
     <div className="space-y-6">
-      <Link href="/" className="btn-ghost -ml-2.5"><ArrowLeft className="h-4 w-4" /> All applications</Link>
-      <header className="flex flex-wrap items-start justify-between gap-4">
-        <div>
-          <h1 className="text-[32px] font-bold leading-tight tracking-tight">{app.name}</h1>
-          <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-slate">
-            {app.organization && <span>{app.organization}</span>}
-            {app.deadline && <span className="inline-flex items-center gap-1"><CalendarDays className="h-4 w-4" /> {app.deadline}</span>}
-            <StatusBadge status={results.current?.status ?? "not_checked"} />
-            {results.current && <span className="tabular-nums">{results.current.outstanding} outstanding</span>}
+      <Link href="/applications" className="btn-ghost -ml-2.5"><ArrowLeft className="h-4 w-4" aria-hidden /> All applications</Link>
+
+      <header className="card relative overflow-hidden p-5 sm:p-6">
+        <University variant={1} className="pointer-events-none absolute -bottom-2 right-2 hidden h-28 w-52 opacity-60 md:block" />
+        <div className="relative flex flex-wrap items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{app.name}</h1>
+            <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted">
+              {app.organization && <span>{app.organization}</span>}
+              {app.deadline && <span className="inline-flex items-center gap-1"><CalendarDays className="h-4 w-4" aria-hidden /> {app.deadline}</span>}
+              <StatusBadge status={results.current?.status ?? "not_checked"} />
+              {results.current && <span className="tabular-nums">{results.current.outstanding} outstanding</span>}
+            </div>
           </div>
+          <RunButton canRun={!!guideline} running={running || reading} onRun={run} />
         </div>
-        <RunButton canRun={!!guideline} running={running || reading} onRun={run} />
+        <ol className="relative mt-6 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm" aria-label="Progress">
+          {steps.map((s, i) => (
+            <li key={s.href} className="flex items-center gap-2">
+              <a href={s.href} className={`inline-flex items-center gap-2 rounded-full px-3 py-1 font-medium transition hover:bg-lilac ${s.done ? "bg-lilac text-primary-ink" : "text-muted"}`}>
+                <span className={`grid h-5 w-5 place-items-center rounded-full text-[11px] font-bold ${s.done ? "bg-primary text-white" : "border border-muted/40"}`}>
+                  {s.done ? "✓" : i + 1}
+                </span>
+                {s.label}
+                <span className="sr-only">{s.done ? "(done)" : "(to do)"}</span>
+              </a>
+              {i < steps.length - 1 && <span className="h-px w-5 bg-line" aria-hidden />}
+            </li>
+          ))}
+        </ol>
       </header>
 
       <DocumentManager

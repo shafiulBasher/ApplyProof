@@ -79,6 +79,16 @@ Build mode: fast
   Learner check: Create an application, click Paste guideline text, paste the contents of `samples/job/job-posting.txt`, and save. The checklist appears; run the check and confirm each quote says "Pasted guideline".
   Commit: `Allow pasting the guideline as text`
 
+- [x] **8. Dream Journal redesign: landing page, intro, and a warm illustrated interface**
+  Becomes usable: A landing page with a one-time, skippable intro; an illustrated dashboard with filters; a workspace with a four-step progress tracker, drag-and-drop zones, and Upload PDF / Paste text tabs; results with butter quote panels, labeled evidence, and Next steps. All logic is unchanged.
+  Why now: Learner's design brief and visual reference during the final review.
+  PRD ref: `prd.md > Look and Feel`, `prd.md > Screens and Layout`
+  Spec ref: `spec.md > Look and Feel`, `spec.md > Components` (Landing Page, App Shell, Dashboard Page), `spec.md > File Structure`
+  Build: Tokens and fonts; shared classes in the components layer; SVG illustration set; Intro; landing page at `/`; dashboard moved to `/applications` inside an App Shell; every component restyled. Fixed a checklist flash ("Couldn't read…" appearing for an instant after upload).
+  Verify (mechanical): `npx tsc --noEmit`, 22/22 Vitest, `npm run build`; an Edge-driven run of the full workflow on a fresh production build (intro once, disclosure before sending, checklist read, documents, details, check, CV replacement → Outdated → rerun in 45 ms with no AI call → What Changed), screenshots at 1440px and 390px, no horizontal overflow on mobile, intro skipped with reduced motion, no console errors.
+  Learner check: Restart `npm run dev`, open http://localhost:3000, watch the intro (or skip it), click Get started, and run the scholarship demo.
+  Commit: `Redesign the interface in the Dream Journal style`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 3 (the first real findings; your feedback can still shape the What Changed view and the dashboard). Learner tried slices 1–3; feedback (generic "check it yourself" lines, wanted a required-documents list after the guideline upload) became slice 4, which they retried and confirmed in the app (checklist ticks, Next steps, deadline "Submit by October 20, 2027, 23:59 CET.").
@@ -110,3 +120,4 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 - Added slice 7 (paste the guideline as text) — learner request during the final review. PRD Non-Goals now allow pasted text for the guideline only; applicant documents stay PDF-only.
 - Extraction prompt: "nationality" is only for citizenship; work authorization, visa, residency, and language rules are unclear eligibility (Needs Verification) — the pasted job posting's "legally authorized to work in the European Union" came back as a nationality rule, which could have wrongly shown Action Needed. Cache version bumped to 3 so saved guidelines are re-read once with the fixed prompt.
 - Document wording now names both forms ("CV/résumé", "motivation/cover letter", "recommendation/reference letter") and units read in the singular ("1 page") — learner-approved polish during the final review, after the job demo read "Uploaded CV" and "Official limit: 1 pages". PRD and README examples updated to the new wording.
+- Added slice 8 (Dream Journal redesign) and a Landing Page; the dashboard moved from `/` to `/applications` — learner design brief during the final review. Illustrations are hand-drawn-style SVG line art rather than the reference's painted artwork (no paid asset services); no Settings page (not in scope). The overall "Passed" status now reads **Ready**, matching the reference.

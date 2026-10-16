@@ -59,7 +59,7 @@ Build mode: fast
   Learner check: Replace `cv-3-pages.pdf` with `cv-2-pages.pdf`. The Outdated notice appears. Rerun: What Changed shows the CV going from Action Needed to Passed, and the check finishes almost instantly.
   Commit: `Add recheck with Outdated notice and What Changed summary`
 
-- [ ] **6. A dashboard of applications that shows where each one stands**
+- [x] **6. A dashboard of applications that shows where each one stands**
   Becomes usable: The dashboard shows a polished card per application: name, organization, deadline chip, status pill, issue count, and a progress bar. First use shows a friendly empty state. If the browser can't save something, you're told which item wasn't kept. The README explains setup and the demo steps.
   Why now: Multiple applications and polish were kept in scope as long as they don't delay the demo path, which is now done.
   PRD ref: `prd.md > The Core Journey` (steps 1, 9), `prd.md > Screens and Layout > Application Dashboard`, `prd.md > Application Management`, `prd.md > States and Boundaries` (first use, persistence fallback), `prd.md > Look and Feel`

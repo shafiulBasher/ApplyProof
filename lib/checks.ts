@@ -44,13 +44,14 @@ function requiredDocument(req: Requirement, docs: Docs): Verdict {
   const unconfirmed = countUnconfirmed(docs);
   const name = docName(req.docType);
   const evidence = `Uploaded ${plural(name, required)}: ${have}`;
-  if (have >= required) return { status: "passed", explanation: `${cap(num(required))} required; ${num(have)} uploaded.`, evidence, measured: have };
+  if (have >= required) return { status: "passed", explanation: `${cap(num(required))} required; ${num(have)} uploaded.`, evidence, measured: have, unit: "uploaded" };
   if (unconfirmed > 0)
     return {
       status: "needs_verification",
       explanation: `${cap(num(required))} required; ${num(have)} confirmed. ${unconfirmed} uploaded ${plural("file", unconfirmed)} ${unconfirmed === 1 ? "has" : "have"} no type yet.`,
       evidence,
       measured: have,
+    unit: "uploaded",
       correction: "Choose a type for each uploaded file so it can be counted.",
     };
   const missing = required - have;
@@ -59,6 +60,7 @@ function requiredDocument(req: Requirement, docs: Docs): Verdict {
     explanation: required > 1 ? `${cap(num(required))} required; only ${num(have)} uploaded.` : `Required, but no ${name} was uploaded.`,
     evidence,
     measured: have,
+    unit: "uploaded",
     correction:
       required === 1 ? `Upload your ${name}.`
       : missing === 1 ? `Upload the ${ORDINALS[required] ?? `${required}th`} ${name}.`
@@ -82,7 +84,7 @@ function lengthLimit(req: Requirement, docs: Docs): Verdict {
   const bad = measures.findIndex((m) => (req.max !== undefined && m > req.max) || (req.min !== undefined && m < req.min));
   const shown = bad >= 0 ? bad : 0;
   const evidence = `${limit} · Uploaded ${name}: ${measures[shown]} ${unit}`;
-  if (bad < 0) return { status: "passed", explanation: `Your ${name} is within the limit.`, evidence, measured: measures[0] };
+  if (bad < 0) return { status: "passed", explanation: `Your ${name} is within the limit.`, evidence, measured: measures[0], unit };
 
   const over = req.max !== undefined && measures[bad] > req.max;
   return {
@@ -90,6 +92,7 @@ function lengthLimit(req: Requirement, docs: Docs): Verdict {
     explanation: over ? `Your ${name} is over the limit.` : `Your ${name} is under the minimum.`,
     evidence,
     measured: measures[bad],
+    unit,
     correction: over ? `Upload a revised ${name} of no more than ${req.max} ${unit}.` : `Upload a revised ${name} of at least ${req.min} ${unit}.`,
   };
 }

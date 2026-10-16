@@ -1,7 +1,7 @@
 import { db, save } from "./db";
 import { guidelineHash } from "./hash";
 import { runChecks } from "./checks";
-import { outstanding, overallStatus } from "./status";
+import { inputHash, outstanding, overallStatus } from "./status";
 import type { Application, CheckResult, Extraction, StoredDocument } from "./types";
 
 // Bump when the extraction prompt or schema changes, so cached requirements are re-read.
@@ -33,6 +33,12 @@ export async function getExtraction(guideline: StoredDocument): Promise<Extracti
   return extraction;
 }
 
+// Fingerprint of the current inputs, compared with the stored result to show Outdated.
+export async function currentInputHash(docs: StoredDocument[], facts: Application["applicant"]): Promise<string> {
+  const guideline = docs.find((d) => d.role === "guideline" && d.readable);
+  return inputHash(guideline ? await guidelineHash(guideline.pages) : "none", docs.filter((d) => d.role === "applicant"), facts);
+}
+
 // Extract (or reuse) → check → store. On failure the stored results stay and only lastError changes.
 export async function runCheck(app: Application, docs: StoredDocument[]): Promise<void> {
   const stored = (await db.results.get(app.id)) ?? { applicationId: app.id };
@@ -41,7 +47,15 @@ export async function runCheck(app: Application, docs: StoredDocument[]): Promis
     if (!guideline) throw new Error("Upload an official application guideline first.");
     const extraction = await getExtraction(guideline);
     const findings = runChecks(extraction.requirements, docs.filter((d) => d.role === "applicant"), app.applicant);
-    const result: CheckResult = { ranAt: Date.now(), guidelineHash: extraction.guidelineHash, findings, status: overallStatus(findings), outstanding: outstanding(findings) };
+    const result: CheckResult = {
+      ranAt: Date.now(),
+      inputHash: await currentInputHash(docs, app.applicant),
+      guidelineHash: extraction.guidelineHash,
+      extractedAt: extraction.createdAt,
+      findings,
+      status: overallStatus(findings),
+      outstanding: outstanding(findings),
+    };
     await save("the check results", () => db.results.put({ applicationId: app.id, previous: stored.current, current: result }));
   } catch (e) {
     await db.results.put({ ...stored, lastError: (e as Error).message });

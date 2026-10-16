@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, CalendarDays } from "lucide-react";
 import { db, save } from "@/lib/db";
-import { cachedExtraction, getExtraction, runCheck } from "@/lib/runCheck";
+import { cachedExtraction, currentInputHash, getExtraction, runCheck } from "@/lib/runCheck";
 import type { Application, Extraction, StoredDocument, StoredResults } from "@/lib/types";
 import StatusBadge from "@/components/StatusBadge";
 import DocumentManager from "@/components/DocumentManager";
@@ -25,6 +25,7 @@ export default function ApplicationPage() {
   const [extraction, setExtraction] = useState<Extraction>();
   const [reading, setReading] = useState(false);
   const [readError, setReadError] = useState("");
+  const [outdated, setOutdated] = useState(false);
 
   const load = useCallback(async () => {
     setApp((await db.applications.get(id)) ?? null);
@@ -36,6 +37,13 @@ export default function ApplicationPage() {
   }, [id]);
 
   useEffect(() => { load(); }, [load]);
+
+  // Outdated whenever the current inputs differ from the ones the last successful check used.
+  useEffect(() => {
+    if (!app || !results.current) return setOutdated(false);
+    const expected = results.current.inputHash;
+    currentInputHash(docs, app.applicant).then((h) => setOutdated(h !== expected));
+  }, [app, docs, results]);
 
   const guideline = docs.find((d) => d.role === "guideline" && d.readable);
 
@@ -103,7 +111,7 @@ export default function ApplicationPage() {
         guidelineExtra={<RequirementsChecklist extraction={extraction} documents={docs} reading={reading} error={readError} onRetry={readRequirements} />}
       />
       <ApplicantInfoForm applicationId={id} initial={app.applicant} onSaved={load} />
-      <ResultsPanel results={results} />
+      <ResultsPanel results={results} outdated={outdated} />
 
       {asking && <DisclosureDialog onAnswer={(ok) => answer.current(ok)} />}
     </div>

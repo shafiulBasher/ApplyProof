@@ -88,12 +88,16 @@ export interface Finding {
   page: number;
   evidence?: string;
   measured?: number;
+  unit?: string;
   correction?: string;
 }
 
 export interface CheckResult {
   ranAt: number;
+  inputHash: string;
   guidelineHash: string;
+  // When the requirements were read; a re-read of the same guideline can renumber them.
+  extractedAt: number;
   findings: Finding[];
   status: FindingStatus;
   outstanding: number;

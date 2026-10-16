@@ -49,7 +49,7 @@ Build mode: fast
   Learner check: Create a new application and upload `guideline.pdf`. The checklist appears under it. Add your documents one by one and watch items tick off; recommendation letters show "1 of 2". Run the check: each Needs Verification card shows a specific Next step, and the deadline reads "Submit by October 20, 2027, 23:59 CET."
   Commit: `Add required-documents checklist and specific next steps`
 
-- [ ] **5. Replace the CV, rerun, and watch Action Needed flip to Passed**
+- [x] **5. Replace the CV, rerun, and watch Action Needed flip to Passed**
   Becomes usable: Replacing a file or editing your info marks the results Outdated. Rerunning is instant and makes no AI call, because the guideline's requirements are remembered. A "What Changed since your last check" summary shows "CV length: Action Needed → Passed", "CV pages: 3 → 2", and the issue count change, with a mint pulse on the finding that passed. If a check fails, your previous results stay and the error shows separately.
   Why now: This completes the demo path, your "oh, that's cool" moment. It needs a working check (slice 3) to compare against.
   PRD ref: `prd.md > The Core Journey` (steps 7–8), `prd.md > Recheck and What Changed`, `prd.md > States and Boundaries` (inputs changed, check fails)

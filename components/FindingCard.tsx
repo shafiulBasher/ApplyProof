@@ -3,10 +3,17 @@ import type { Finding } from "@/lib/types";
 
 const ACCENT = { action_needed: "border-l-rose", needs_verification: "border-l-amber", passed: "border-l-mint" } as const;
 
-export default function FindingCard({ finding }: { finding: Finding }) {
+export default function FindingCard({ finding, justPassed }: { finding: Finding; justPassed?: boolean }) {
   return (
-    <article className={`card animate-[fade-in_200ms_ease-out] border-l-4 p-4 ${ACCENT[finding.status]}`}>
-      <h4 className="font-semibold">{finding.title}</h4>
+    <article className={`card border-l-4 p-4 ${ACCENT[finding.status]} ${justPassed ? "animate-[pass-pulse_900ms_ease-out]" : "animate-[fade-in_200ms_ease-out]"}`}>
+      <h4 className="flex items-center gap-2 font-semibold">
+        {finding.title}
+        {justPassed && (
+          <svg viewBox="0 0 16 16" className="h-4 w-4 text-mint" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-label="Now passed">
+            <path d="M3.5 8.5l3 3 6-7" pathLength="1" className="animate-[draw-check_500ms_ease-out_200ms_both] [stroke-dasharray:1]" />
+          </svg>
+        )}
+      </h4>
       <p className="mt-0.5 text-sm text-slate">{finding.explanation}</p>
       <figure className="mt-3">
         <blockquote className="rounded-lg bg-amber/10 px-3 py-2 text-sm">“{finding.quote}”</blockquote>

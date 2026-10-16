@@ -1,6 +1,6 @@
 "use client";
 import { CheckCircle2, Circle, Loader2, RefreshCw } from "lucide-react";
-import { countDocs, countUnconfirmed, docName } from "@/lib/checks";
+import { countDocs, countUnconfirmed, docName, qty } from "@/lib/checks";
 import type { Extraction, StoredDocument } from "@/lib/types";
 
 interface Props {
@@ -37,7 +37,7 @@ export default function RequirementsChecklist({ extraction, documents, reading, 
           const done = have >= need;
           const limits = extraction.requirements
             .filter((l) => (l.category === "page_limit" || l.category === "word_limit") && l.docType === r.docType && l.quoteVerified)
-            .map((l) => (l.min !== undefined && l.max !== undefined ? `${l.min}–${l.max} ${l.unit}` : l.max !== undefined ? `max ${l.max} ${l.unit}` : `min ${l.min} ${l.unit}`));
+            .map((l) => (l.min !== undefined && l.max !== undefined ? `${l.min}–${l.max} ${l.unit}` : l.max !== undefined ? `max ${qty(l.max, l.unit ?? "")}` : `min ${qty(l.min ?? 0, l.unit ?? "")}`));
           return (
             <li key={r.id} className="flex items-center gap-2 text-sm">
               {done ? <CheckCircle2 className="h-4 w-4 shrink-0 text-mint" /> : <Circle className="h-4 w-4 shrink-0 text-slate/50" />}

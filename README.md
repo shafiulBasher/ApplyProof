@@ -30,7 +30,7 @@ npm run dev                    # open http://localhost:3000
 2. Upload `samples/guideline.pdf` and accept the disclosure. The checklist of required documents appears.
 3. Add `cv-3-pages.pdf`, `motivation-letter.pdf`, `transcript.pdf`, and `recommendation-1.pdf`, and watch the checklist tick off.
 4. Enter GPA `3.6` on a `4` scale and the degree `Bachelor of Science`, then click **Run Readiness Check**.
-   The CV is **Action Needed**: "Official limit: 2 pages · Uploaded CV: 3 pages", with the guideline's quote and page.
+   The CV is **Action Needed**: "Official limit: 2 pages · Uploaded CV/résumé: 3 pages", with the guideline's quote and page.
 5. Replace the CV with `cv-2-pages.pdf`. The results are marked **Outdated**.
 6. Rerun. It's instant, with no AI call, and **What Changed** shows "CV length: Action Needed → Passed".
 

@@ -91,7 +91,7 @@ Each extracted requirement becomes a finding. The finding list is the checklist.
 - **Missing documents:** the required count of each type is compared with the confirmed uploads.
   - [ ] With 2 recommendation letters required and 1 uploaded, the finding is **Action Needed** and says "Two required; only one uploaded."
 - **Page and word limits:** counts are measured exactly, not estimated by AI.
-  - [ ] A 3-page CV against a 2-page limit is **Action Needed** and shows "Official limit: 2 pages · Uploaded CV: 3 pages."
+  - [ ] A 3-page CV against a 2-page limit is **Action Needed** and shows "Official limit: 2 pages · Uploaded CV/résumé: 3 pages."
   - [ ] A 620-word motivation letter against a 500–800 word limit is **Passed**.
 - **Basic eligibility:** the user's typed facts are compared with clearly stated rules.
   - [ ] A clearly stated rule the user meets is **Passed**, and one they don't meet is **Action Needed**.
@@ -104,7 +104,7 @@ Source: `scope.md > The Unique Kernel`.
 - As an applicant, I want to see why each finding was made so that I can trust it and act on it.
   - [ ] For a pasted guideline, the verified quote is labeled **"Pasted guideline"** instead of a page number.
   - [ ] Every finding shows the requirement, a plain explanation, the exact quote from the guideline, and its page number.
-  - [ ] Where relevant, it also shows evidence from the applicant's side (for example "Uploaded CV: 3 pages").
+  - [ ] Where relevant, it also shows evidence from the applicant's side (for example "Uploaded CV/résumé: 3 pages").
   - [ ] Every Action Needed finding has a recommended correction, and every Needs Verification finding has a specific next step (for example "Upload a revised CV of no more than 2 pages", "Confirm the accepted evidence with the program organizer"). No generic "check it yourself" lines.
   - [ ] Facts (the explanation and evidence) are shown separately from suggestions (labeled **Next step**). Next steps are grounded in the quoted rule and never invent requirements, deadlines, or evidence.
   - [ ] A deadline shows its date, time, and timezone only where the quote states them; a missing closing time or timezone is flagged for verification, never filled in.

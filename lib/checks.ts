@@ -1,12 +1,22 @@
 import { normalize } from "./quotes";
-import { DOC_TYPE_LABELS, type ApplicantFacts, type DocType, type Finding, type Requirement, type StoredDocument } from "./types";
+import { type ApplicantFacts, type DocType, type Finding, type Requirement, type StoredDocument } from "./types";
 
 const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
 const ORDINALS = ["", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"];
 const num = (n: number) => NUMBER_WORDS[n] ?? String(n);
 const cap = (s: string) => s[0].toUpperCase() + s.slice(1);
 const plural = (name: string, n: number) => (n === 1 ? name : `${name}s`);
-export const docName = (t?: DocType) => (t === "cv" ? "CV" : t ? DOC_TYPE_LABELS[t].toLowerCase() : "document");
+// Both names, so the wording fits scholarship and job applications alike.
+const DOC_NAMES: Record<DocType, string> = {
+  cv: "CV/résumé",
+  motivation_letter: "motivation/cover letter",
+  transcript: "transcript",
+  recommendation_letter: "recommendation/reference letter",
+  other: "document",
+};
+export const docName = (t?: DocType) => DOC_NAMES[t ?? "other"];
+// "1 page", "2 pages".
+export const qty = (n: number, unit: string) => `${n} ${n === 1 ? unit.replace(/s$/, "") : unit}`;
 
 type Docs = Pick<StoredDocument, "fileName" | "confirmedType" | "pageCount" | "wordCount" | "readable">[];
 type Verdict = Omit<Finding, "requirementId" | "title" | "quote" | "page">;
@@ -74,8 +84,8 @@ function lengthLimit(req: Requirement, docs: Docs): Verdict {
   const matching = docs.filter((d) => d.confirmedType === req.docType);
   const limit =
     req.min !== undefined && req.max !== undefined ? `Official range: ${req.min}–${req.max} ${unit}`
-    : req.max !== undefined ? `Official limit: ${req.max} ${unit}`
-    : req.min !== undefined ? `Official minimum: ${req.min} ${unit}`
+    : req.max !== undefined ? `Official limit: ${qty(req.max, unit)}`
+    : req.min !== undefined ? `Official minimum: ${qty(req.min, unit)}`
     : undefined;
   if (!limit) return { status: "needs_verification", explanation: "The quoted limit isn't a number we can measure against.", correction: "Check your document against the quoted rule." };
   if (matching.length === 0) return { status: "needs_verification", explanation: `No ${name} uploaded to measure.`, correction: `Upload your ${name} to check its length.` };
@@ -83,7 +93,7 @@ function lengthLimit(req: Requirement, docs: Docs): Verdict {
   const measures = matching.map((d) => (unit === "pages" ? d.pageCount : d.wordCount));
   const bad = measures.findIndex((m) => (req.max !== undefined && m > req.max) || (req.min !== undefined && m < req.min));
   const shown = bad >= 0 ? bad : 0;
-  const evidence = `${limit} · Uploaded ${name}: ${measures[shown]} ${unit}`;
+  const evidence = `${limit} · Uploaded ${name}: ${qty(measures[shown], unit)}`;
   if (bad < 0) return { status: "passed", explanation: `Your ${name} is within the limit.`, evidence, measured: measures[0], unit };
 
   const over = req.max !== undefined && measures[bad] > req.max;
@@ -93,7 +103,7 @@ function lengthLimit(req: Requirement, docs: Docs): Verdict {
     evidence,
     measured: measures[bad],
     unit,
-    correction: over ? `Upload a revised ${name} of no more than ${req.max} ${unit}.` : `Upload a revised ${name} of at least ${req.min} ${unit}.`,
+    correction: over ? `Upload a revised ${name} of no more than ${qty(req.max!, unit)}.` : `Upload a revised ${name} of at least ${qty(req.min!, unit)}.`,
   };
 }
 

@@ -86,6 +86,7 @@ Build mode: fast
 
 ## Final Review
 
+- [x] Wording polish: CV/résumé, motivation/cover letter, recommendation/reference letter; singular "1 page" — verified by Vitest (22/22) and tsc.
 - [ ] Final review complete — feedback resolved and learner confirms ready to ship
 
 ## Code Tour and App Map
@@ -108,3 +109,4 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 - Faster, more resilient guideline reading — learner asked for more free models and a shorter wait after uploading the guideline. Gemini now uses low "thinking" (the default took ~16s; low takes ~7–12s; "minimal" was rejected by some models and cost Flash-Lite a requirement). The fallback list grew to five free models, fastest first (`gemini-flash-lite-latest, gemini-3.5-flash, gemini-3.6-flash, gemini-3.5-flash-lite, gemini-3.8-flash`), and any error except a bad key moves on to the next model, each tried once. The prompt now says every "who may apply" rule is its own eligibility item, after a lite model skipped the degree rule; with that line every model tested scored 10/10 with all quotes verified.
 - Added slice 7 (paste the guideline as text) — learner request during the final review. PRD Non-Goals now allow pasted text for the guideline only; applicant documents stay PDF-only.
 - Extraction prompt: "nationality" is only for citizenship; work authorization, visa, residency, and language rules are unclear eligibility (Needs Verification) — the pasted job posting's "legally authorized to work in the European Union" came back as a nationality rule, which could have wrongly shown Action Needed. Cache version bumped to 3 so saved guidelines are re-read once with the fixed prompt.
+- Document wording now names both forms ("CV/résumé", "motivation/cover letter", "recommendation/reference letter") and units read in the singular ("1 page") — learner-approved polish during the final review, after the job demo read "Uploaded CV" and "Official limit: 1 pages". PRD and README examples updated to the new wording.

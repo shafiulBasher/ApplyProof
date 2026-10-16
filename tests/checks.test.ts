@@ -10,8 +10,8 @@ const one = (r: Partial<Requirement>, docs = [doc("cv")], facts = {}) => runChec
 test("3-page CV against a 2-page limit is Action Needed with evidence and correction", () => {
   const f = one({ category: "page_limit", docType: "cv", max: 2, unit: "pages" }, [doc("cv", 3)]);
   expect(f.status).toBe("action_needed");
-  expect(f.evidence).toBe("Official limit: 2 pages · Uploaded CV: 3 pages");
-  expect(f.correction).toBe("Upload a revised CV of no more than 2 pages.");
+  expect(f.evidence).toBe("Official limit: 2 pages · Uploaded CV/résumé: 3 pages");
+  expect(f.correction).toBe("Upload a revised CV/résumé of no more than 2 pages.");
   expect(one({ category: "page_limit", docType: "cv", max: 2, unit: "pages" }, [doc("cv", 2)]).status).toBe("passed");
 });
 
@@ -25,7 +25,7 @@ test("1 of 2 recommendation letters is Action Needed", () => {
   const f = one({ category: "required_document", docType: "recommendation_letter", count: 2 }, [doc("recommendation_letter"), doc("cv")]);
   expect(f.status).toBe("action_needed");
   expect(f.explanation).toBe("Two required; only one uploaded.");
-  expect(f.correction).toBe("Upload the second recommendation letter.");
+  expect(f.correction).toBe("Upload the second recommendation/reference letter.");
 });
 
 test("unconfirmed file types and unreadable files", () => {
@@ -97,4 +97,10 @@ test("every Needs Verification finding has a next step", () => {
     req({ id: "d", category: "page_limit", docType: "cv", max: 2, quoteVerified: false }),
   ];
   expect(runChecks(reqs, [], {}).filter((f) => !f.correction)).toHaveLength(0);
+});
+
+test("a 1-page limit reads in the singular", () => {
+  const f = one({ category: "page_limit", docType: "cv", max: 1, unit: "pages" }, [doc("cv", 2)]);
+  expect(f.evidence).toBe("Official limit: 1 page · Uploaded CV/résumé: 2 pages");
+  expect(f.correction).toBe("Upload a revised CV/résumé of no more than 1 page.");
 });

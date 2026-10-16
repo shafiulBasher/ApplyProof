@@ -1,10 +1,10 @@
 export type DocType = "cv" | "motivation_letter" | "transcript" | "recommendation_letter" | "other";
 
 export const DOC_TYPE_LABELS: Record<DocType, string> = {
-  cv: "CV",
-  motivation_letter: "Motivation letter",
+  cv: "CV / Résumé",
+  motivation_letter: "Motivation / cover letter",
   transcript: "Transcript",
-  recommendation_letter: "Recommendation letter",
+  recommendation_letter: "Recommendation / reference letter",
   other: "Other",
 };
 

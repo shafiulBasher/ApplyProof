@@ -2,7 +2,7 @@ import type { DocType } from "./types";
 
 const KEYWORDS: [DocType, string[]][] = [
   ["cv", ["cv", "resume"]],
-  ["motivation_letter", ["motivation", "statement", "essay"]],
+  ["motivation_letter", ["motivation", "statement", "essay", "cover"]],
   ["transcript", ["transcript", "grades"]],
   ["recommendation_letter", ["recommendation", "reference", "rec"]],
 ];

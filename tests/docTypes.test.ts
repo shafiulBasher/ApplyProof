@@ -7,6 +7,9 @@ test("suggests a type when exactly one matches", () => {
   expect(suggestType("motivation-letter.pdf")).toBe("motivation_letter");
   expect(suggestType("transcript.pdf")).toBe("transcript");
   expect(suggestType("recommendation-1.pdf")).toBe("recommendation_letter");
+  expect(suggestType("cover-letter.pdf")).toBe("motivation_letter");
+  expect(suggestType("reference-2.pdf")).toBe("recommendation_letter");
+  expect(suggestType("resume-1-page.pdf")).toBe("cv");
 });
 
 test("asks the user when unclear", () => {

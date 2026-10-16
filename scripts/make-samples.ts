@@ -106,6 +106,49 @@ async function main() {
   await makePdf("motivation-letter-short.pdf", [[head, NOTE, filler(300, LETTER_SEED)]]);
   await makePdf("my-document.pdf", [cvPage("Alex Rivera - Curriculum Vitae")]);
 
+  // Job application set (samples/job/): a fictional posting with a 1-page resume limit,
+  // a deadline with no closing time, and two references required.
+  mkdirSync(`${OUT}/job`, { recursive: true });
+  const JOB_NOTE = "SYNTHETIC SAMPLE - Northwind Analytics is a fictional company created for the ApplyProof demo.";
+  await makePdf("job/job-posting.pdf", [
+    [
+      "Junior Data Analyst - Northwind Analytics (Berlin, hybrid)",
+      JOB_NOTE,
+      "Northwind Analytics helps public transport operators understand ridership. As a Junior Data Analyst you will clean data, build dashboards, and present findings to city partners.",
+      "Who can apply",
+      "Candidates must hold a bachelor's degree in statistics, economics, computer science, or a related field.",
+      "Candidates must be legally authorized to work in the European Union.",
+    ],
+    [
+      "How to apply",
+      "Please send the following documents. Applications missing any document will not be considered.",
+      "A resume of no more than 1 page.",
+      "A cover letter of between 250 and 400 words explaining why you want this role.",
+      "Two professional references.",
+      "Submit all documents as PDF files.",
+      "Applications close on November 30, 2026.",
+      JOB_NOTE,
+    ],
+  ]);
+  const resumePage = (title: string) => [
+    title,
+    "Experience: data intern at a fictional transit agency, cleaning ticketing data and building weekly ridership reports in SQL and Python.",
+    "Education: Bachelor of Science in Economics, fictional state university.",
+    "Skills: SQL, Python, spreadsheet modeling, dashboard design, clear written reports.",
+  ];
+  await makePdf("job/resume-2-pages.pdf", [resumePage("Sam Okafor - Resume (page 1)"), resumePage("Sam Okafor - Resume (page 2)")]);
+  await makePdf("job/resume-1-page.pdf", [resumePage("Sam Okafor - Resume")]);
+  const COVER_SEED = "I would love to join Northwind Analytics because turning messy ridership data into clear decisions for city partners is exactly the work I enjoy most";
+  const coverHead = "Cover Letter - Sam Okafor";
+  await makePdf("job/cover-letter.pdf", [[coverHead, JOB_NOTE, filler(320 - coverHead.split(" ").length - JOB_NOTE.split(" ").length, COVER_SEED)]]);
+  for (const [file, who] of [["job/reference-1.pdf", "my manager during the transit internship"], ["job/reference-2.pdf", "Sam's thesis supervisor"]]) {
+    await makePdf(file, [[
+      "Professional Reference for Sam Okafor",
+      JOB_NOTE,
+      `Written by ${who}. Sam is careful with data, asks good questions, and explains results clearly to non-technical colleagues. I recommend Sam for an analyst role.`,
+    ]]);
+  }
+
   // A PDF with no text layer, to exercise the "unreadable" path.
   const blank = await PDFDocument.create();
   blank.addPage([612, 792]).drawRectangle({ x: 100, y: 300, width: 400, height: 200, color: rgb(0.8, 0.8, 0.8) });

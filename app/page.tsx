@@ -86,7 +86,7 @@ export default function Landing() {
             <p className="mt-[1.4cqw] max-w-[32cqw] text-[1.65cqw] leading-snug text-ink">Turn application requirements into a clear, source-linked checklist.</p>
             <div className="mt-[2.4cqw] flex gap-[1.7cqw] text-[1.3cqw]">
               <Link href="/applications" className="btn-primary rounded-[0.55em] px-[2.4em] py-[1em] text-[1em]">Get Started <ArrowRight className="h-[1.1em] w-[1.1em]" aria-hidden /></Link>
-              <ReplayIntroButton className="btn-secondary rounded-[0.55em] border-line px-[1.8em] py-[1em] text-[1em] text-[#1d1a33]" />
+              <a href="#how" className="btn-secondary rounded-[0.55em] border-line px-[1.8em] py-[1em] text-[1em] text-[#1d1a33]">See how it works</a>
             </div>
             <Badges className="mt-[3.3cqw] max-w-[36cqw] gap-[1.5cqw] text-[0.95cqw]" />
           </div>
@@ -107,7 +107,7 @@ export default function Landing() {
         <p className="mt-5 text-lg text-ink">Turn application requirements into a clear, source-linked checklist.</p>
         <div className="mt-6 flex flex-wrap gap-3">
           <Link href="/applications" className="btn-primary px-5 py-3 text-base">Get Started <ArrowRight className="h-4 w-4" aria-hidden /></Link>
-          <ReplayIntroButton className="btn-secondary px-5 py-3 text-base" />
+          <a href="#how" className="btn-secondary px-5 py-3 text-base">See how it works</a>
         </div>
         <Badges className="mt-7 gap-3 text-xs" />
         <div className="relative mt-8 rotate-[1.5deg] rounded-[24px] bg-white p-2.5 shadow-[0_24px_50px_-26px_rgba(48,43,64,0.5)]">
@@ -158,6 +158,7 @@ export default function Landing() {
         <footer className="flex flex-wrap items-center justify-between gap-3 border-t border-line py-8 text-sm text-muted">
           <Logo />
           <p>ApplyProof checks readiness. It doesn&apos;t predict outcomes.</p>
+          <ReplayIntroButton className="text-sm text-muted underline-offset-4 hover:text-primary hover:underline" label="Replay intro" />
         </footer>
       </div>
     </>

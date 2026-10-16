@@ -15,7 +15,7 @@ interface Props {
 export default function RequirementsChecklist({ extraction, documents, reading, error, onRetry }: Props) {
   const docs = documents.filter((d) => d.role === "applicant");
 
-  if (reading) return <p className="mt-4 flex items-center gap-2 text-sm text-slate"><Loader2 className="h-4 w-4 animate-spin" /> Reading the guideline&apos;s requirements…</p>;
+  if (reading) return <p className="mt-4 flex items-center gap-2 text-sm text-slate"><Loader2 className="h-4 w-4 animate-spin" /> Reading the guideline&apos;s requirements… this usually takes 10–20 seconds, and only happens once per guideline.</p>;
   if (!extraction)
     return (
       <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl bg-amber/10 p-3 text-sm">

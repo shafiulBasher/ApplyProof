@@ -21,9 +21,10 @@ const matches = (e: Expected, r: Requirement) =>
 async function main() {
   const { pages } = await parsePdf(new Uint8Array(readFileSync("samples/guideline.pdf")));
   const expected: Expected[] = JSON.parse(readFileSync("samples/expected-requirements.json", "utf8"));
+  const started = Date.now();
   const { requirements, model } = await extractVerified(pages);
 
-  console.log(`Model: ${model}\n`);
+  console.log(`Model: ${model} · took ${((Date.now() - started) / 1000).toFixed(1)}s\n`);
   const used = new Set<string>();
   const missing: string[] = [];
   for (const e of expected) {

@@ -1,18 +1,22 @@
 "use client";
 import { useState } from "react";
-import { AlertTriangle, ChevronDown, Clock } from "lucide-react";
+import { AlertTriangle, ChevronDown, Clock, PartyPopper } from "lucide-react";
 import { whatChanged } from "@/lib/diff";
 import type { Finding, FindingStatus, StoredResults } from "@/lib/types";
-import FindingCard, { FINDING_STYLE } from "./FindingCard";
+import { ActionCard, CheckNote, FINDING_STYLE, PassedRow } from "./FindingCard";
 import WhatChanged from "./WhatChanged";
 
-const ORDER: FindingStatus[] = ["action_needed", "needs_verification", "passed"];
-
-export default function ResultsPanel({ results, outdated }: { results: StoredResults; outdated: boolean }) {
+export default function ResultsPanel({ results, outdated, onFix }: { results: StoredResults; outdated: boolean; onFix?: (f: Finding) => void }) {
   const { current, previous, lastError } = results;
   if (!current && !lastError) return null;
   const changes = current && previous ? whatChanged(previous, current) : undefined;
   const justPassed = new Set(changes?.statusChanges.filter((c) => c.to === "passed").map((c) => c.requirementId));
+  const pasted = !!current?.guidelinePasted;
+  const of = (s: FindingStatus) => current?.findings.filter((f) => f.status === s) ?? [];
+  const action = of("action_needed");
+  const verify = of("needs_verification");
+  const passed = of("passed");
+
   return (
     <section id="results" className="scroll-mt-6 space-y-4">
       <div>
@@ -30,35 +34,47 @@ export default function ResultsPanel({ results, outdated }: { results: StoredRes
         <p className="flex items-start gap-2 rounded-2xl border border-peach-ink/20 bg-peach/60 p-4 text-sm text-peach-ink" role="alert"><AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" aria-hidden /> {lastError}</p>
       )}
       {changes && <WhatChanged key={current!.ranAt} changes={changes} />}
-      {current && ORDER.map((status) => {
-        const items = current.findings.filter((f) => f.status === status);
-        return (
-          <Group key={`${status}-${current.ranAt}`} status={status} items={items} justPassed={justPassed} pasted={!!current.guidelinePasted}
-            defaultOpen={items.length > 0 && (status !== "passed" || items.some((f) => justPassed.has(f.requirementId)))} />
-        );
-      })}
+
+      {current && (
+        <>
+          <Group key={`a-${current.ranAt}`} status="action_needed" count={action.length} defaultOpen>
+            {action.length === 0 ? (
+              <p className="flex items-center gap-2 rounded-2xl bg-sage/70 px-4 py-3 text-sm font-medium text-sage-ink"><PartyPopper className="h-4 w-4" aria-hidden /> Nothing to fix right now.</p>
+            ) : (
+              <div className="space-y-5 pt-2">
+                {action.map((f, i) => <ActionCard key={f.requirementId} f={f} index={i} pasted={pasted} onFix={onFix} />)}
+              </div>
+            )}
+          </Group>
+          <Group key={`v-${current.ranAt}`} status="needs_verification" count={verify.length} defaultOpen={verify.length > 0}>
+            <div className="grid gap-5 pt-3 md:grid-cols-2">
+              {verify.map((f, i) => <CheckNote key={f.requirementId} f={f} index={i} pasted={pasted} />)}
+            </div>
+          </Group>
+          <Group key={`p-${current.ranAt}`} status="passed" count={passed.length} defaultOpen={passed.some((f) => justPassed.has(f.requirementId))}>
+            <ul className="card divide-y divide-line/70 p-2">
+              {passed.map((f) => <PassedRow key={f.requirementId} f={f} pasted={pasted} justPassed={justPassed.has(f.requirementId)} />)}
+            </ul>
+          </Group>
+        </>
+      )}
     </section>
   );
 }
 
-function Group({ status, items, justPassed, pasted, defaultOpen }: { status: FindingStatus; items: Finding[]; justPassed: Set<string>; pasted: boolean; defaultOpen: boolean }) {
+function Group({ status, count, defaultOpen, children }: { status: FindingStatus; count: number; defaultOpen: boolean; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen);
   const s = FINDING_STYLE[status];
   return (
     <div>
       <button className="flex w-full items-center gap-2 rounded-xl py-2 text-left" onClick={() => setOpen(!open)} aria-expanded={open}>
         <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${s.pill}`}>
-          <s.icon className="h-4 w-4" aria-hidden /> {s.label} <span className="tabular-nums">({items.length})</span>
+          <s.icon className="h-4 w-4" aria-hidden /> {s.label} <span className="tabular-nums">({count})</span>
         </span>
         <span className="h-px flex-1 bg-line" aria-hidden />
         <ChevronDown className={`h-4 w-4 text-muted transition ${open ? "rotate-180" : ""}`} aria-hidden />
       </button>
-      {open && (
-        <div className="mt-1 space-y-3">
-          {items.length === 0 && <p className="px-1 text-sm text-muted">Nothing here.</p>}
-          {items.map((f) => <FindingCard key={f.requirementId} finding={f} justPassed={justPassed.has(f.requirementId)} pasted={pasted} />)}
-        </div>
-      )}
+      {open && <div className="mt-1">{children}</div>}
     </div>
   );
 }

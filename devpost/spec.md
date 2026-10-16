@@ -220,7 +220,8 @@ PRD ref: `prd.md > Recheck and What Changed`.
 
 ### Results Panel and Finding Card
 - Order: Outdated notice (if any), then any check error, then **What Changed** (if there's a previous result), then three groups: Action Needed (expanded), Needs Verification (expanded if it has items), Passed (collapsed). Each group shows its count.
-- A **Finding Card** shows the requirement, explanation, highlighted quote with its page (or "Pasted guideline" when the result came from pasted text), applicant-side evidence, and correction. It animates on a status change.
+- `components/FindingCard.tsx` has three presentations: **ActionCard** (numbered, "Fix this first", LimitMeter bar or upload dots, quote, evidence, Next step, Replace/Upload file, which opens that document's file picker via `data-doctype` on its row), **CheckNote** (butter sticky note led by the Next step, quote visible), and **PassedRow** (compact, expandable to quote and evidence). Findings carry `category`, `docType`, and `limit` for icons, meters, and the action; older saved results without them still render.
+- Previously: a **Finding Card** showed the requirement, explanation, highlighted quote with its page (or "Pasted guideline" when the result came from pasted text), applicant-side evidence, and correction. It animates on a status change.
 
 PRD ref: `prd.md > Fix-First Results`, `prd.md > Evidence-Linked Findings`.
 

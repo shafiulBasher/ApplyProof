@@ -5,7 +5,7 @@ import Link from "next/link";
 import { ArrowLeft, CalendarDays } from "lucide-react";
 import { db, save } from "@/lib/db";
 import { cachedExtraction, currentInputHash, getExtraction, runCheck } from "@/lib/runCheck";
-import type { Application, Extraction, StoredDocument, StoredResults } from "@/lib/types";
+import type { Application, Extraction, Finding, StoredDocument, StoredResults } from "@/lib/types";
 import StatusBadge from "@/components/StatusBadge";
 import DocumentManager from "@/components/DocumentManager";
 import DisclosureDialog from "@/components/DisclosureDialog";
@@ -86,6 +86,16 @@ export default function ApplicationPage() {
     setRunning(false);
   }
 
+  // "Replace file" on a fix-first card: open the picker for that document, or the upload area if it's missing.
+  function fix(f: Finding) {
+    const row = document.querySelector<HTMLElement>(`#documents [data-doctype="${f.docType}"]`);
+    const target = row ?? document.querySelector<HTMLElement>("#documents");
+    target?.scrollIntoView({ behavior: "smooth", block: "center" });
+    row?.animate([{ boxShadow: "0 0 0 0 rgba(120,97,207,0.6)" }, { boxShadow: "0 0 0 10px rgba(120,97,207,0)" }], { duration: 1200 });
+    const input = row?.querySelector<HTMLInputElement>("input[type=file]") ?? document.querySelector<HTMLInputElement>("#documents input[type=file][multiple]");
+    input?.click();
+  }
+
   if (app === undefined) return null;
   if (app === null) return <p>This application wasn&apos;t found. <Link className="text-primary underline" href="/applications">Back to your applications</Link></p>;
 
@@ -142,7 +152,7 @@ export default function ApplicationPage() {
         guidelineExtra={<RequirementsChecklist extraction={extraction} documents={docs} reading={reading} error={readError} onRetry={readRequirements} />}
       />
       <ApplicantInfoForm applicationId={id} initial={app.applicant} onSaved={load} />
-      <ResultsPanel results={results} outdated={outdated} />
+      <ResultsPanel results={results} outdated={outdated} onFix={fix} />
 
       {asking && <DisclosureDialog onAnswer={(ok) => answer.current(ok)} />}
     </div>

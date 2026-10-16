@@ -4,29 +4,44 @@ import Image from "next/image";
 import { LoopPlane, Sparkle } from "./Illustrations";
 
 const SEEN_KEY = "applyproof-intro-seen";
+export const REPLAY_EVENT = "applyproof:replay-intro";
 const EASE = "cubic-bezier(.22,1,.36,1)";
 
-// ~7s intro in three scenes, transform/opacity only. Plays once per browser, skippable,
-// never for reduced-motion users, and starts only once the artwork is ready.
+// ~7s intro in three scenes, transform/opacity only. Plays once per browser session (not on every
+// navigation), can be replayed, is skippable, never autoplays for reduced-motion users, and starts
+// only once the artwork is ready.
 export default function Intro() {
   const [show, setShow] = useState(false);
   const [ready, setReady] = useState(false);
+  const [run, setRun] = useState(0);
 
   useEffect(() => {
+    const play = () => {
+      setReady(false);
+      setRun((n) => n + 1);
+      setShow(true);
+    };
     let seen = true;
     try {
-      seen = localStorage.getItem(SEEN_KEY) === "1";
-      localStorage.setItem(SEEN_KEY, "1");
+      seen = sessionStorage.getItem(SEEN_KEY) === "1";
+      sessionStorage.setItem(SEEN_KEY, "1");
     } catch {}
-    if (seen || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    setShow(true);
-    const t = setTimeout(() => setReady(true), 1500); // don't wait forever on a slow connection
-    return () => clearTimeout(t);
+    if (!seen && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) play();
+    window.addEventListener(REPLAY_EVENT, play);
+    return () => window.removeEventListener(REPLAY_EVENT, play);
   }, []);
+
+  // Don't wait forever for the artwork on a slow connection.
+  useEffect(() => {
+    if (!show) return;
+    const t = setTimeout(() => setReady(true), 1500);
+    return () => clearTimeout(t);
+  }, [show, run]);
 
   if (!show) return null;
   return (
     <div
+      key={run}
       className="intro fixed inset-0 z-50 grid place-items-center overflow-hidden bg-oat px-4"
       data-ready={ready}
       style={{ animation: `fade-away 700ms ${EASE} 6.5s forwards` }}

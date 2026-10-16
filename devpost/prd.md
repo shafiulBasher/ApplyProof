@@ -111,7 +111,8 @@ Source: `scope.md > The Unique Kernel`.
   - [ ] Every Action Needed finding has a recommended correction, and every Needs Verification finding has a specific next step (for example "Upload a revised CV of no more than 2 pages", "Confirm the accepted evidence with the program organizer"). No generic "check it yourself" lines.
   - [ ] Facts (the explanation and evidence) are shown separately from suggestions (labeled **Next step**). Next steps are grounded in the quoted rule and never invent requirements, deadlines, or evidence.
   - [ ] A deadline shows its date, time, and timezone only where the quote states them; a missing closing time or timezone is flagged for verification, never filled in.
-  - [ ] No finding is shown without a source quote.
+  - [ ] No finding is shown without a source quote. **Presentation (learner-approved during the final review):** Action Needed and Needs Verification always show the quote. Passed findings are compact checklist rows, with the quote and evidence one click away, never removed.
+  - [ ] Action Needed findings are numbered fix-first cards ("Fix this first" on the top one), with a visual limit meter where there's a measured value and a **Replace file** / **Upload file** action for document-related findings. Needs Verification findings are sticky-note cards led by the Next step. Every finding shows an icon for its requirement type (document, length limit, eligibility, deadline).
 
 ### Fix-First Results
 - [ ] The groups appear in this order: **Action Needed** (expanded), **Needs Verification** (expanded when it has items), **Passed** (collapsed).

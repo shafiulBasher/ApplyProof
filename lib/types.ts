@@ -84,6 +84,10 @@ export type FindingStatus = "passed" | "action_needed" | "needs_verification";
 export interface Finding {
   requirementId: string;
   status: FindingStatus;
+  // Presentation hints (icons, limit meters, the Replace file action). Older saved results may lack them.
+  category?: RequirementCategory;
+  docType?: DocType;
+  limit?: { min?: number; max?: number };
   title: string;
   explanation: string;
   quote: string;

@@ -210,7 +210,7 @@ function DocRow({ doc, onReplace, onRemove, onType, busy }: {
   const ref = useRef<HTMLInputElement>(null);
   const pasted = doc.source === "pasted";
   return (
-    <div className="rounded-2xl border border-line bg-white p-3 animate-[fade-in_200ms_ease-out]">
+    <div data-doctype={doc.role === "applicant" ? doc.confirmedType : undefined} className="rounded-2xl border border-line bg-white p-3 transition animate-[fade-in_200ms_ease-out]">
       <div className="flex flex-wrap items-center gap-3">
         <span className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${doc.readable ? "bg-lilac text-primary-ink" : "bg-peach text-peach-ink"}`}>
           {pasted ? <ClipboardPaste className="h-5 w-5" aria-hidden /> : <FileText className="h-5 w-5" aria-hidden />}

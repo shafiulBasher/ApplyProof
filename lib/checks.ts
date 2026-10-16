@@ -19,7 +19,7 @@ export const docName = (t?: DocType) => DOC_NAMES[t ?? "other"];
 export const qty = (n: number, unit: string) => `${n} ${n === 1 ? unit.replace(/s$/, "") : unit}`;
 
 type Docs = Pick<StoredDocument, "fileName" | "confirmedType" | "pageCount" | "wordCount" | "readable">[];
-type Verdict = Omit<Finding, "requirementId" | "title" | "quote" | "page">;
+type Verdict = Omit<Finding, "requirementId" | "title" | "quote" | "page" | "category" | "docType">;
 
 // Readable files of a confirmed type. Shared by the checker and the requirements checklist.
 export const countDocs = (docs: Docs, type?: DocType) => docs.filter((d) => d.readable && d.confirmedType === type).length;
@@ -33,7 +33,7 @@ export function runChecks(requirements: Requirement[], documents: Docs, facts: A
     const verdict: Verdict = req.quoteVerified
       ? check(req, docs, facts)
       : { status: "needs_verification", explanation: "We couldn't find this quote in the guideline.", correction: "Look up this rule in the original guideline before relying on it." };
-    return { requirementId: req.id, title: req.title, quote: req.quote, page: req.page, ...verdict };
+    return { requirementId: req.id, category: req.category, docType: req.docType, title: req.title, quote: req.quote, page: req.page, ...verdict };
   });
 }
 
@@ -54,7 +54,7 @@ function requiredDocument(req: Requirement, docs: Docs): Verdict {
   const unconfirmed = countUnconfirmed(docs);
   const name = docName(req.docType);
   const evidence = `Uploaded ${plural(name, required)}: ${have}`;
-  if (have >= required) return { status: "passed", explanation: `${cap(num(required))} required; ${num(have)} uploaded.`, evidence, measured: have, unit: "uploaded" };
+  if (have >= required) return { status: "passed", explanation: `${cap(num(required))} required; ${num(have)} uploaded.`, evidence, measured: have, unit: "uploaded", limit: { min: required } };
   if (unconfirmed > 0)
     return {
       status: "needs_verification",
@@ -62,6 +62,7 @@ function requiredDocument(req: Requirement, docs: Docs): Verdict {
       evidence,
       measured: have,
     unit: "uploaded",
+    limit: { min: required },
       correction: "Choose a type for each uploaded file so it can be counted.",
     };
   const missing = required - have;
@@ -71,6 +72,7 @@ function requiredDocument(req: Requirement, docs: Docs): Verdict {
     evidence,
     measured: have,
     unit: "uploaded",
+    limit: { min: required },
     correction:
       required === 1 ? `Upload your ${name}.`
       : missing === 1 ? `Upload the ${ORDINALS[required] ?? `${required}th`} ${name}.`
@@ -94,7 +96,7 @@ function lengthLimit(req: Requirement, docs: Docs): Verdict {
   const bad = measures.findIndex((m) => (req.max !== undefined && m > req.max) || (req.min !== undefined && m < req.min));
   const shown = bad >= 0 ? bad : 0;
   const evidence = `${limit} · Uploaded ${name}: ${qty(measures[shown], unit)}`;
-  if (bad < 0) return { status: "passed", explanation: `Your ${name} is within the limit.`, evidence, measured: measures[0], unit };
+  if (bad < 0) return { status: "passed", explanation: `Your ${name} is within the limit.`, evidence, measured: measures[0], unit, limit: { min: req.min, max: req.max } };
 
   const over = req.max !== undefined && measures[bad] > req.max;
   return {
@@ -103,6 +105,7 @@ function lengthLimit(req: Requirement, docs: Docs): Verdict {
     evidence,
     measured: measures[bad],
     unit,
+    limit: { min: req.min, max: req.max },
     correction: over ? `Upload a revised ${name} of no more than ${qty(req.max!, unit)}.` : `Upload a revised ${name} of at least ${qty(req.min!, unit)}.`,
   };
 }

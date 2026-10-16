@@ -28,6 +28,7 @@
   --font-sans: var(--font-dm-sans), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-fraunces), Georgia, serif;
   --font-hand: var(--font-caveat), "Comic Sans MS", cursive;
+  --font-marker: var(--font-kalam), var(--font-caveat), cursive;
 }
 
 body {

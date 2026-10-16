@@ -97,6 +97,15 @@ async function main() {
     "I have supervised Alex as a research assistant for two years. Alex is reliable, curious, and communicates findings clearly. I recommend Alex without reservation.",
   ]]);
 
+  // Extra test files: a second letter (fixes the letter count), a too-short letter, an unclear filename.
+  await makePdf("recommendation-2.pdf", [[
+    "Letter of Recommendation for Alex Rivera",
+    NOTE,
+    "I taught Alex in two engineering courses. Alex consistently delivered careful, well-organized work and helped classmates understand difficult material.",
+  ]]);
+  await makePdf("motivation-letter-short.pdf", [[head, NOTE, filler(300, LETTER_SEED)]]);
+  await makePdf("my-document.pdf", [cvPage("Alex Rivera - Curriculum Vitae")]);
+
   // A PDF with no text layer, to exercise the "unreadable" path.
   const blank = await PDFDocument.create();
   blank.addPage([612, 792]).drawRectangle({ x: 100, y: 300, width: 400, height: 200, color: rgb(0.8, 0.8, 0.8) });

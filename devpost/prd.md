@@ -64,6 +64,8 @@ Source: `scope.md > The POC Boundary` (multiple applications).
 ### Document Upload and Identification
 - As an applicant, I want ApplyProof to recognize my files but let me have the final word, so that the document checks count the right things.
   - [ ] PDFs can be uploaded as the official guideline or as applicant documents.
+  - [ ] The guideline can instead be pasted as text (**Paste guideline text**), for requirements published on a website. Pasting replaces an uploaded guideline PDF and vice versa; there is still one guideline per application. Applicant documents remain PDF uploads.
+  - [ ] Empty or very short pasted text (under 30 words) is rejected with "Paste the full guideline text (at least 30 words) so its requirements can be read."
   - [ ] Each applicant file gets a type suggested from its filename (CV, motivation letter, transcript, recommendation letter, other), shown in a dropdown the user can change. No AI is used for this.
   - [ ] If the type is uncertain, ApplyProof asks the user to choose and doesn't pre-select a guess.
   - [ ] Several files can share a type (for example two recommendation letters).
@@ -100,6 +102,7 @@ Each extracted requirement becomes a finding. The finding list is the checklist.
 ### Evidence-Linked Findings
 Source: `scope.md > The Unique Kernel`.
 - As an applicant, I want to see why each finding was made so that I can trust it and act on it.
+  - [ ] For a pasted guideline, the verified quote is labeled **"Pasted guideline"** instead of a page number.
   - [ ] Every finding shows the requirement, a plain explanation, the exact quote from the guideline, and its page number.
   - [ ] Where relevant, it also shows evidence from the applicant's side (for example "Uploaded CV: 3 pages").
   - [ ] Every Action Needed finding has a recommended correction, and every Needs Verification finding has a specific next step (for example "Upload a revised CV of no more than 2 pages", "Confirm the accepted evidence with the program organizer"). No generic "check it yourself" lines.
@@ -161,6 +164,7 @@ Build priority: the demo path first (see Product Decisions), then everything els
 - Single Application Page: header, Documents, Applicant Information, Results
 - PDF upload, with file types suggested from the filename and confirmed by the user
 - Required-documents checklist shown right after the guideline is read, ticking off uploads
+- Guideline as a PDF upload or pasted text
 - Requirement extraction with quotes and page numbers
 - Missing-document, page-limit, and word-limit checks
 - Basic eligibility check against typed-in facts
@@ -189,7 +193,7 @@ Build priority: the demo path first (see Product Decisions), then everything els
 - **Predicting admission or success:** it promises readiness, not outcomes.
 - **Reading eligibility facts out of the CV:** the user enters them.
 - **Judging writing quality:** quality isn't objectively verifiable, so it's out.
-- **Supporting non-PDF uploads (Word, images) or OCR of scanned PDFs:** the MVP is PDF-only, and a scanned PDF gets a clear error asking for a text-readable PDF.
+- **Supporting non-PDF uploads (Word, images) or OCR of scanned PDFs:** the MVP accepts PDFs, plus pasted text for the guideline only (added after the final review began, learner request), and a scanned PDF gets a clear error asking for a text-readable PDF.
 
 ## Open Questions
 None. The four review assumptions were confirmed and clarified by the learner: the overall status rule, the Outdated notice, keeping results after a failed check, and PDF-only uploads.

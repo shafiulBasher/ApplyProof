@@ -110,7 +110,7 @@ async function main() {
   // a deadline with no closing time, and two references required.
   mkdirSync(`${OUT}/job`, { recursive: true });
   const JOB_NOTE = "SYNTHETIC SAMPLE - Northwind Analytics is a fictional company created for the ApplyProof demo.";
-  await makePdf("job/job-posting.pdf", [
+  const jobPosting = [
     [
       "Junior Data Analyst - Northwind Analytics (Berlin, hybrid)",
       JOB_NOTE,
@@ -129,7 +129,10 @@ async function main() {
       "Applications close on November 30, 2026.",
       JOB_NOTE,
     ],
-  ]);
+  ];
+  await makePdf("job/job-posting.pdf", jobPosting);
+  // The same posting as plain text, for trying "Paste guideline text".
+  writeFileSync(`${OUT}/job/job-posting.txt`, jobPosting.flat().join("\n\n") + "\n");
   const resumePage = (title: string) => [
     title,
     "Experience: data intern at a fictional transit agency, cleaning ticketing data and building weekly ridership reports in SQL and Python.",

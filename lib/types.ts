@@ -36,6 +36,8 @@ export interface StoredDocument extends ParsedPdf {
   id: string;
   applicationId: string;
   role: "guideline" | "applicant";
+  // A guideline can be a PDF or pasted text (one "page", no page numbers).
+  source?: "pdf" | "pasted";
   fileName: string;
   blob: Blob;
   contentHash: string;
@@ -96,6 +98,7 @@ export interface CheckResult {
   ranAt: number;
   inputHash: string;
   guidelineHash: string;
+  guidelinePasted?: boolean;
   // When the requirements were read; a re-read of the same guideline can renumber them.
   extractedAt: number;
   findings: Finding[];

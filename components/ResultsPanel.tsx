@@ -32,13 +32,13 @@ export default function ResultsPanel({ results, outdated }: { results: StoredRes
       {changes && <WhatChanged key={current!.ranAt} changes={changes} />}
       {current && GROUPS.map((g) => {
         const items = current.findings.filter((f) => f.status === g.status);
-        return <Group key={`${g.status}-${current.ranAt}`} {...g} items={items} justPassed={justPassed} defaultOpen={items.length > 0 && (g.status !== "passed" || items.some((f) => justPassed.has(f.requirementId)))} />;
+        return <Group key={`${g.status}-${current.ranAt}`} {...g} items={items} justPassed={justPassed} pasted={!!current.guidelinePasted} defaultOpen={items.length > 0 && (g.status !== "passed" || items.some((f) => justPassed.has(f.requirementId)))} />;
       })}
     </section>
   );
 }
 
-function Group({ label, dot, items, justPassed, defaultOpen }: { label: string; dot: string; items: Finding[]; justPassed: Set<string>; defaultOpen: boolean }) {
+function Group({ label, dot, items, justPassed, pasted, defaultOpen }: { label: string; dot: string; items: Finding[]; justPassed: Set<string>; pasted: boolean; defaultOpen: boolean }) {
   const [open, setOpen] = useState(defaultOpen);
   return (
     <div>
@@ -48,7 +48,7 @@ function Group({ label, dot, items, justPassed, defaultOpen }: { label: string; 
         <span className="rounded-full bg-navy/5 px-2 text-sm tabular-nums text-slate">{items.length}</span>
         <ChevronDown className={`ml-auto h-4 w-4 text-slate transition ${open ? "rotate-180" : ""}`} />
       </button>
-      {open && <div className="space-y-3">{items.map((f) => <FindingCard key={f.requirementId} finding={f} justPassed={justPassed.has(f.requirementId)} />)}</div>}
+      {open && <div className="space-y-3">{items.map((f) => <FindingCard key={f.requirementId} finding={f} justPassed={justPassed.has(f.requirementId)} pasted={pasted} />)}</div>}
     </div>
   );
 }

@@ -69,6 +69,16 @@ Build mode: fast
   Learner check: Go back to the dashboard. Your scholarship card shows its latest status and issue count. Create a second application and confirm it starts empty and Not Checked, and that the first one's files and results are untouched.
   Commit: `Add application dashboard cards, empty state, and README`
 
+- [x] **7. Paste the guideline text instead of uploading a PDF**
+  Becomes usable: The guideline slot offers Upload guideline PDF or Paste guideline text. Pasted text (at least 30 words) goes through the same disclosure, single cached Gemini read, checklist, quote verification, and fix-and-rerun path; its quotes are labeled "Pasted guideline" instead of a page number.
+  Why now: Learner request during the final review — many scholarship and job requirements are published directly on websites.
+  PRD ref: `prd.md > Document Upload and Identification`, `prd.md > Evidence-Linked Findings`, `prd.md > Non-Goals`
+  Spec ref: `spec.md > Components` (Document Manager, Results Panel and Finding Card), `spec.md > Data Model` (`documents.source`, `CheckResult.guidelinePasted`), `spec.md > What Was Simplified and Why`
+  Build: Paste box in the guideline slot with a 30-word minimum; pasted text stored as a one-"page" guideline document with `source: 'pasted'`; results remember `guidelinePasted` so cards show "Pasted guideline"; `samples/job/job-posting.txt` for trying it.
+  Verify (mechanical): `npx tsc --noEmit` and all Vitest tests pass; the pasted job posting sent through the running app's extract route returns 9 requirements with 9/9 quotes verified; the scholarship accuracy test still finds 10/10.
+  Learner check: Create an application, click Paste guideline text, paste the contents of `samples/job/job-posting.txt`, and save. The checklist appears; run the check and confirm each quote says "Pasted guideline".
+  Commit: `Allow pasting the guideline as text`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 3 (the first real findings; your feedback can still shape the What Changed view and the dashboard). Learner tried slices 1–3; feedback (generic "check it yourself" lines, wanted a required-documents list after the guideline upload) became slice 4, which they retried and confirmed in the app (checklist ticks, Next steps, deadline "Submit by October 20, 2027, 23:59 CET.").
@@ -96,3 +106,5 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 - Added slice 4 (required-documents checklist + specific next steps) and renumbered What Changed to 5 and the dashboard to 6 — learner feedback at the slice 3 checkpoint: the generic "check it yourself" lines looked odd, and they want to see required documents right after uploading the guideline. The guideline's text is now sent at upload (after the disclosure) instead of at Run; PRD and spec updated to match.
 - Expected-requirements list grew from 8 rules to 10 checks — the guideline lists the CV and motivation letter as required documents as well as length-limited ones, so each gets a "required" check and a length check, matching the extraction prompt's one-item-per-rule design.
 - Faster, more resilient guideline reading — learner asked for more free models and a shorter wait after uploading the guideline. Gemini now uses low "thinking" (the default took ~16s; low takes ~7–12s; "minimal" was rejected by some models and cost Flash-Lite a requirement). The fallback list grew to five free models, fastest first (`gemini-flash-lite-latest, gemini-3.5-flash, gemini-3.6-flash, gemini-3.5-flash-lite, gemini-3.8-flash`), and any error except a bad key moves on to the next model, each tried once. The prompt now says every "who may apply" rule is its own eligibility item, after a lite model skipped the degree rule; with that line every model tested scored 10/10 with all quotes verified.
+- Added slice 7 (paste the guideline as text) — learner request during the final review. PRD Non-Goals now allow pasted text for the guideline only; applicant documents stay PDF-only.
+- Extraction prompt: "nationality" is only for citizenship; work authorization, visa, residency, and language rules are unclear eligibility (Needs Verification) — the pasted job posting's "legally authorized to work in the European Union" came back as a nationality rule, which could have wrongly shown Action Needed. Cache version bumped to 3 so saved guidelines are re-read once with the fixed prompt.

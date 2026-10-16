@@ -122,7 +122,8 @@ PRD ref: `prd.md > Application Management`.
 PRD ref: `prd.md > Screens and Layout > Single Application Page`.
 
 ### Document Manager
-- Has a guideline slot (one file) and an applicant documents list.
+- Has a guideline slot (one guideline) and an applicant documents list.
+- The guideline slot offers **Upload guideline PDF** and **Paste guideline text**. Pasted text (at least 30 words, else a clear message) is saved as the guideline document with `source: 'pasted'`, one "page" holding the whole text, a content hash of the text, and its word count. It goes through the same disclosure, extraction, cache, quote check, and rerun path as a PDF. Pasting replaces a PDF guideline and vice versa. Applicant documents stay PDF-only.
 - The first upload in an application shows the **Disclosure Dialog** first. Upload sends each file to the **Parse Route**, computes its content fingerprint, gets a filename-based suggestion from **Document Type Hints**, then saves everything.
 - Each row shows the filename, a type dropdown (CV, motivation letter, transcript, recommendation letter, other), page and word counts, and Replace / Remove.
 - When the filename doesn't clearly match one type, the dropdown starts on "Choose type…" and the check treats the file as unconfirmed.
@@ -227,7 +228,7 @@ PRD ref: `prd.md > Recheck and What Changed`.
 
 ### Results Panel and Finding Card
 - Order: Outdated notice (if any), then any check error, then **What Changed** (if there's a previous result), then three groups: Action Needed (expanded), Needs Verification (expanded if it has items), Passed (collapsed). Each group shows its count.
-- A **Finding Card** shows the requirement, explanation, highlighted quote with its page, applicant-side evidence, and correction. It animates on a status change.
+- A **Finding Card** shows the requirement, explanation, highlighted quote with its page (or "Pasted guideline" when the result came from pasted text), applicant-side evidence, and correction. It animates on a status change.
 
 PRD ref: `prd.md > Fix-First Results`, `prd.md > Evidence-Linked Findings`.
 
@@ -260,13 +261,13 @@ All of this is in IndexedDB, via Dexie, in the user's browser. Nothing is stored
 | Table | Fields | Updated when | When you come back |
 |---|---|---|---|
 | `applications` | `id, name, organization?, deadline?, applicant: {gpa?, gpaScale?, degree?, nationality?}, disclosureAccepted, createdAt` | creating; editing applicant info; accepting the disclosure | all still there |
-| `documents` | `id, applicationId, role: 'guideline' \| 'applicant', fileName, blob, contentHash, pages: string[], pageCount, wordCount, readable, suggestedType?, confirmedType?, uploadedAt` | upload, type confirmation, replace (overwrites the same row), remove | all still there |
+| `documents` | `id, applicationId, role: 'guideline' \| 'applicant', source?: 'pdf' \| 'pasted', fileName, blob, contentHash, pages: string[], pageCount, wordCount, readable, suggestedType?, confirmedType?, uploadedAt` | upload, type confirmation, replace (overwrites the same row), remove | all still there |
 | `extractions` | `guidelineHash (key), pages: string[], requirements: Requirement[], model, version, createdAt` (a cached row with an older `version` is re-read after a prompt or schema change) | first run with a new guideline | reused, so no new AI call |
 | `results` | `applicationId (key), current: CheckResult?, previous: CheckResult?, lastError?` | each run; on failure only `lastError` changes | all still there |
 
 **Requirement:** `{ id, category: 'required_document'|'page_limit'|'word_limit'|'eligibility'|'deadline'|'formatting'|'other', title, docType?, count?, min?, max?, unit?: 'pages'|'words', eligibility?: { field: 'gpa'|'degree'|'nationality'|'other', minGpa?, scale?, allowedValues?: string[], clear: boolean }, deadline?: { date?, time?, timezone? }, quote, page, quoteVerified }`
 
-**CheckResult:** `{ ranAt, inputHash, guidelineHash, findings: Finding[], status, outstanding }`
+**CheckResult:** `{ ranAt, inputHash, guidelineHash, guidelinePasted?, extractedAt, findings: Finding[], status, outstanding }`
 
 **Finding:** `{ requirementId, status: 'passed'|'action_needed'|'needs_verification', title, explanation, quote, page, evidence?, measured?: number, correction? }`
 
@@ -349,7 +350,7 @@ build-with-ai-basics/            # repo root = the app
 - **Word count = whitespace-separated words in the extracted text.** It's good enough for the limits, though headers and footers may add a few words. A fuller version would let the user exclude sections.
 - **Filename-based type hints** instead of AI or content analysis (learner's choice). This means no AI calls on upload, less data sent, and less quota use. A fuller version could also look at first-page keywords in code.
 - **Only the latest and previous results are kept**, which is all What Changed needs (`prd.md > Deferred From the POC`).
-- **No OCR, PDF only** (learner-approved, `prd.md > Non-Goals`).
+- **No OCR; PDFs, plus pasted text for the guideline only** (learner-approved, `prd.md > Non-Goals`). Pasted text has no pages, so its evidence label is "Pasted guideline".
 
 ## Decisions and Open Issues
 

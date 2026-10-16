@@ -26,7 +26,7 @@ npm run dev                    # open http://localhost:3000
 
 ## Try the demo
 
-1. Click **+ New Application** and name it "Global Future Scholars Scholarship".
+1. Click **+ New Application** and name it "Global Future Scholars Scholarship". (Guidelines can also be pasted as text: try **Paste guideline text** with `samples/job/job-posting.txt`.)
 2. Upload `samples/guideline.pdf` and accept the disclosure. The checklist of required documents appears.
 3. Add `cv-3-pages.pdf`, `motivation-letter.pdf`, `transcript.pdf`, and `recommendation-1.pdf`, and watch the checklist tick off.
 4. Enter GPA `3.6` on a `4` scale and the degree `Bachelor of Science`, then click **Run Readiness Check**.

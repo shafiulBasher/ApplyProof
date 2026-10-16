@@ -5,7 +5,7 @@ import { inputHash, outstanding, overallStatus } from "./status";
 import type { Application, CheckResult, Extraction, StoredDocument } from "./types";
 
 // Bump when the extraction prompt or schema changes, so cached requirements are re-read.
-const EXTRACTION_VERSION = 2;
+const EXTRACTION_VERSION = 3;
 
 // The saved requirements for this guideline, if it has been read already. No network call.
 export async function cachedExtraction(guideline: StoredDocument): Promise<Extraction | undefined> {
@@ -51,6 +51,7 @@ export async function runCheck(app: Application, docs: StoredDocument[]): Promis
       ranAt: Date.now(),
       inputHash: await currentInputHash(docs, app.applicant),
       guidelineHash: extraction.guidelineHash,
+      guidelinePasted: guideline.source === "pasted",
       extractedAt: extraction.createdAt,
       findings,
       status: overallStatus(findings),

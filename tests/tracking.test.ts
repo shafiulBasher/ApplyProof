@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { guidelineDeadline, trackingOf } from "@/lib/tracking";
+import { confirmationFor, guidelineDeadline, trackingOf } from "@/lib/tracking";
 import type { Requirement } from "@/lib/types";
 
 const now = new Date(2026, 9, 17, 15, 0).getTime(); // Oct 17, 2026, 3 pm local
@@ -21,4 +21,12 @@ test("guideline deadline only when its date is in the verified quote", () => {
   expect(guidelineDeadline([req({ deadline: { date: "October 21, 2027" } })])).toBeUndefined(); // not in the quote
   expect(guidelineDeadline([req({ quoteVerified: false })])).toBeUndefined();
   expect(guidelineDeadline([req({ deadline: undefined })])).toBeUndefined();
+});
+
+test("a confirmation applies only to the same quoted rule", () => {
+  const app = { confirmations: { r9: { quote: "Applicants must demonstrate strong English proficiency.", note: "IELTS 7.0", at: 1 } } };
+  expect(confirmationFor(app, { requirementId: "r9", quote: "Applicants must demonstrate strong English proficiency." })?.note).toBe("IELTS 7.0");
+  expect(confirmationFor(app, { requirementId: "r9", quote: "Applicants must submit an IELTS score of 7.0." })).toBeUndefined();
+  expect(confirmationFor(app, { requirementId: "r1", quote: "x" })).toBeUndefined();
+  expect(confirmationFor({}, { requirementId: "r9", quote: "x" })).toBeUndefined();
 });

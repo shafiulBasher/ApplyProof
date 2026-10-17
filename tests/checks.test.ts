@@ -114,6 +114,9 @@ test("a GPA or degree rule mislabeled by the AI is still checked from its verifi
   const degreeQuote = "Applicants must hold a bachelor's degree, or expect to complete one before the program starts.";
   expect(one({ category: "eligibility", quote: degreeQuote, eligibility: { field: "degree", clear: false } }, [], facts).status).toBe("passed");
   expect(one({ category: "eligibility", quote: degreeQuote, eligibility: { field: "other", clear: false } }, [], facts).status).toBe("passed");
+  // Eligibility details missing altogether: still read from the quote.
+  expect(one({ category: "eligibility", quote: degreeQuote }, [], facts).status).toBe("passed");
+  expect(one({ category: "eligibility", quote: gpaQuote }, [], facts).status).toBe("passed");
   // A genuinely unclear rule stays unclear.
   expect(one({ category: "eligibility", quote: "Applicants must demonstrate strong English proficiency.", eligibility: { field: "other", clear: false } }, [], facts).status).toBe("needs_verification");
 });

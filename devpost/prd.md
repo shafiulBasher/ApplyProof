@@ -129,6 +129,14 @@ Added after the final review began (learner request). Separate from readiness: w
 - [ ] The dashboard can filter by **Submitted** and **Missed**.
 - [ ] Days are compared in the user's local time; the guideline's own timezone isn't applied.
 
+### Confirmed by You
+Added during the final review (learner request), for rules ApplyProof can't verify (for example "strong English proficiency").
+- [ ] Each Needs Verification finding offers **Mark as confirmed** with an optional short note (for example "IELTS 7.0 certificate ready").
+- [ ] A confirmed finding shows **Confirmed by you**, the date, and the note, styled differently from Passed, and says ApplyProof didn't verify it. It stays in Needs Verification with its quote, evidence, and Next step.
+- [ ] The note can be edited and the confirmation undone.
+- [ ] Confirmations never change a finding's status, the outstanding-issue count, or whether the application is Ready, and make no AI calls.
+- [ ] A confirmation applies only to the same quoted rule; if the guideline changes the rule's wording, it no longer applies.
+
 ### Recheck and What Changed
 Source: `scope.md > What "Working" Looks Like` (the "oh, that's cool" beat).
 - As an applicant, I want to see what my fix changed so that I know my correction worked.

@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { AlertCircle, CalendarDays, CheckCircle2, ChevronDown, FileText, GraduationCap, HelpCircle, Lightbulb, ListChecks, Ruler, Type, Upload } from "lucide-react";
-import type { Finding, FindingStatus, RequirementCategory } from "@/lib/types";
+import { AlertCircle, CalendarDays, CheckCircle2, ChevronDown, FileText, GraduationCap, HelpCircle, Lightbulb, ListChecks, Pencil, Ruler, Type, Undo2, Upload, UserCheck } from "lucide-react";
+import type { Confirmation, Finding, FindingStatus, RequirementCategory } from "@/lib/types";
 
 export const FINDING_STYLE: Record<FindingStatus, { label: string; pill: string; icon: typeof CheckCircle2 }> = {
   action_needed: { label: "Action Needed", pill: "bg-peach text-peach-ink", icon: AlertCircle },
@@ -131,7 +131,9 @@ export function ActionCard({ f, index, pasted, onFix }: { f: Finding; index: num
 }
 
 // Needs Verification: a sticky note led by what you should do.
-export function CheckNote({ f, index, pasted }: { f: Finding; index: number; pasted?: boolean }) {
+export function CheckNote({ f, index, pasted, confirmation, onConfirm }: {
+  f: Finding; index: number; pasted?: boolean; confirmation?: Confirmation; onConfirm?: (note: string | null) => void;
+}) {
   const Cat = categoryOf(f);
   return (
     <article className={`relative rounded-2xl bg-butter/70 p-4 shadow-[0_10px_24px_-16px_rgba(122,90,18,0.55)] animate-[fade-in_220ms_ease-out] sm:p-5 ${index % 2 ? "rotate-[0.4deg]" : "-rotate-[0.4deg]"}`}>
@@ -147,7 +149,49 @@ export function CheckNote({ f, index, pasted }: { f: Finding; index: number; pas
       <p className="mt-1 text-sm text-butter-ink">{f.explanation}</p>
       <Quote f={f} pasted={pasted} className="mt-3 bg-white/60" />
       <Evidence f={f} />
+      {onConfirm && <ConfirmBox confirmation={confirmation} onConfirm={onConfirm} />}
     </article>
+  );
+}
+
+// The applicant's own confirmation: their word, labeled as such, never a "Passed".
+function ConfirmBox({ confirmation, onConfirm }: { confirmation?: Confirmation; onConfirm: (note: string | null) => void }) {
+  const [editing, setEditing] = useState(false);
+  const [note, setNote] = useState(confirmation?.note ?? "");
+  const save = () => { onConfirm(note.trim().slice(0, 140)); setEditing(false); };
+
+  if (editing)
+    return (
+      <div className="mt-3 rounded-xl border border-primary/25 bg-white/80 p-3">
+        <label className="block text-xs font-medium text-muted">
+          Note (optional), e.g. &quot;IELTS 7.0 certificate ready&quot;
+          <input className="input mt-1" autoFocus maxLength={140} value={note} onChange={(e) => setNote(e.target.value)} onKeyDown={(e) => e.key === "Enter" && save()} />
+        </label>
+        <div className="mt-2 flex justify-end gap-2">
+          <button className="btn-ghost" onClick={() => setEditing(false)}>Cancel</button>
+          <button className="btn-primary py-1.5" onClick={save}><UserCheck className="h-4 w-4" aria-hidden /> {confirmation ? "Save note" : "Confirm"}</button>
+        </div>
+      </div>
+    );
+  if (!confirmation)
+    return (
+      <button className="btn-secondary mt-3 w-full py-2" onClick={() => setEditing(true)}>
+        <UserCheck className="h-4 w-4" aria-hidden /> Mark as confirmed
+      </button>
+    );
+  return (
+    <div className="mt-3 rounded-xl border border-primary/25 bg-lilac/70 px-3 py-2.5">
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-ink"><UserCheck className="h-4 w-4" aria-hidden /> Confirmed by you</span>
+        <span className="text-xs text-muted">· {new Date(confirmation.at).toLocaleDateString(undefined, { month: "short", day: "numeric" })}</span>
+        <span className="ml-auto flex">
+          <button className="btn-ghost py-1" onClick={() => { setNote(confirmation.note ?? ""); setEditing(true); }}><Pencil className="h-3.5 w-3.5" aria-hidden /> Edit note</button>
+          <button className="btn-ghost py-1" onClick={() => onConfirm(null)}><Undo2 className="h-3.5 w-3.5" aria-hidden /> Undo</button>
+        </span>
+      </div>
+      {confirmation.note && <p className="mt-1 text-sm text-ink">“{confirmation.note}”</p>}
+      <p className="mt-1 text-xs text-muted">Your own confirmation. ApplyProof didn&apos;t verify this, so it stays under Needs Verification.</p>
+    </div>
   );
 }
 

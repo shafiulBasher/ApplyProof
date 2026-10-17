@@ -88,6 +88,14 @@ export default function ApplicationPage() {
     await load();
   }
 
+  // The applicant's own confirmation of a rule ApplyProof can't verify (null = undo). Not a check result.
+  function confirm(f: Finding, note: string | null) {
+    const next = { ...(app?.confirmations ?? {}) };
+    if (note === null) delete next[f.requirementId];
+    else next[f.requirementId] = { quote: f.quote, note: note || undefined, at: next[f.requirementId]?.at ?? Date.now() };
+    return updateApp("your confirmation", { confirmations: next });
+  }
+
   async function run() {
     if (!app) return;
     setRunning(true);
@@ -174,7 +182,7 @@ export default function ApplicationPage() {
         guidelineExtra={<RequirementsChecklist extraction={extraction} documents={docs} reading={reading} error={readError} onRetry={readRequirements} />}
       />
       <ApplicantInfoForm applicationId={id} initial={app.applicant} onSaved={load} />
-      <ResultsPanel results={results} outdated={outdated} onFix={fix} />
+      <ResultsPanel results={results} outdated={outdated} onFix={fix} app={app} onConfirm={confirm} />
 
       {asking && <DisclosureDialog onAnswer={(ok) => answer.current(ok)} />}
     </div>

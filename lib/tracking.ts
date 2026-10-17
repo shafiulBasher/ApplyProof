@@ -1,5 +1,5 @@
 import { normalize } from "./quotes";
-import type { Application, Requirement } from "./types";
+import type { Application, Confirmation, Finding, Requirement } from "./types";
 
 export type Tracking =
   | { kind: "submitted"; submittedAt: number }
@@ -33,4 +33,10 @@ export function guidelineDeadline(requirements: Requirement[]): string | undefin
     if (isNaN(t.getTime())) continue;
     return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
   }
+}
+
+// The applicant's confirmation for this finding, if it was made for the same quoted rule.
+export function confirmationFor(app: Pick<Application, "confirmations">, f: Pick<Finding, "requirementId" | "quote">): Confirmation | undefined {
+  const c = app.confirmations?.[f.requirementId];
+  return c && c.quote === f.quote ? c : undefined;
 }

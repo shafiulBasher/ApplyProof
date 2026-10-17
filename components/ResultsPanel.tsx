@@ -2,11 +2,15 @@
 import { useState } from "react";
 import { AlertTriangle, ChevronDown, Clock, PartyPopper } from "lucide-react";
 import { whatChanged } from "@/lib/diff";
-import type { Finding, FindingStatus, StoredResults } from "@/lib/types";
+import type { Application, Finding, FindingStatus, StoredResults } from "@/lib/types";
+import { confirmationFor } from "@/lib/tracking";
 import { ActionCard, CheckNote, FINDING_STYLE, PassedRow } from "./FindingCard";
 import WhatChanged from "./WhatChanged";
 
-export default function ResultsPanel({ results, outdated, onFix }: { results: StoredResults; outdated: boolean; onFix?: (f: Finding) => void }) {
+export default function ResultsPanel({ results, outdated, onFix, app, onConfirm }: {
+  results: StoredResults; outdated: boolean; onFix?: (f: Finding) => void;
+  app?: Pick<Application, "confirmations">; onConfirm?: (f: Finding, note: string | null) => void;
+}) {
   const { current, previous, lastError } = results;
   if (!current && !lastError) return null;
   const changes = current && previous ? whatChanged(previous, current) : undefined;
@@ -46,9 +50,12 @@ export default function ResultsPanel({ results, outdated, onFix }: { results: St
               </div>
             )}
           </Group>
-          <Group key={`v-${current.ranAt}`} status="needs_verification" count={verify.length} defaultOpen={verify.length > 0}>
+          <Group key={`v-${current.ranAt}`} status="needs_verification" count={verify.length} defaultOpen={verify.length > 0}
+            extra={app && verify.some((f) => confirmationFor(app, f)) ? `${verify.filter((f) => confirmationFor(app, f)).length} confirmed by you` : undefined}>
             <div className="grid gap-5 pt-3 md:grid-cols-2">
-              {verify.map((f, i) => <CheckNote key={f.requirementId} f={f} index={i} pasted={pasted} />)}
+              {verify.map((f, i) => (
+                <CheckNote key={f.requirementId} f={f} index={i} pasted={pasted} confirmation={app && confirmationFor(app, f)} onConfirm={onConfirm && ((note) => onConfirm(f, note))} />
+              ))}
             </div>
           </Group>
           <Group key={`p-${current.ranAt}`} status="passed" count={passed.length} defaultOpen={passed.some((f) => justPassed.has(f.requirementId))}>
@@ -62,7 +69,7 @@ export default function ResultsPanel({ results, outdated, onFix }: { results: St
   );
 }
 
-function Group({ status, count, defaultOpen, children }: { status: FindingStatus; count: number; defaultOpen: boolean; children: React.ReactNode }) {
+function Group({ status, count, defaultOpen, extra, children }: { status: FindingStatus; count: number; defaultOpen: boolean; extra?: string; children: React.ReactNode }) {
   const [open, setOpen] = useState(defaultOpen);
   const s = FINDING_STYLE[status];
   return (
@@ -71,6 +78,7 @@ function Group({ status, count, defaultOpen, children }: { status: FindingStatus
         <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-semibold ${s.pill}`}>
           <s.icon className="h-4 w-4" aria-hidden /> {s.label} <span className="tabular-nums">({count})</span>
         </span>
+        {extra && <span className="text-xs font-medium text-primary-ink">{extra}</span>}
         <span className="h-px flex-1 bg-line" aria-hidden />
         <ChevronDown className={`h-4 w-4 text-muted transition ${open ? "rotate-180" : ""}`} aria-hidden />
       </button>

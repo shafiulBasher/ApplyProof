@@ -113,8 +113,8 @@ function lengthLimit(req: Requirement, docs: Docs): Verdict {
 // The AI sometimes mislabels a measurable rule (a GPA rule marked unclear, missing numbers, a degree rule as "other").
 // Fill the gaps from the verified quote itself, so the check stays grounded in the guideline's own words.
 export function readEligibility(req: Requirement): Requirement["eligibility"] {
-  const e = req.eligibility;
-  if (!e) return e;
+  // The AI may also leave the eligibility details out entirely; then only the quote can tell.
+  const e = req.eligibility ?? { field: "other" as const, clear: false };
   const quote = req.quote;
   if (e.field === "gpa" || (e.field === "other" && /\bGPA\b|grade point average/i.test(quote))) {
     const m = quote.match(/(\d+(?:\.\d+)?)\s*(?:\/|out of|on an?)\s*(\d+(?:\.\d+)?)/i);

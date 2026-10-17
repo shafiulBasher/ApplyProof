@@ -24,7 +24,16 @@ export interface Application {
   disclosureAccepted: boolean;
   // Set when the user marks the application as submitted.
   submittedAt?: number;
+  // The applicant's own confirmations of rules ApplyProof can't verify, by requirement ID.
+  // Never changes a finding's status: it is the user's word, not a check.
+  confirmations?: Record<string, Confirmation>;
   createdAt: number;
+}
+
+export interface Confirmation {
+  quote: string; // the rule as confirmed, so a changed guideline doesn't carry it over
+  note?: string;
+  at: number;
 }
 
 export interface ParsedPdf {

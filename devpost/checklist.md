@@ -99,6 +99,16 @@ Build mode: fast
   Learner check: Open an application, see its tracking pill, change the deadline to a past date to see Missed, then Mark as submitted.
   Commit: `Add application tracking: not submitted, submitted, missed`
 
+- [x] **10. Confirmed by you: the applicant's own confirmation of rules ApplyProof can't verify**
+  Becomes usable: On each Needs Verification note, Mark as confirmed with an optional note; it then shows Confirmed by you with the date and note, Edit note and Undo, and stays in Needs Verification with its quote and Next step.
+  Why now: Learner request during the final review (English proficiency and similar rules).
+  PRD ref: `prd.md > Features and Behavior > Confirmed by You`
+  Spec ref: `spec.md > Components` (Confirmed by You), `spec.md > Data Model` (`applications.confirmations`)
+  Build: `Confirmation` type, `confirmationFor`, ConfirmBox on CheckNote, "N confirmed by you" in the group header.
+  Verify (mechanical): `tests/tracking.test.ts` (only the same quoted rule), 26/26 Vitest, tsc, build; Edge run: confirm with a note, card stays Needs Verification, outstanding 3 → 3, edit note, undo, no errors.
+  Learner check: On English proficiency, click Mark as confirmed, add a note, then edit and undo it.
+  Commit: `Add Confirmed by you for rules ApplyProof can't verify`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 3 (the first real findings; your feedback can still shape the What Changed view and the dashboard). Learner tried slices 1–3; feedback (generic "check it yourself" lines, wanted a required-documents list after the guideline upload) became slice 4, which they retried and confirmed in the app (checklist ticks, Next steps, deadline "Submit by October 20, 2027, 23:59 CET.").
@@ -134,3 +144,4 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 - Landing hero and intro now use the learner's painted artwork (cropped to the illustration only, compressed to WebP in `public/illustrations/`, ~170–180 KB each); the intro became three eased scenes (paper + handwriting + looping plane → dream board with a slow zoom → logo reveal) using transform/opacity only, paused until the artwork loads. Eligibility checks now read GPA numbers or the degree level from the verified quote when the AI mislabels a measurable rule as unclear — the learner's run showed "Minimum GPA" and "Bachelor's degree" as Needs Verification despite "3.0 on a 4.0 scale".
 - Landing hero now matches the learner's full mockup: their painted scene (baked-in text painted out, `public/illustrations/hero-scene.webp`) with live headline (Kalam), buttons, and badges positioned and scaled over it on desktop; stacked text plus the cropped illustration on phones. The intro now plays once per browser **session** (it looked "removed" because it played once per browser) and **See how it works** replays it (or jumps to the steps with reduced motion). Result cards redesigned per the learner's approval: fix-first numbered cards with limit meters and Replace/Upload file, sticky-note Needs Verification cards, compact expandable Passed rows, and requirement-type icons; PRD and spec updated (Passed quotes are one click away, never removed).
 - "See how it works" now scrolls smoothly to the four steps; it no longer replays the intro and has no play icon (learner: it looked like a video and restarted the animation). The replay moved to a quiet "Replay intro" text link in the footer.
+- Eligibility details missing entirely from the AI's output (not just mislabeled) are now also read from the verified quote — a browser run showed "Bachelor's degree" in Needs Verification again; covered by a new test.

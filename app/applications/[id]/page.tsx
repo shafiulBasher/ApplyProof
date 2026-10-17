@@ -150,7 +150,7 @@ export default function ApplicationPage() {
             <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{app.name}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted">
               {app.organization && <span>{app.organization}</span>}
-              <StatusBadge status={summary.status} confirmed={summary.confirmed} />
+              <StatusBadge status={summary.status} confirmed={summary.confirmed} past={!!app.submittedAt} />
               {results.current && <span className="tabular-nums">{summary.pending} outstanding{summary.confirmed > 0 && summary.status !== "passed" ? ` · ${summary.confirmed} confirmed by you` : ""}</span>}
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">

@@ -10,9 +10,11 @@ const STYLES: Record<OverallStatus, [string, string]> = {
 
 export const STATUS_LABEL = (s: OverallStatus) => STYLES[s][0];
 
-export default function StatusBadge({ status, label, confirmed = 0 }: { status: OverallStatus; label?: string; confirmed?: number }) {
+export default function StatusBadge({ status, label, confirmed = 0, past = false }: { status: OverallStatus; label?: string; confirmed?: number; past?: boolean }) {
   const [text, cls] = STYLES[status];
   // Never "Verified" when the applicant vouched for some items: say so.
   const shown = label ?? (status === "passed" && confirmed > 0 ? `Ready to submit · ${confirmed} confirmed by you` : text);
+  // Submitted: readiness is history, not a to-do.
+  if (past) return <span className="inline-flex items-center whitespace-nowrap rounded-full border border-line px-2.5 py-0.5 text-xs text-muted">Last check: {shown.replace("Ready to submit", "Ready")}</span>;
   return <span className={`inline-flex items-center whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-semibold ${cls}`}>{shown}</span>;
 }

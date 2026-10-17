@@ -29,7 +29,7 @@ export default function ApplicationCard({ app, result }: { app: Application; res
           <p className="font-display text-lg font-semibold leading-snug">{app.name}</p>
           {app.organization && <p className="text-sm text-muted">{app.organization}</p>}
         </div>
-        <div className="flex flex-wrap gap-1.5"><StatusBadge status={status} confirmed={summary.confirmed} /><TrackingPill t={trackingOf(app)} /></div>
+        <div className="flex flex-wrap gap-1.5"><TrackingPill t={trackingOf(app)} /><StatusBadge status={status} confirmed={summary.confirmed} past={!!app.submittedAt} /></div>
         <div className="mt-auto space-y-2">
           {result ? (
             <>

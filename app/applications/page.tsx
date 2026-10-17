@@ -14,7 +14,7 @@ const FILTERS: { key: "all" | OverallStatus | "submitted" | "missed"; label: str
   { key: "all", label: "All" },
   { key: "action_needed", label: "Action Needed" },
   { key: "needs_verification", label: "Needs Verification" },
-  { key: "passed", label: "Ready" },
+  { key: "passed", label: "Ready to submit" },
   { key: "not_checked", label: "Not Checked" },
   { key: "submitted", label: "Submitted" },
   { key: "missed", label: "Missed" },
@@ -41,8 +41,10 @@ export default function Dashboard() {
   }, []);
 
   const statusOf = (a: Application): OverallStatus => summaryFor(a, results.get(a.id)?.current).status;
+  // Submitted or missed applications leave the readiness tabs: they're no longer something to get ready.
+  const active = (a: Application) => !["submitted", "missed"].includes(trackingOf(a).kind);
   const matches = (a: Application, k: (typeof FILTERS)[number]["key"]) =>
-    k === "all" || (k === "submitted" || k === "missed" ? trackingOf(a).kind === k : statusOf(a) === k);
+    k === "all" || (k === "submitted" || k === "missed" ? trackingOf(a).kind === k : active(a) && statusOf(a) === k);
   const count = (k: (typeof FILTERS)[number]["key"]) => (apps ?? []).filter((a) => matches(a, k)).length;
   const shown = (apps ?? []).filter((a) => matches(a, filter));
 

@@ -130,7 +130,7 @@ Added after the final review began (learner request). Separate from readiness: w
 - [ ] Each application shows **Not submitted · due in N days** (butter-yellow within 7 days, "due today" on the day), **Submitted · date**, **Missed · was due date**, or **No deadline set**, on its page and its dashboard card.
 - [ ] **Mark as submitted** records today's date; **Undo submitted** reverses it. A missed application can still be marked submitted.
 - [ ] The deadline can be entered or changed on the application page. If none was entered, it's filled from the guideline's deadline, but only when that date appears word for word in the verified quote.
-- [ ] The dashboard can filter by **Submitted** and **Missed**.
+- [ ] The dashboard can filter by **Submitted** and **Missed**. Readiness tabs (Action Needed, Needs Verification, Ready to submit, Not Checked) list only applications still in progress; a submitted application shows its readiness as "Last check: …".
 - [ ] Days are compared in the user's local time; the guideline's own timezone isn't applied.
 
 ### Confirmed by You

@@ -89,6 +89,16 @@ Build mode: fast
   Learner check: Restart `npm run dev`, open http://localhost:3000, watch the intro (or skip it), click Get started, and run the scholarship demo.
   Commit: `Redesign the interface in the Dream Journal style`
 
+- [x] **9. Track each application: not submitted, submitted, or missed**
+  Becomes usable: Each application shows Not submitted · due in N days, Submitted · date, Missed · was due date, or No deadline set, on its page and dashboard card. Mark as submitted / Undo, an editable deadline (auto-filled from the guideline's verified quote when empty), and Submitted / Missed dashboard filters.
+  Why now: Learner request during the final review: they wanted application tracking (submitted, not submitted, missed).
+  PRD ref: `prd.md > Features and Behavior > Application Tracking`
+  Spec ref: `spec.md > Components` (Application Tracking), `spec.md > Data Model` (`applications.submittedAt`)
+  Build: `lib/tracking.ts` (status + guideline deadline from the verified quote), TrackingPill, header controls, dashboard card pill and filters.
+  Verify (mechanical): `tests/tracking.test.ts` (upcoming, due today, missed, submitted, no deadline; deadline only from a verified quote), 25/25 Vitest, tsc, build; Edge run: deadline auto-filled 2027-10-20 → "due in 368 days", past date → Missed, Mark as submitted → Submitted · Oct 17, 2026, Undo → Missed, dashboard Submitted filter, no errors.
+  Learner check: Open an application, see its tracking pill, change the deadline to a past date to see Missed, then Mark as submitted.
+  Commit: `Add application tracking: not submitted, submitted, missed`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 3 (the first real findings; your feedback can still shape the What Changed view and the dashboard). Learner tried slices 1–3; feedback (generic "check it yourself" lines, wanted a required-documents list after the guideline upload) became slice 4, which they retried and confirmed in the app (checklist ticks, Next steps, deadline "Submit by October 20, 2027, 23:59 CET.").

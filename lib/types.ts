@@ -22,6 +22,8 @@ export interface Application {
   deadline?: string;
   applicant: ApplicantFacts;
   disclosureAccepted: boolean;
+  // Set when the user marks the application as submitted.
+  submittedAt?: number;
   createdAt: number;
 }
 

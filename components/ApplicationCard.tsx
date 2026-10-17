@@ -2,6 +2,8 @@ import Link from "next/link";
 import { CalendarDays } from "lucide-react";
 import type { Application, CheckResult } from "@/lib/types";
 import StatusBadge from "./StatusBadge";
+import TrackingPill, { fmtDate } from "./TrackingPill";
+import { trackingOf } from "@/lib/tracking";
 import { University } from "./Illustrations";
 
 const SKY = { not_checked: "bg-lilac/60", passed: "bg-sage/80", action_needed: "bg-peach/70", needs_verification: "bg-butter/70" } as const;
@@ -26,7 +28,7 @@ export default function ApplicationCard({ app, result }: { app: Application; res
           <p className="font-display text-lg font-semibold leading-snug">{app.name}</p>
           {app.organization && <p className="text-sm text-muted">{app.organization}</p>}
         </div>
-        <div><StatusBadge status={status} /></div>
+        <div className="flex flex-wrap gap-1.5"><StatusBadge status={status} /><TrackingPill t={trackingOf(app)} /></div>
         <div className="mt-auto space-y-2">
           {result ? (
             <>
@@ -42,7 +44,7 @@ export default function ApplicationCard({ app, result }: { app: Application; res
             <p className="text-xs text-muted">Not checked yet</p>
           )}
           {app.deadline && (
-            <p className="flex items-center gap-1.5 pt-1 text-xs text-muted"><CalendarDays className="h-3.5 w-3.5" aria-hidden /> {app.deadline}</p>
+            <p className="flex items-center gap-1.5 pt-1 text-xs text-muted"><CalendarDays className="h-3.5 w-3.5" aria-hidden /> Due {fmtDate(app.deadline)}</p>
           )}
         </div>
       </div>

@@ -142,6 +142,9 @@ PRD ref: `prd.md > AI Disclosure`, `prd.md > States and Boundaries`.
 
 PRD ref: `prd.md > Required-Documents Checklist`.
 
+### Application Tracking
+`lib/tracking.ts`: `trackingOf(app)` → submitted / missed / upcoming (days left) / no_deadline, from `application.submittedAt` and `application.deadline` (YYYY-MM-DD, whole local days). `guidelineDeadline(requirements)` returns the guideline's date only when it appears in the verified quote; the page fills `deadline` with it after the first read if none was entered. `components/TrackingPill.tsx` shows the state on the page header (with a deadline date field and Mark as submitted / Undo) and on dashboard cards; the dashboard adds Submitted and Missed filters. Tested in `tests/tracking.test.ts`.
+
 ### Check Orchestrator
 `lib/runCheck.ts`, called by the Run button. Its steps:
 1. If there's no extraction for this guideline's fingerprint (a hash of its page-by-page text), call the **Extract Route** and save the result.
@@ -253,7 +256,7 @@ All of this is in IndexedDB, via Dexie, in the user's browser. Nothing is stored
 
 | Table | Fields | Updated when | When you come back |
 |---|---|---|---|
-| `applications` | `id, name, organization?, deadline?, applicant: {gpa?, gpaScale?, degree?, nationality?}, disclosureAccepted, createdAt` | creating; editing applicant info; accepting the disclosure | all still there |
+| `applications` | `id, name, organization?, deadline?, submittedAt?, applicant: {gpa?, gpaScale?, degree?, nationality?}, disclosureAccepted, createdAt` | creating; editing applicant info; accepting the disclosure | all still there |
 | `documents` | `id, applicationId, role: 'guideline' \| 'applicant', source?: 'pdf' \| 'pasted', fileName, blob, contentHash, pages: string[], pageCount, wordCount, readable, suggestedType?, confirmedType?, uploadedAt` | upload, type confirmation, replace (overwrites the same row), remove | all still there |
 | `extractions` | `guidelineHash (key), pages: string[], requirements: Requirement[], model, version, createdAt` (a cached row with an older `version` is re-read after a prompt or schema change) | first run with a new guideline | reused, so no new AI call |
 | `results` | `applicationId (key), current: CheckResult?, previous: CheckResult?, lastError?` | each run; on failure only `lastError` changes | all still there |

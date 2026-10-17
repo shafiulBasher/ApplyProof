@@ -2,7 +2,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, CalendarDays } from "lucide-react";
+import { ArrowLeft, Send, Undo2 } from "lucide-react";
+import { guidelineDeadline, trackingOf } from "@/lib/tracking";
+import TrackingPill from "@/components/TrackingPill";
 import { db, save } from "@/lib/db";
 import { cachedExtraction, currentInputHash, getExtraction, runCheck } from "@/lib/runCheck";
 import type { Application, Extraction, Finding, StoredDocument, StoredResults } from "@/lib/types";
@@ -69,12 +71,21 @@ export default function ApplicationPage() {
     const g = (await db.documents.where("applicationId").equals(id).toArray()).find((d) => d.role === "guideline" && d.readable);
     if (!g || !fresh?.disclosureAccepted) return setReading(false);
     try {
-      setExtraction(await getExtraction(g));
+      const ex = await getExtraction(g);
+      setExtraction(ex);
+      // No deadline entered yet: take the guideline's, but only a date that appears in its verified quote.
+      const due = guidelineDeadline(ex.requirements);
+      if (!fresh.deadline && due) await updateApp("the deadline", { deadline: due });
     } catch (e) {
       setReadError((e as Error).message);
     } finally {
       setReading(false);
     }
+  }
+
+  async function updateApp(what: string, changes: Partial<Application>) {
+    await save(what, () => db.applications.update(id, changes));
+    await load();
   }
 
   async function run() {
@@ -120,9 +131,20 @@ export default function ApplicationPage() {
             <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{app.name}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted">
               {app.organization && <span>{app.organization}</span>}
-              {app.deadline && <span className="inline-flex items-center gap-1"><CalendarDays className="h-4 w-4" aria-hidden /> {app.deadline}</span>}
               <StatusBadge status={results.current?.status ?? "not_checked"} />
               {results.current && <span className="tabular-nums">{results.current.outstanding} outstanding</span>}
+            </div>
+            <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
+              <TrackingPill t={trackingOf(app)} />
+              <label className="inline-flex items-center gap-2 text-muted">
+                Deadline
+                <input type="date" className="input w-auto py-1" value={app.deadline ?? ""} onChange={(e) => updateApp("the deadline", { deadline: e.target.value || undefined })} />
+              </label>
+              {app.submittedAt ? (
+                <button className="btn-ghost" onClick={() => updateApp("the submission status", { submittedAt: undefined })}><Undo2 className="h-4 w-4" aria-hidden /> Undo submitted</button>
+              ) : (
+                <button className="btn-secondary py-1.5" onClick={() => updateApp("the submission status", { submittedAt: Date.now() })}><Send className="h-4 w-4" aria-hidden /> Mark as submitted</button>
+              )}
             </div>
           </div>
           <RunButton canRun={!!guideline} running={running || reading} onRun={run} />

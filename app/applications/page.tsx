@@ -7,13 +7,17 @@ import ApplicationCard from "@/components/ApplicationCard";
 import NewApplicationDialog from "@/components/NewApplicationDialog";
 import { Notebook, Sparkle } from "@/components/Illustrations";
 import type { OverallStatus } from "@/components/StatusBadge";
+import { trackingOf } from "@/lib/tracking";
 
-const FILTERS: { key: "all" | OverallStatus; label: string }[] = [
+// Readiness filters plus two tracking filters.
+const FILTERS: { key: "all" | OverallStatus | "submitted" | "missed"; label: string }[] = [
   { key: "all", label: "All" },
   { key: "action_needed", label: "Action Needed" },
   { key: "needs_verification", label: "Needs Verification" },
   { key: "passed", label: "Ready" },
   { key: "not_checked", label: "Not Checked" },
+  { key: "submitted", label: "Submitted" },
+  { key: "missed", label: "Missed" },
 ];
 
 const greeting = () => {
@@ -37,8 +41,10 @@ export default function Dashboard() {
   }, []);
 
   const statusOf = (a: Application): OverallStatus => results.get(a.id)?.current?.status ?? "not_checked";
-  const count = (k: (typeof FILTERS)[number]["key"]) => (apps ?? []).filter((a) => k === "all" || statusOf(a) === k).length;
-  const shown = (apps ?? []).filter((a) => filter === "all" || statusOf(a) === filter);
+  const matches = (a: Application, k: (typeof FILTERS)[number]["key"]) =>
+    k === "all" || (k === "submitted" || k === "missed" ? trackingOf(a).kind === k : statusOf(a) === k);
+  const count = (k: (typeof FILTERS)[number]["key"]) => (apps ?? []).filter((a) => matches(a, k)).length;
+  const shown = (apps ?? []).filter((a) => matches(a, filter));
 
   return (
     <>

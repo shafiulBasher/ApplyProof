@@ -121,6 +121,14 @@ Source: `scope.md > The Unique Kernel`.
 - [ ] If no check has completed successfully yet, the status is **Not Checked**.
 - [ ] The status is never Passed while any required criterion is still unverified.
 
+### Application Tracking
+Added after the final review began (learner request). Separate from readiness: where the application stands.
+- [ ] Each application shows **Not submitted · due in N days** (butter-yellow within 7 days, "due today" on the day), **Submitted · date**, **Missed · was due date**, or **No deadline set**, on its page and its dashboard card.
+- [ ] **Mark as submitted** records today's date; **Undo submitted** reverses it. A missed application can still be marked submitted.
+- [ ] The deadline can be entered or changed on the application page. If none was entered, it's filled from the guideline's deadline, but only when that date appears word for word in the verified quote.
+- [ ] The dashboard can filter by **Submitted** and **Missed**.
+- [ ] Days are compared in the user's local time; the guideline's own timezone isn't applied.
+
 ### Recheck and What Changed
 Source: `scope.md > What "Working" Looks Like` (the "oh, that's cool" beat).
 - As an applicant, I want to see what my fix changed so that I know my correction worked.

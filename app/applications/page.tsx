@@ -7,7 +7,7 @@ import ApplicationCard from "@/components/ApplicationCard";
 import NewApplicationDialog from "@/components/NewApplicationDialog";
 import { Notebook, Sparkle } from "@/components/Illustrations";
 import type { OverallStatus } from "@/components/StatusBadge";
-import { trackingOf } from "@/lib/tracking";
+import { summaryFor, trackingOf } from "@/lib/tracking";
 
 // Readiness filters plus two tracking filters.
 const FILTERS: { key: "all" | OverallStatus | "submitted" | "missed"; label: string }[] = [
@@ -40,7 +40,7 @@ export default function Dashboard() {
     })();
   }, []);
 
-  const statusOf = (a: Application): OverallStatus => results.get(a.id)?.current?.status ?? "not_checked";
+  const statusOf = (a: Application): OverallStatus => summaryFor(a, results.get(a.id)?.current).status;
   const matches = (a: Application, k: (typeof FILTERS)[number]["key"]) =>
     k === "all" || (k === "submitted" || k === "missed" ? trackingOf(a).kind === k : statusOf(a) === k);
   const count = (k: (typeof FILTERS)[number]["key"]) => (apps ?? []).filter((a) => matches(a, k)).length;

@@ -1,4 +1,5 @@
 import { normalize } from "./quotes";
+import { summarize } from "./status";
 import type { Application, Confirmation, Finding, Requirement } from "./types";
 
 export type Tracking =
@@ -40,3 +41,6 @@ export function confirmationFor(app: Pick<Application, "confirmations">, f: Pick
   const c = app.confirmations?.[f.requirementId];
   return c && c.quote === f.quote ? c : undefined;
 }
+
+export const summaryFor = (app: Pick<Application, "confirmations">, result?: { findings: Finding[] }) =>
+  summarize(result, (f) => !!confirmationFor(app, f));

@@ -1,5 +1,6 @@
 import { normalize } from "./quotes";
-import { type ApplicantFacts, type DocType, type Finding, type Requirement, type StoredDocument } from "./types";
+import { acceptedFields, allowsExpectedCompletion, allowsRelatedField, degreeLevelOf, DEGREE_LEVELS, fieldMatches, levelLabel, meetsLevel } from "./degrees";
+import { type ApplicantFacts, type FactField, type DocType, type Finding, type Requirement, type StoredDocument } from "./types";
 
 const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"];
 const ORDINALS = ["", "first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"];
@@ -122,10 +123,10 @@ export function readEligibility(req: Requirement): Requirement["eligibility"] {
     const scale = e.scale ?? (m ? Number(m[2]) : undefined);
     return { ...e, field: "gpa", minGpa, scale, clear: minGpa !== undefined && scale !== undefined };
   }
-  const level = quote.match(/\b(bachelor|master|doctorate|doctoral|ph\.?d)/i)?.[1];
+  const level = degreeLevelOf(quote);
   if (e.field === "degree" || (e.field === "other" && level && /degree/i.test(quote))) {
-    const allowedValues = e.allowedValues?.filter(Boolean).length ? e.allowedValues : level ? [level] : [];
-    return { ...e, field: "degree", allowedValues, clear: allowedValues!.length > 0 };
+    const allowedValues = e.allowedValues?.filter(Boolean) ?? [];
+    return { ...e, field: "degree", allowedValues, clear: !!(level ?? degreeLevelOf(allowedValues.join(", "))) || acceptedFields(allowedValues).length > 0 };
   }
   return e;
 }
@@ -142,7 +143,7 @@ function eligibility(req: Requirement, facts: ApplicantFacts): Verdict {
   if (e.field === "gpa") {
     if (e.minGpa === undefined || e.scale === undefined) return unclear;
     if (facts.gpa === undefined || facts.gpaScale === undefined)
-      return { status: "needs_verification", explanation: `Requires a GPA of at least ${e.minGpa} on a ${e.scale} scale.`, correction: "Enter your GPA and grading scale in Applicant Information." };
+      return { status: "needs_verification", explanation: `Requires a GPA of at least ${e.minGpa} on a ${e.scale} scale.`, correction: "Add your GPA and grading scale in Your details.", missingField: facts.gpa === undefined ? "gpa" : "gpaScale" };
     const evidence = `Required: ${e.minGpa} on a ${e.scale} scale · Yours: ${facts.gpa} on a ${facts.gpaScale} scale`;
     if (facts.gpaScale !== e.scale)
       return { status: "needs_verification", explanation: `Your GPA is on a ${facts.gpaScale} scale; the rule uses a ${e.scale} scale and states no conversion.`, evidence, correction: "Ask the program organizer how they convert your grading scale." };
@@ -151,26 +152,65 @@ function eligibility(req: Requirement, facts: ApplicantFacts): Verdict {
       : { status: "action_needed", explanation: "Your GPA is below the stated minimum.", evidence, measured: facts.gpa, correction: "Ask the program organizer whether exceptions apply before submitting." };
   }
 
-  if (e.field === "degree" || e.field === "nationality") {
-    const fieldName = e.field;
-    const value = facts[fieldName]?.trim();
+  if (e.field === "degree") return degree(req.quote, e.allowedValues ?? [], facts);
+
+  if (e.field === "nationality") {
+    const value = facts.nationality?.trim();
     const allowed = e.allowedValues?.filter(Boolean) ?? [];
     if (allowed.length === 0) return unclear;
-    if (!value) return { status: "needs_verification", explanation: `Accepted: ${allowed.join(", ")}.`, correction: `Enter your ${fieldName} in Applicant Information.` };
+    if (!value) return { status: "needs_verification", explanation: `Accepted: ${allowed.join(", ")}.`, correction: "Add your nationality in Your details.", missingField: "nationality" };
     const evidence = `Accepted: ${allowed.join(", ")} · Yours: ${value}`;
-    if (fieldName === "nationality") {
-      return allowed.some((a) => a.toLowerCase() === value.toLowerCase())
-        ? { status: "passed", explanation: "Your nationality is on the accepted list.", evidence }
-        : { status: "action_needed", explanation: "Your nationality isn't on the accepted list.", evidence, correction: "Ask the program organizer whether you're eligible before submitting." };
-    }
-    // Degree names vary ("Bachelor of Science" vs "bachelor's degree"): match on the key word, and ask rather than fail when unsure.
-    const key = (s: string) => s.toLowerCase().replace(/'s\b/g, "").replace(/\bdegree\b/g, "").replace(/[^a-z ]/g, "").trim().split(/\s+/)[0];
-    return allowed.some((a) => value.toLowerCase().includes(key(a)))
-      ? { status: "passed", explanation: "Your degree matches the requirement.", evidence }
-      : { status: "needs_verification", explanation: "Your degree doesn't clearly match the accepted ones.", evidence, correction: "Confirm with the program organizer that your degree qualifies." };
+    return allowed.some((a) => a.toLowerCase() === value.toLowerCase())
+      ? { status: "passed", explanation: "Your nationality is on the accepted list.", evidence }
+      : { status: "action_needed", explanation: "Your nationality isn't on the accepted list.", evidence, correction: "Ask the program organizer whether you're eligible before submitting." };
   }
 
   return unclear;
+}
+
+// Degree rules: level and field are compared separately; a missing or unclear detail is asked for, never guessed.
+function degree(quote: string, allowed: string[], facts: ApplicantFacts): Verdict {
+  const needLevel = degreeLevelOf(quote) ?? degreeLevelOf(allowed.join(", "));
+  const fields = acceptedFields(allowed);
+  const related = allowsRelatedField([quote, ...allowed]);
+  const expected = allowsExpectedCompletion(quote);
+  if (!needLevel && !fields.length)
+    return { status: "needs_verification", explanation: "The quoted rule doesn't state a measurable standard or what proof is accepted.", correction: "Confirm the accepted evidence with the program organizer." };
+
+  const haveLevel = facts.degreeLevel ?? degreeLevelOf(facts.degree);
+  const haveField = facts.fieldOfStudy?.trim() || facts.degree?.match(/\bin\s+(.+)$/i)?.[1]?.trim();
+  const required = [
+    needLevel && levelLabel(needLevel) + (expected ? " (or finishing before the program starts)" : ""),
+    fields.length && `in ${fields.join(", ")}${related ? ", or a related field" : ""}`,
+  ].filter(Boolean).join(" ");
+  const yours = [
+    haveLevel && DEGREE_LEVELS.find((l) => l.value === haveLevel)!.label.replace(/ \(.*\)$/, ""),
+    facts.degreeStatus && (facts.degreeStatus === "completed" ? "completed" : "in progress"),
+    haveField && `in ${haveField}`,
+  ].filter(Boolean).join(", ");
+  const evidence = `Required: ${required} · Yours: ${yours || "not entered yet"}`;
+  const ask = (field: FactField, what: string): Verdict => ({
+    status: "needs_verification", explanation: `Requires ${required}.`, evidence, correction: `Add your ${what} in Your details.`, missingField: field,
+  });
+
+  if (needLevel) {
+    if (!haveLevel) return ask("degreeLevel", "degree level");
+    if (!meetsLevel(haveLevel, needLevel))
+      return { status: "action_needed", explanation: `Your degree level is below the required ${levelLabel(needLevel)}.`, evidence, correction: "Ask the program organizer whether you're eligible before submitting." };
+    // "Must hold" a degree at exactly this level: completion matters. A higher degree implies it.
+    if (!expected && haveLevel === needLevel && facts.degreeStatus !== "completed") {
+      if (!facts.degreeStatus) return ask("degreeStatus", "degree status (completed or in progress)");
+      return { status: "needs_verification", explanation: "The rule says you must already hold this degree; yours is still in progress.", evidence, correction: "Confirm with the program organizer whether finishing before the program starts is accepted." };
+    }
+  }
+  if (fields.length) {
+    if (!haveField) return ask("fieldOfStudy", "field of study");
+    if (!fieldMatches(haveField, fields))
+      return related
+        ? { status: "needs_verification", explanation: "Your field isn't one of those listed, but the rule also accepts related fields.", evidence, correction: `Confirm with the program organizer that ${haveField} counts as a related field.` }
+        : { status: "action_needed", explanation: "Your field of study isn't on the accepted list.", evidence, correction: "Ask the program organizer whether you're eligible before submitting." };
+  }
+  return { status: "passed", explanation: "Your qualification meets the requirement.", evidence };
 }
 
 // Shows only the date, time, and timezone that literally appear in the quote; never fills in a missing one.

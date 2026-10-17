@@ -3,7 +3,7 @@ import { CalendarDays } from "lucide-react";
 import type { Application, CheckResult } from "@/lib/types";
 import StatusBadge from "./StatusBadge";
 import TrackingPill, { fmtDate } from "./TrackingPill";
-import { trackingOf } from "@/lib/tracking";
+import { summaryFor, trackingOf } from "@/lib/tracking";
 import { University } from "./Illustrations";
 
 const SKY = { not_checked: "bg-lilac/60", passed: "bg-sage/80", action_needed: "bg-peach/70", needs_verification: "bg-butter/70" } as const;
@@ -12,9 +12,10 @@ const SKY = { not_checked: "bg-lilac/60", passed: "bg-sage/80", action_needed: "
 const variantOf = (id: string) => [...id].reduce((n, c) => n + c.charCodeAt(0), 0) % 3;
 
 export default function ApplicationCard({ app, result }: { app: Application; result?: CheckResult }) {
-  const status = result?.status ?? "not_checked";
+  const summary = summaryFor(app, result);
+  const status = summary.status;
   const total = result?.findings.length ?? 0;
-  const passed = result ? total - result.outstanding : 0;
+  const passed = result ? result.findings.filter((f) => f.status === "passed").length : 0;
   return (
     <Link
       href={`/applications/${app.id}`}
@@ -28,12 +29,12 @@ export default function ApplicationCard({ app, result }: { app: Application; res
           <p className="font-display text-lg font-semibold leading-snug">{app.name}</p>
           {app.organization && <p className="text-sm text-muted">{app.organization}</p>}
         </div>
-        <div className="flex flex-wrap gap-1.5"><StatusBadge status={status} /><TrackingPill t={trackingOf(app)} /></div>
+        <div className="flex flex-wrap gap-1.5"><StatusBadge status={status} confirmed={summary.confirmed} /><TrackingPill t={trackingOf(app)} /></div>
         <div className="mt-auto space-y-2">
           {result ? (
             <>
               <div className="flex justify-between text-xs tabular-nums text-muted">
-                <span>{result.outstanding === 0 ? "No outstanding issues" : `${result.outstanding} outstanding ${result.outstanding === 1 ? "issue" : "issues"}`}</span>
+                <span>{summary.pending === 0 ? "No outstanding issues" : `${summary.pending} outstanding ${summary.pending === 1 ? "issue" : "issues"}`}</span>
                 <span>{passed}/{total} passed</span>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-lilac" role="progressbar" aria-valuemin={0} aria-valuemax={total} aria-valuenow={passed} aria-label="Requirements passed">

@@ -43,7 +43,8 @@ test("GPA: same scale compares, different scale or missing value needs verificat
 
 test("degree, nationality, and unclear rules", () => {
   const degree = { category: "eligibility" as const, eligibility: { field: "degree" as const, allowedValues: ["bachelor's degree"], clear: true } };
-  expect(one(degree, [], { degree: "Bachelor of Science" }).status).toBe("passed");
+  expect(one(degree, [], { degree: "Bachelor of Science", degreeStatus: "completed" }).status).toBe("passed");
+  expect(one(degree, [], { degree: "Bachelor of Science" }).missingField).toBe("degreeStatus"); // completion unclear: ask
   expect(one(degree, [], {}).explanation).toMatch(/degree/);
   const nat = { category: "eligibility" as const, eligibility: { field: "nationality" as const, allowedValues: ["Kenya"], clear: true } };
   expect(one(nat, [], { nationality: "kenya" }).status).toBe("passed");
@@ -119,4 +120,33 @@ test("a GPA or degree rule mislabeled by the AI is still checked from its verifi
   expect(one({ category: "eligibility", quote: gpaQuote }, [], facts).status).toBe("passed");
   // A genuinely unclear rule stays unclear.
   expect(one({ category: "eligibility", quote: "Applicants must demonstrate strong English proficiency.", eligibility: { field: "other", clear: false } }, [], facts).status).toBe("needs_verification");
+});
+
+test("degree level and field are checked separately, from the saved details", () => {
+  const quote = "Candidates must hold a bachelor's degree in statistics, economics, computer science, or a related field.";
+  const rule = { category: "eligibility" as const, quote, eligibility: { field: "degree" as const, allowedValues: ["bachelor's degree", "statistics", "economics", "computer science", "related field"], clear: true } };
+  const done = { degreeLevel: "bachelor" as const, degreeStatus: "completed" as const };
+  expect(one(rule, [], { ...done, fieldOfStudy: "CSE" }).status).toBe("passed");
+  expect(one(rule, [], { ...done, fieldOfStudy: "Computer Science and Engineering" }).status).toBe("passed");
+  expect(one(rule, [], { degreeLevel: "master", fieldOfStudy: "Economics" }).status).toBe("passed"); // a higher degree implies the bachelor's
+  expect(one(rule, [], { degreeLevel: "associate", fieldOfStudy: "Economics" }).status).toBe("action_needed");
+  // Not listed, but "related field" is allowed: ask, don't fail.
+  expect(one(rule, [], { ...done, fieldOfStudy: "Biology" }).status).toBe("needs_verification");
+});
+
+test("missing or unclear details are asked for, with the form field to fill in", () => {
+  const quote = "Applicants must hold a bachelor's degree.";
+  const rule = { category: "eligibility" as const, quote, eligibility: { field: "degree" as const, clear: true } };
+  expect(one(rule, [], {}).missingField).toBe("degreeLevel");
+  expect(one(rule, [], { fieldOfStudy: "CSE" }).missingField).toBe("degreeLevel"); // a subject alone never implies a level
+  expect(one(rule, [], { degreeLevel: "bachelor" }).missingField).toBe("degreeStatus"); // "must hold": completion matters
+  expect(one(rule, [], { degreeLevel: "bachelor", degreeStatus: "completed" }).status).toBe("passed");
+  expect(one(rule, [], { degreeLevel: "bachelor", degreeStatus: "in_progress" }).status).toBe("needs_verification");
+  // "...or expect to complete one before the program starts": in progress is fine.
+  const expected = { ...rule, quote: "Applicants must hold a bachelor's degree, or expect to complete one before the program starts." };
+  expect(one(expected, [], { degreeLevel: "bachelor", degreeStatus: "in_progress" }).status).toBe("passed");
+  expect(one(expected, [], { degree: "B.Sc. in Economics" }).status).toBe("passed"); // older free-text degree still works
+  const gpa = { category: "eligibility" as const, eligibility: { field: "gpa" as const, minGpa: 3, scale: 4, clear: true } };
+  expect(one(gpa, [], {}).missingField).toBe("gpa");
+  expect(one(gpa, [], { gpa: 3.5 }).missingField).toBe("gpaScale");
 });

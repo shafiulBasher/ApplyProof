@@ -109,6 +109,16 @@ Build mode: fast
   Learner check: On English proficiency, click Mark as confirmed, add a note, then edit and undo it.
   Commit: `Add Confirmed by you for rules ApplyProof can't verify`
 
+- [x] **11. Smarter degree matching, missing-detail prompts, and a transparent readiness summary**
+  Becomes usable: Your details has separate Degree level, Degree status, and Field of study. Equivalent degree terms match (BSc/B.Sc./Bachelor of Science; CSE/Computer Science/Computer Science and Engineering); a subject alone never implies a level; unclear level or completion is asked for. Cards needing a detail offer Add missing detail. Confirmed items move to a Confirmed by you group, and the status reads "Ready to submit · N confirmed by you" when everything else passed.
+  Why now: Learner's three UX issues during the final review.
+  PRD ref: `prd.md > Readiness Checks` (basic eligibility), `prd.md > Confirmed by You`
+  Spec ref: `spec.md > Components` (Degree Matching and Missing Details, Readiness Summary, Confirmed by You), `spec.md > Data Model`
+  Build: `lib/degrees.ts`; Checker `degree()` with `missingField`; `summarize`/`summaryFor`; form fields; Add missing detail; Confirmed by you group; header, cards, and filters use the summary. Also fixed: "Upload file" for a missing document now adds a file instead of replacing an existing one.
+  Verify (mechanical): tests first: `tests/degrees.test.ts` (equivalents, subject-only, levels, fields, wording), new `checks` cases (level vs field, related field, must-hold vs expected completion, missing fields), `summarize` cases; 34/34 Vitest, tsc, build. Edge run: Add missing detail focuses Degree level; 1 confirm → "2 outstanding · 1 confirmed by you"; both confirmed + second letter added + rerun → "Ready to submit · 2 confirmed by you" (Action Needed 0, Needs Verification 0, Confirmed 2, Passed 8); dashboard Ready (1); no errors.
+  Learner check: Fill Your details with BSc / Computer Science and Engineering, confirm the remaining notes, add the second letter, rerun, and see "Ready to submit · 2 confirmed by you".
+  Commit: `Separate degree level and field, add missing-detail prompts, and a transparent readiness summary`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 3 (the first real findings; your feedback can still shape the What Changed view and the dashboard). Learner tried slices 1–3; feedback (generic "check it yourself" lines, wanted a required-documents list after the guideline upload) became slice 4, which they retried and confirmed in the app (checklist ticks, Next steps, deadline "Submit by October 20, 2027, 23:59 CET.").
@@ -145,3 +155,5 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 - Landing hero now matches the learner's full mockup: their painted scene (baked-in text painted out, `public/illustrations/hero-scene.webp`) with live headline (Kalam), buttons, and badges positioned and scaled over it on desktop; stacked text plus the cropped illustration on phones. The intro now plays once per browser **session** (it looked "removed" because it played once per browser) and **See how it works** replays it (or jumps to the steps with reduced motion). Result cards redesigned per the learner's approval: fix-first numbered cards with limit meters and Replace/Upload file, sticky-note Needs Verification cards, compact expandable Passed rows, and requirement-type icons; PRD and spec updated (Passed quotes are one click away, never removed).
 - "See how it works" now scrolls smoothly to the four steps; it no longer replays the intro and has no play icon (learner: it looked like a video and restarted the animation). The replay moved to a quiet "Replay intro" text link in the footer.
 - Eligibility details missing entirely from the AI's output (not just mislabeled) are now also read from the verified quote — a browser run showed "Bachelor's degree" in Needs Verification again; covered by a new test.
+- Confirmed items now count toward a transparent "Ready to submit · N confirmed by you" — learner decision in the final review, replacing their earlier rule that confirmations never make an application Ready. Stored check results are unchanged; only the readiness summary counts confirmations, separately.
+- Applicant details split into degree level, degree status, and field of study (input fingerprint updated, so existing results show Outdated once). "Upload file" on a missing document now adds a file — the browser run showed it replacing the existing recommendation letter.

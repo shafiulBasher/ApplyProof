@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import { AlertCircle, CalendarDays, CheckCircle2, ChevronDown, FileText, GraduationCap, HelpCircle, Lightbulb, ListChecks, Pencil, Ruler, Type, Undo2, Upload, UserCheck } from "lucide-react";
-import type { Confirmation, Finding, FindingStatus, RequirementCategory } from "@/lib/types";
+import { AlertCircle, CalendarDays, CheckCircle2, ChevronDown, FileText, GraduationCap, HelpCircle, Lightbulb, ListChecks, Pencil, PencilLine, Ruler, Type, Undo2, Upload, UserCheck } from "lucide-react";
+import type { Confirmation, FactField, Finding, FindingStatus, RequirementCategory } from "@/lib/types";
 
 export const FINDING_STYLE: Record<FindingStatus, { label: string; pill: string; icon: typeof CheckCircle2 }> = {
   action_needed: { label: "Action Needed", pill: "bg-peach text-peach-ink", icon: AlertCircle },
@@ -131,16 +131,20 @@ export function ActionCard({ f, index, pasted, onFix }: { f: Finding; index: num
 }
 
 // Needs Verification: a sticky note led by what you should do.
-export function CheckNote({ f, index, pasted, confirmation, onConfirm }: {
-  f: Finding; index: number; pasted?: boolean; confirmation?: Confirmation; onConfirm?: (note: string | null) => void;
+export function CheckNote({ f, index, pasted, confirmation, onConfirm, onAddDetail }: {
+  f: Finding; index: number; pasted?: boolean; confirmation?: Confirmation; onConfirm?: (note: string | null) => void; onAddDetail?: (field: FactField) => void;
 }) {
   const Cat = categoryOf(f);
   return (
-    <article className={`relative rounded-2xl bg-butter/70 p-4 shadow-[0_10px_24px_-16px_rgba(122,90,18,0.55)] animate-[fade-in_220ms_ease-out] sm:p-5 ${index % 2 ? "rotate-[0.4deg]" : "-rotate-[0.4deg]"}`}>
+    <article className={`relative rounded-2xl ${confirmation ? "bg-lilac/60" : "bg-butter/70"} p-4 shadow-[0_10px_24px_-16px_rgba(122,90,18,0.55)] animate-[fade-in_220ms_ease-out] sm:p-5 ${index % 2 ? "rotate-[0.4deg]" : "-rotate-[0.4deg]"}`}>
       <span className="absolute -top-2.5 left-1/2 h-5 w-20 -translate-x-1/2 rotate-[-3deg] rounded-sm bg-lilac/80" aria-hidden />
       <div className="flex items-start justify-between gap-2">
-        <p className="flex items-center gap-1.5 text-xs font-medium text-butter-ink"><Cat.icon className="h-3.5 w-3.5" aria-hidden /> {Cat.label} · to check yourself</p>
-        <FindingPill status={f.status} />
+        <p className="flex items-center gap-1.5 text-xs font-medium text-butter-ink"><Cat.icon className="h-3.5 w-3.5" aria-hidden /> {Cat.label} · {confirmation ? "confirmed by you" : "to check yourself"}</p>
+        {confirmation ? (
+          <span className="inline-flex items-center whitespace-nowrap rounded-full bg-lilac px-2.5 py-0.5 text-xs font-semibold text-primary-ink">Confirmed by you</span>
+        ) : (
+          <FindingPill status={f.status} />
+        )}
       </div>
       <h4 className="mt-1 text-lg font-semibold">{f.title}</h4>
       {f.correction && (
@@ -149,7 +153,13 @@ export function CheckNote({ f, index, pasted, confirmation, onConfirm }: {
       <p className="mt-1 text-sm text-butter-ink">{f.explanation}</p>
       <Quote f={f} pasted={pasted} className="mt-3 bg-white/60" />
       <Evidence f={f} />
-      {onConfirm && <ConfirmBox confirmation={confirmation} onConfirm={onConfirm} />}
+      {f.missingField && onAddDetail && !confirmation ? (
+        <button className="btn-primary mt-3 w-full py-2" onClick={() => onAddDetail(f.missingField!)}>
+          <PencilLine className="h-4 w-4" aria-hidden /> Add missing detail
+        </button>
+      ) : (
+        onConfirm && <ConfirmBox confirmation={confirmation} onConfirm={onConfirm} />
+      )}
     </article>
   );
 }
@@ -190,7 +200,7 @@ function ConfirmBox({ confirmation, onConfirm }: { confirmation?: Confirmation; 
         </span>
       </div>
       {confirmation.note && <p className="mt-1 text-sm text-ink">“{confirmation.note}”</p>}
-      <p className="mt-1 text-xs text-muted">Your own confirmation. ApplyProof didn&apos;t verify this, so it stays under Needs Verification.</p>
+      <p className="mt-1 text-xs text-muted">Your own confirmation. ApplyProof didn&apos;t verify this; it isn&apos;t counted as Passed.</p>
     </div>
   );
 }

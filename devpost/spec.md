@@ -145,8 +145,14 @@ PRD ref: `prd.md > Required-Documents Checklist`.
 ### Application Tracking
 `lib/tracking.ts`: `trackingOf(app)` → submitted / missed / upcoming (days left) / no_deadline, from `application.submittedAt` and `application.deadline` (YYYY-MM-DD, whole local days). `guidelineDeadline(requirements)` returns the guideline's date only when it appears in the verified quote; the page fills `deadline` with it after the first read if none was entered. `components/TrackingPill.tsx` shows the state on the page header (with a deadline date field and Mark as submitted / Undo) and on dashboard cards; the dashboard adds Submitted and Missed filters. Tested in `tests/tracking.test.ts`.
 
+### Degree Matching and Missing Details
+`lib/degrees.ts`: `degreeLevelOf` (patterns for bachelor/master/doctorate titles and abbreviations; two-letter BA/BS/MA/MS only in capitals; a subject alone returns nothing), `meetsLevel` (minimum), field families (`fieldMatches`), `allowsExpectedCompletion`, `allowsRelatedField`, `acceptedFields`. The Checker's `degree()` compares level, completion, and field separately and sets `missingField` (`FactField`) when a detail is needed; the CheckNote shows **Add missing detail**, which focuses `#field-<name>` in **Your details**. Older free-text `degree` values are still read (and split once in the form). Tested in `tests/degrees.test.ts` and `tests/checks.test.ts`.
+
+### Readiness Summary
+`summarize(result, isConfirmed)` in `lib/status.ts` (and `summaryFor(app, result)` in `lib/tracking.ts`) → `{ status, pending, confirmed }`. Used by the page header, dashboard cards, and filters; `StatusBadge` shows "Ready to submit · N confirmed by you" when status is passed with confirmations. The Results Panel splits Needs Verification into pending and a **Confirmed by you** group.
+
 ### Confirmed by You
-`application.confirmations`: requirement ID → `{ quote, note?, at }`. `confirmationFor(app, finding)` (`lib/tracking.ts`) returns it only when the stored quote equals the finding's quote. The **CheckNote** card's ConfirmBox adds, edits, or undoes it through the page's `updateApp`. Results, status, and the input fingerprint ignore confirmations entirely. Tested in `tests/tracking.test.ts`.
+`application.confirmations`: requirement ID → `{ quote, note?, at }`. `confirmationFor(app, finding)` (`lib/tracking.ts`) returns it only when the stored quote equals the finding's quote. The **CheckNote** card's ConfirmBox adds, edits, or undoes it through the page's `updateApp`. The stored results and the input fingerprint ignore confirmations; only the readiness summary counts them, separately. Tested in `tests/tracking.test.ts`.
 
 ### Check Orchestrator
 `lib/runCheck.ts`, called by the Run button. Its steps:
@@ -259,7 +265,7 @@ All of this is in IndexedDB, via Dexie, in the user's browser. Nothing is stored
 
 | Table | Fields | Updated when | When you come back |
 |---|---|---|---|
-| `applications` | `id, name, organization?, deadline?, submittedAt?, confirmations?, applicant: {gpa?, gpaScale?, degree?, nationality?}, disclosureAccepted, createdAt` | creating; editing applicant info; accepting the disclosure | all still there |
+| `applications` | `id, name, organization?, deadline?, submittedAt?, confirmations?, applicant: {gpa?, gpaScale?, degreeLevel?, degreeStatus?, fieldOfStudy?, nationality?, degree? (legacy)}, applicant: {gpa?, gpaScale?, degree?, nationality?}, disclosureAccepted, createdAt` | creating; editing applicant info; accepting the disclosure | all still there |
 | `documents` | `id, applicationId, role: 'guideline' \| 'applicant', source?: 'pdf' \| 'pasted', fileName, blob, contentHash, pages: string[], pageCount, wordCount, readable, suggestedType?, confirmedType?, uploadedAt` | upload, type confirmation, replace (overwrites the same row), remove | all still there |
 | `extractions` | `guidelineHash (key), pages: string[], requirements: Requirement[], model, version, createdAt` (a cached row with an older `version` is re-read after a prompt or schema change) | first run with a new guideline | reused, so no new AI call |
 | `results` | `applicationId (key), current: CheckResult?, previous: CheckResult?, lastError?` | each run; on failure only `lastError` changes | all still there |

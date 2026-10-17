@@ -30,3 +30,14 @@ test("a confirmation applies only to the same quoted rule", () => {
   expect(confirmationFor(app, { requirementId: "r1", quote: "x" })).toBeUndefined();
   expect(confirmationFor({}, { requirementId: "r9", quote: "x" })).toBeUndefined();
 });
+
+test("readiness summary keeps confirmed items apart from pending ones", async () => {
+  const { summarize } = await import("@/lib/status");
+  const f = (id: string, status: "passed" | "action_needed" | "needs_verification") => ({ requirementId: id, status, title: "", explanation: "", quote: id, page: 1 });
+  const result = { findings: [f("a", "passed"), f("b", "needs_verification"), f("c", "needs_verification")] };
+  expect(summarize(result, () => false)).toEqual({ status: "needs_verification", pending: 2, confirmed: 0 });
+  expect(summarize(result, (x) => x.requirementId === "b")).toEqual({ status: "needs_verification", pending: 1, confirmed: 1 });
+  expect(summarize(result, () => true)).toEqual({ status: "passed", pending: 0, confirmed: 2 }); // "Ready · 2 confirmed by you"
+  expect(summarize({ findings: [f("x", "action_needed")] }, () => true)).toEqual({ status: "action_needed", pending: 1, confirmed: 0 }); // only Needs Verification can be confirmed
+  expect(summarize(undefined, () => true).status).toBe("not_checked");
+});

@@ -3,11 +3,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Send, Undo2 } from "lucide-react";
-import { guidelineDeadline, trackingOf } from "@/lib/tracking";
+import { guidelineDeadline, summaryFor, trackingOf } from "@/lib/tracking";
 import TrackingPill from "@/components/TrackingPill";
 import { db, save } from "@/lib/db";
 import { cachedExtraction, currentInputHash, getExtraction, runCheck } from "@/lib/runCheck";
-import type { Application, Extraction, Finding, StoredDocument, StoredResults } from "@/lib/types";
+import type { Application, Extraction, FactField, Finding, StoredDocument, StoredResults } from "@/lib/types";
 import StatusBadge from "@/components/StatusBadge";
 import DocumentManager from "@/components/DocumentManager";
 import DisclosureDialog from "@/components/DisclosureDialog";
@@ -105,9 +105,10 @@ export default function ApplicationPage() {
     setRunning(false);
   }
 
-  // "Replace file" on a fix-first card: open the picker for that document, or the upload area if it's missing.
+  // "Replace file" opens that document's picker; "Upload file" (a missing document) adds a new one.
   function fix(f: Finding) {
-    const row = document.querySelector<HTMLElement>(`#documents [data-doctype="${f.docType}"]`);
+    // A missing document is added, never swapped for one already uploaded.
+    const row = f.category === "required_document" ? null : document.querySelector<HTMLElement>(`#documents [data-doctype="${f.docType}"]`);
     const target = row ?? document.querySelector<HTMLElement>("#documents");
     target?.scrollIntoView({ behavior: "smooth", block: "center" });
     row?.animate([{ boxShadow: "0 0 0 0 rgba(120,97,207,0.6)" }, { boxShadow: "0 0 0 10px rgba(120,97,207,0)" }], { duration: 1200 });
@@ -115,8 +116,18 @@ export default function ApplicationPage() {
     input?.click();
   }
 
+  // "Add missing detail": open the right field in Your details.
+  function addDetail(field: FactField) {
+    const el = document.getElementById(`field-${field}`);
+    el?.scrollIntoView({ behavior: "smooth", block: "center" });
+    el?.animate([{ boxShadow: "0 0 0 0 rgba(120,97,207,0.7)" }, { boxShadow: "0 0 0 10px rgba(120,97,207,0)" }], { duration: 1400, iterations: 2 });
+    setTimeout(() => el?.focus({ preventScroll: true }), 400);
+  }
+
   if (app === undefined) return null;
   if (app === null) return <p>This application wasn&apos;t found. <Link className="text-primary underline" href="/applications">Back to your applications</Link></p>;
+
+  const summary = summaryFor(app, results.current);
 
   // Progress tracker: each step reflects real state, not just page position.
   const required = extraction?.requirements.filter((r) => r.category === "required_document") ?? [];
@@ -139,8 +150,8 @@ export default function ApplicationPage() {
             <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{app.name}</h1>
             <div className="mt-2 flex flex-wrap items-center gap-3 text-sm text-muted">
               {app.organization && <span>{app.organization}</span>}
-              <StatusBadge status={results.current?.status ?? "not_checked"} />
-              {results.current && <span className="tabular-nums">{results.current.outstanding} outstanding</span>}
+              <StatusBadge status={summary.status} confirmed={summary.confirmed} />
+              {results.current && <span className="tabular-nums">{summary.pending} outstanding{summary.confirmed > 0 && summary.status !== "passed" ? ` · ${summary.confirmed} confirmed by you` : ""}</span>}
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-3 text-sm">
               <TrackingPill t={trackingOf(app)} />
@@ -182,7 +193,7 @@ export default function ApplicationPage() {
         guidelineExtra={<RequirementsChecklist extraction={extraction} documents={docs} reading={reading} error={readError} onRetry={readRequirements} />}
       />
       <ApplicantInfoForm applicationId={id} initial={app.applicant} onSaved={load} />
-      <ResultsPanel results={results} outdated={outdated} onFix={fix} app={app} onConfirm={confirm} />
+      <ResultsPanel results={results} outdated={outdated} onFix={fix} app={app} onConfirm={confirm} onAddDetail={addDetail} />
 
       {asking && <DisclosureDialog onAnswer={(ok) => answer.current(ok)} />}
     </div>

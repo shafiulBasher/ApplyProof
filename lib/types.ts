@@ -1,3 +1,5 @@
+import type { DegreeLevel } from "./degrees";
+
 export type DocType = "cv" | "motivation_letter" | "transcript" | "recommendation_letter" | "other";
 
 export const DOC_TYPE_LABELS: Record<DocType, string> = {
@@ -11,9 +13,15 @@ export const DOC_TYPE_LABELS: Record<DocType, string> = {
 export interface ApplicantFacts {
   gpa?: number;
   gpaScale?: number;
-  degree?: string;
+  degreeLevel?: DegreeLevel;
+  degreeStatus?: "completed" | "in_progress";
+  fieldOfStudy?: string;
   nationality?: string;
+  // Older free-text degree ("Bachelor of Science in Economics"); read only when the fields above are empty.
+  degree?: string;
 }
+
+export type FactField = "gpa" | "gpaScale" | "degreeLevel" | "degreeStatus" | "fieldOfStudy" | "nationality";
 
 export interface Application {
   id: string;
@@ -99,6 +107,8 @@ export interface Finding {
   category?: RequirementCategory;
   docType?: DocType;
   limit?: { min?: number; max?: number };
+  // A detail the applicant hasn't entered yet; the card links to that form field.
+  missingField?: FactField;
   title: string;
   explanation: string;
   quote: string;

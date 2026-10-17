@@ -96,7 +96,11 @@ Each extracted requirement becomes a finding. The finding list is the checklist.
 - **Page and word limits:** counts are measured exactly, not estimated by AI.
   - [ ] A 3-page CV against a 2-page limit is **Action Needed** and shows "Official limit: 2 pages · Uploaded CV/résumé: 3 pages."
   - [ ] A 620-word motivation letter against a 500–800 word limit is **Passed**.
-- **Basic eligibility:** the user's typed facts are compared with clearly stated rules.
+- **Basic eligibility:** the user's typed facts are compared with clearly stated rules. **Your details** has GPA, grading scale, **degree level**, **degree status** (completed / in progress), **field of study**, and nationality, entered once and reused by every check.
+  - [ ] Degree level and field are compared separately. Equivalent terms count as the same (BSc, B.Sc., Bachelor of Science → bachelor's; CSE, Computer Science, Computer Science and Engineering → the same field family). A higher degree meets a lower requirement.
+  - [ ] A subject alone never implies a level. If the level or completion status is unclear (for example "must hold" with no status given), the app asks instead of guessing.
+  - [ ] A field not on the list is Needs Verification when the rule also accepts "a related field", otherwise Action Needed.
+  - [ ] When a check needs a detail that wasn't entered, its card offers **Add missing detail**, which scrolls to, highlights, and focuses that field.
   - [ ] A clearly stated rule the user meets is **Passed**, and one they don't meet is **Action Needed**.
   - [ ] A rule that's ambiguous, or that can't be compared with the facts given (for example a different grading scale with no stated conversion), is **Needs Verification**.
   - [ ] A rule needing a fact the user hasn't entered is **Needs Verification**, and says which field to fill in.
@@ -132,9 +136,10 @@ Added after the final review began (learner request). Separate from readiness: w
 ### Confirmed by You
 Added during the final review (learner request), for rules ApplyProof can't verify (for example "strong English proficiency").
 - [ ] Each Needs Verification finding offers **Mark as confirmed** with an optional short note (for example "IELTS 7.0 certificate ready").
-- [ ] A confirmed finding shows **Confirmed by you**, the date, and the note, styled differently from Passed, and says ApplyProof didn't verify it. It stays in Needs Verification with its quote, evidence, and Next step.
-- [ ] The note can be edited and the confirmation undone.
-- [ ] Confirmations never change a finding's status, the outstanding-issue count, or whether the application is Ready, and make no AI calls.
+- [ ] A confirmed finding moves to its own **Confirmed by you** group (between Needs Verification and Passed), with the date, the note, the requirement, quote, evidence, and Next step. It's styled differently from Passed and says ApplyProof didn't verify it.
+- [ ] The note can be edited and the confirmation undone. No AI calls.
+- [ ] **Readiness summary (learner decision, replacing the earlier "never Ready"):** confirmed items leave the outstanding count and are reported separately ("2 outstanding · 1 confirmed by you"). When everything is either Passed or confirmed, the status reads **Ready to submit · N confirmed by you**, never plain verified. The stored check result itself is never changed.
+- [ ] Submission tracking stays separate: a Submitted application keeps its readiness summary, and a confirmed item isn't shown as pending.
 - [ ] A confirmation applies only to the same quoted rule; if the guideline changes the rule's wording, it no longer applies.
 
 ### Recheck and What Changed

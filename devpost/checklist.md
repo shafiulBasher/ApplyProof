@@ -142,12 +142,12 @@ Build mode: fast
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 3 (the first real findings; your feedback can still shape the What Changed view and the dashboard). Learner tried slices 1–3; feedback (generic "check it yourself" lines, wanted a required-documents list after the guideline upload) became slice 4, which they retried and confirmed in the app (checklist ticks, Next steps, deadline "Submit by October 20, 2027, 23:59 CET.").
-- [ ] Final kick-the-tires exploration and feedback completed
+- [x] Final kick-the-tires exploration and feedback completed — learner explored desktop and mobile across many sessions; feedback became slices 7–13 and the fixes listed under Revisions.
 
 ## Final Review
 
 - [x] Wording polish: CV/résumé, motivation/cover letter, recommendation/reference letter; singular "1 page" — verified by Vitest (22/22) and tsc.
-- [ ] Final review complete — feedback resolved and learner confirms ready to ship
+- [x] Final review complete — feedback resolved and learner confirms ready to ship ("Now I think everything is okay"). Last checks: 44/44 Vitest, production build, full desktop and 390 px mobile journeys in Edge with no errors or overflow.
 
 ## Code Tour and App Map
 

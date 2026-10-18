@@ -91,7 +91,7 @@ export default function Intro() {
             />
           </div>
           <p
-            className="font-hand absolute inset-x-0 -bottom-12 text-center text-3xl text-ink sm:text-4xl"
+            className="font-hand absolute inset-x-0 top-full mt-3 text-center text-2xl leading-tight text-ink sm:text-4xl"
             style={{ animation: `fade-up 800ms ${EASE} 3.4s both` }}
           >
             Every big dream starts somewhere…

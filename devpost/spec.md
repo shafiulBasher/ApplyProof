@@ -151,6 +151,9 @@ PRD ref: `prd.md > Required-Documents Checklist`.
 ### Readiness Summary
 `summarize(result, isConfirmed)` in `lib/status.ts` (and `summaryFor(app, result)` in `lib/tracking.ts`) → `{ status, pending, confirmed }`. Used by the page header, dashboard cards, and filters; `StatusBadge` shows "Ready to submit · N confirmed by you" when status is passed with confirmations. The Results Panel splits Needs Verification into pending and a **Confirmed by you** group.
 
+### Deadline Reminders
+`lib/calendar.ts` builds an RFC 5545 .ics (all-day `VALUE=DATE` or exact UTC from a known timezone abbreviation or "UTC±h", VALARMs -P7D and -P1D, escaping and 75-octet folding). `guidelineDeadlineParts` (`lib/tracking.ts`) keeps the date, time, and timezone only when each appears in the verified quote. `dueSoon(apps)` picks the banner items; `components/DueSoonBanner.tsx` stores a per-day, per-set dismissal in localStorage. Tested in `tests/calendar.test.ts` and `tests/tracking.test.ts`.
+
 ### Confirmed by You
 `application.confirmations`: requirement ID → `{ quote, note?, at }`. `confirmationFor(app, finding)` (`lib/tracking.ts`) returns it only when the stored quote equals the finding's quote. The **CheckNote** card's ConfirmBox adds, edits, or undoes it through the page's `updateApp`. The stored results and the input fingerprint ignore confirmations; only the readiness summary counts them, separately. Tested in `tests/tracking.test.ts`.
 

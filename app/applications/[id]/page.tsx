@@ -2,8 +2,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
-import { ArrowLeft, Send, Undo2 } from "lucide-react";
-import { guidelineDeadline, summaryFor, trackingOf } from "@/lib/tracking";
+import { ArrowLeft, CalendarPlus, Send, Undo2 } from "lucide-react";
+import { deadlineIcs } from "@/lib/calendar";
+import { guidelineDeadline, guidelineDeadlineParts, summaryFor, trackingOf } from "@/lib/tracking";
 import TrackingPill from "@/components/TrackingPill";
 import { db, save } from "@/lib/db";
 import { cachedExtraction, currentInputHash, getExtraction, runCheck } from "@/lib/runCheck";
@@ -116,6 +117,21 @@ export default function ApplicationPage() {
     input?.click();
   }
 
+  // Downloads an .ics file. The guideline's time and timezone are used only while the deadline date
+  // still matches the guideline's; otherwise it's an all-day event (never an invented time).
+  function addToCalendar() {
+    if (!app?.deadline) return;
+    const g = extraction && guidelineDeadlineParts(extraction.requirements);
+    const same = g?.date === app.deadline ? g : undefined;
+    const ics = deadlineIcs({ id: app.id, title: app.name, organization: app.organization, date: app.deadline, time: same?.time, timezone: same?.timezone, note: same?.quote });
+    const url = URL.createObjectURL(new Blob([ics], { type: "text/calendar;charset=utf-8" }));
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${app.name.replace(/[^a-z0-9]+/gi, "-").replace(/^-|-$/g, "").toLowerCase() || "application"}-deadline.ics`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
   // "Add missing detail": open the right field in Your details.
   function addDetail(field: FactField) {
     const el = document.getElementById(`field-${field}`);
@@ -159,6 +175,11 @@ export default function ApplicationPage() {
                 Deadline
                 <input type="date" className="input w-auto py-1" value={app.deadline ?? ""} onChange={(e) => updateApp("the deadline", { deadline: e.target.value || undefined })} />
               </label>
+              {app.deadline && !app.submittedAt && (
+                <button className="btn-ghost border border-line bg-white py-1.5" onClick={addToCalendar} title="Download a calendar file with reminders 7 days and 1 day before">
+                  <CalendarPlus className="h-4 w-4" aria-hidden /> Add to calendar
+                </button>
+              )}
               {app.submittedAt ? (
                 <button className="btn-ghost" onClick={() => updateApp("the submission status", { submittedAt: undefined })}><Undo2 className="h-4 w-4" aria-hidden /> Undo submitted</button>
               ) : (

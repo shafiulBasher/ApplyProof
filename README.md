@@ -29,10 +29,11 @@ npm run dev                    # open http://localhost:3000
 1. Open http://localhost:3000 (a short intro plays once; **Skip intro** is top right), click **Get started**, then **+ New Application**, and name it "Global Future Scholars Scholarship". (Guidelines can also be pasted as text: try **Paste guideline text** with `samples/job/job-posting.txt`.)
 2. Upload `samples/guideline.pdf` and accept the disclosure. The checklist of required documents appears.
 3. Add `cv-3-pages.pdf`, `motivation-letter.pdf`, `transcript.pdf`, and `recommendation-1.pdf`, and watch the checklist tick off.
-4. Enter GPA `3.6` on a `4` scale and the degree `Bachelor of Science`, then click **Run Readiness Check**.
+4. In **Your details**, enter GPA `3.6` on a `4` scale, Degree level **Bachelor's**, Degree status **Completed**, and Field of study `Environmental Engineering`, then click **Run Readiness Check**.
    The CV is **Action Needed**: "Official limit: 2 pages · Uploaded CV/résumé: 3 pages", with the guideline's quote and page.
 5. Replace the CV with `cv-2-pages.pdf`. The results are marked **Outdated**.
 6. Rerun. It's instant, with no AI call, and **What Changed** shows "CV length: Action Needed → Passed".
+7. Optional: **Mark as confirmed** on the remaining notes, **Add to calendar** for the deadline (reminders 7 days and 1 day before), and **Mark as submitted** when you're done.
 
 All sample documents are fictional.
 

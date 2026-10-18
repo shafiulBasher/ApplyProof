@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { confirmationFor, guidelineDeadline, trackingOf } from "@/lib/tracking";
+import { confirmationFor, dueSoon, guidelineDeadline, guidelineDeadlineParts, trackingOf } from "@/lib/tracking";
 import type { Requirement } from "@/lib/types";
 
 const now = new Date(2026, 9, 17, 15, 0).getTime(); // Oct 17, 2026, 3 pm local
@@ -40,4 +40,25 @@ test("readiness summary keeps confirmed items apart from pending ones", async ()
   expect(summarize(result, () => true)).toEqual({ status: "passed", pending: 0, confirmed: 2 }); // "Ready · 2 confirmed by you"
   expect(summarize({ findings: [f("x", "action_needed")] }, () => true)).toEqual({ status: "action_needed", pending: 1, confirmed: 0 }); // only Needs Verification can be confirmed
   expect(summarize(undefined, () => true).status).toBe("not_checked");
+});
+
+test("guideline time and timezone only when they're in the verified quote", () => {
+  const req = (deadline: Requirement["deadline"]): Requirement => ({
+    id: "d", category: "deadline", title: "Deadline", page: 3, quoteVerified: true,
+    quote: "The application deadline is October 20, 2027, at 23:59 CET.", deadline,
+  });
+  expect(guidelineDeadlineParts([req({ date: "October 20, 2027", time: "23:59", timezone: "CET" })])).toMatchObject({ date: "2027-10-20", time: "23:59", timezone: "CET" });
+  expect(guidelineDeadlineParts([req({ date: "October 20, 2027", time: "18:00", timezone: "UTC" })])).toMatchObject({ date: "2027-10-20", time: undefined, timezone: undefined });
+});
+
+test("due soon: overdue first, then by days left; submitted and far-off ones left out", () => {
+  const apps = [
+    { id: "far", deadline: "2026-11-30" },
+    { id: "soon", deadline: "2026-10-22" },
+    { id: "today", deadline: "2026-10-17" },
+    { id: "late", deadline: "2026-10-10" },
+    { id: "sent", deadline: "2026-10-18", submittedAt: now - 1 },
+    { id: "none" },
+  ];
+  expect(dueSoon(apps, now).map((x) => x.app.id)).toEqual(["late", "today", "soon"]);
 });

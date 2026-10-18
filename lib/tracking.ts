@@ -25,15 +25,28 @@ export function trackingOf(app: Pick<Application, "deadline" | "submittedAt">, n
   return daysLeft < 0 ? { kind: "missed", deadline: app.deadline } : { kind: "upcoming", deadline: app.deadline, daysLeft };
 }
 
-// The guideline's deadline as YYYY-MM-DD, only when its date appears word for word in the verified quote.
-export function guidelineDeadline(requirements: Requirement[]): string | undefined {
+// The guideline's deadline: the date as YYYY-MM-DD plus any time and timezone, each kept only
+// when it appears word for word in the verified quote.
+export function guidelineDeadlineParts(requirements: Requirement[]): { date: string; time?: string; timezone?: string; quote: string } | undefined {
   for (const r of requirements) {
-    const date = r.deadline?.date;
-    if (r.category !== "deadline" || !r.quoteVerified || !date || !normalize(r.quote).includes(normalize(date))) continue;
+    const inQuote = (x?: string) => (x && normalize(r.quote).includes(normalize(x)) ? x.trim() : undefined);
+    const date = inQuote(r.deadline?.date);
+    if (r.category !== "deadline" || !r.quoteVerified || !date) continue;
     const t = new Date(date);
     if (isNaN(t.getTime())) continue;
-    return `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+    const iso = `${t.getFullYear()}-${String(t.getMonth() + 1).padStart(2, "0")}-${String(t.getDate()).padStart(2, "0")}`;
+    return { date: iso, time: inQuote(r.deadline?.time), timezone: inQuote(r.deadline?.timezone), quote: r.quote };
   }
+}
+
+export const guidelineDeadline = (requirements: Requirement[]) => guidelineDeadlineParts(requirements)?.date;
+
+// Unsubmitted applications that are overdue, due today, or due within 7 days, most urgent first.
+export function dueSoon<A extends Pick<Application, "deadline" | "submittedAt">>(apps: A[], now = Date.now()) {
+  return apps
+    .map((app) => ({ app, t: trackingOf(app, now) }))
+    .filter(({ t }) => t.kind === "missed" || (t.kind === "upcoming" && t.daysLeft <= 7))
+    .sort((x, y) => (x.t.kind === "missed" ? -1 : x.t.kind === "upcoming" ? x.t.daysLeft : 0) - (y.t.kind === "missed" ? -1 : y.t.kind === "upcoming" ? y.t.daysLeft : 0));
 }
 
 // The applicant's confirmation for this finding, if it was made for the same quoted rule.

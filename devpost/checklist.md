@@ -119,6 +119,16 @@ Build mode: fast
   Learner check: Fill Your details with BSc / Computer Science and Engineering, confirm the remaining notes, add the second letter, rerun, and see "Ready to submit · 2 confirmed by you".
   Commit: `Separate degree level and field, add missing-detail prompts, and a transparent readiness summary`
 
+- [x] **12. Deadline reminders: Due soon banner and Add to calendar**
+  Becomes usable: The dashboard's Due soon banner lists overdue, due-today, and due-this-week unsubmitted applications (Hide until tomorrow). Each unsubmitted application with a deadline has Add to calendar, downloading an .ics with reminders 7 days and 1 day before; date-only deadlines are all-day, stated times are exact.
+  Why now: Learner request during the final review, kept local and free.
+  PRD ref: `prd.md > Features and Behavior > Deadline Reminders`
+  Spec ref: `spec.md > Components` (Deadline Reminders)
+  Build: `lib/calendar.ts`, `guidelineDeadlineParts`, `dueSoon`, DueSoonBanner, Add to calendar button.
+  Verify (mechanical): `tests/calendar.test.ts` (23:59 CET → 22:59 UTC, UTC+2, all-day for date-only or unknown timezone, year rollover, alarms, escaping, folding) and tracking tests (verified-only time/zone, due-soon order); 41/41 Vitest, tsc, build. Edge: banner order Missed → due in 3 days, submitted and far-off excluded, dismissal survives reload, pills still shown; downloaded all-day .ics with both alarms; scholarship .ics timed at 22:59 UTC; button hidden after Mark as submitted; no errors.
+  Learner check: Give an application a deadline within a week, see it in Due soon, click Add to calendar, and import the file into your calendar.
+  Commit: `Add deadline reminders: Due soon banner and Add to calendar`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 3 (the first real findings; your feedback can still shape the What Changed view and the dashboard). Learner tried slices 1–3; feedback (generic "check it yourself" lines, wanted a required-documents list after the guideline upload) became slice 4, which they retried and confirmed in the app (checklist ticks, Next steps, deadline "Submit by October 20, 2027, 23:59 CET.").
@@ -159,3 +169,4 @@ Activity mode: [live app and editor, explicit static fallback, focused alternati
 - Applicant details split into degree level, degree status, and field of study (input fingerprint updated, so existing results show Outdated once). "Upload file" on a missing document now adds a file — the browser run showed it replacing the existing recommendation letter.
 - Readiness tabs now list only applications still in progress; submitted or missed ones appear under Submitted or Missed, and a submitted application shows its readiness as a muted "Last check: …" note. The tab "Ready" is now "Ready to submit" — learner noticed a submitted application still listed under Ready.
 - Six building sketches instead of three, and each application now keeps its own: a free sketch is chosen when the application is created and saved with it (older applications get distinct ones once, oldest first); the application page header uses the same sketch as its card — learner saw two cards sharing a sketch.
+- README demo steps updated for the current app (degree level, status, and field; Add to calendar) — they still described the old single Degree box.

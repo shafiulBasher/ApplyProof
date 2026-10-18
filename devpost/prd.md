@@ -133,6 +133,13 @@ Added after the final review began (learner request). Separate from readiness: w
 - [ ] The dashboard can filter by **Submitted** and **Missed**. Readiness tabs (Action Needed, Needs Verification, Ready to submit, Not Checked) list only applications still in progress; a submitted application shows its readiness as "Last check: …".
 - [ ] Days are compared in the user's local time; the guideline's own timezone isn't applied.
 
+### Deadline Reminders
+Added during the final review (learner request). Local and free: no emails, push, or server.
+- [ ] A **Due soon** banner on the dashboard lists unsubmitted applications that are overdue, due today, or due within 7 days, most urgent first, each linking to its application. Submitted applications never appear.
+- [ ] **Hide until tomorrow** hides it for today only, and a newly urgent application brings it back; the cards' deadline pills always stay visible.
+- [ ] **Add to calendar** on each unsubmitted application with a deadline downloads a standard .ics file (Google Calendar, Outlook, Apple Calendar) with reminders 7 days and 1 day before.
+- [ ] A date-only deadline becomes an all-day event. A time and timezone are used only when the guideline states them (verified in its quote) and the deadline date still matches the guideline's; they're converted exactly (23:59 CET → 22:59 UTC). An unknown timezone falls back to all-day, never an invented time.
+
 ### Confirmed by You
 Added during the final review (learner request), for rules ApplyProof can't verify (for example "strong English proficiency").
 - [ ] Each Needs Verification finding offers **Mark as confirmed** with an optional short note (for example "IELTS 7.0 certificate ready").

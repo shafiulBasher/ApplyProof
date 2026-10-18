@@ -5,6 +5,7 @@ import { db } from "@/lib/db";
 import type { Application, StoredResults } from "@/lib/types";
 import ApplicationCard from "@/components/ApplicationCard";
 import NewApplicationDialog from "@/components/NewApplicationDialog";
+import DueSoonBanner from "@/components/DueSoonBanner";
 import { nextSketch, Notebook, Sparkle } from "@/components/Illustrations";
 import type { OverallStatus } from "@/components/StatusBadge";
 import { summaryFor, trackingOf } from "@/lib/tracking";
@@ -69,6 +70,8 @@ export default function Dashboard() {
         </button>
         <Sparkle className="absolute -top-2 right-48 hidden h-7 w-7 animate-[twinkle_3s_ease-in-out_infinite] md:block" />
       </header>
+
+      {apps && <DueSoonBanner apps={apps} />}
 
       {apps && apps.length > 0 && (
         <div className="mt-8 flex gap-1 overflow-x-auto border-b border-line" role="tablist" aria-label="Filter applications">

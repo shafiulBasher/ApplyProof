@@ -151,15 +151,15 @@ Build mode: fast
 
 ## Code Tour and App Map
 
-- [ ] Learning activity complete — guided route, focused alternative, prior practice connected, or brief recap
-- [ ] Optional edit and transfer reflection addressed — offered/declined/already covered/not applicable as appropriate
-- [ ] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
+- [x] Learning activity complete — focused alternative on the planning-time unknown (free-model extraction accuracy)
+- [x] Optional edit and transfer reflection addressed — edit not applicable (focused alternative); transfer question skipped because the learner stated the takeaway
+- [x] `devpost/app-map.html` generated from finished code, checked, and shown, including a project-grounded practice to reuse
 
-Activity and evidence: [what actually happened; real document/test/code references; unfinished work if interrupted]
-Route and stops: [actual paths and symbols; guided stops completed, or reference-only route]
-Edit outcome: [tried/kept/reverted/declined/not applicable; verification if changed]
-Reflection: [offered/answered/declined/already covered — personal answer belongs only in the ignored profile]
-Activity mode: [live app and editor, explicit static fallback, focused alternative, prior practice, or recap]
+Activity and evidence: Focused alternative. Evidence reviewed: `samples/expected-requirements.json` + `npm run test:extraction` (10/10 found, 10/10 quotes verified) versus interpretation errors found in real use (GPA marked unclear, missing degree details, EU work authorization as nationality), fixed by `readEligibility` in `lib/checks.ts` and regression tests in `tests/checks.test.ts`. The learner answered what the 10/10 result does and doesn't establish.
+Route and stops: Reference route only (not toured): `app/applications/[id]/page.tsx` `async function run()` → `lib/runCheck.ts` `getExtraction` / `runCheck` → `lib/checks.ts` `runChecks` / `readEligibility` → `components/ResultsPanel.tsx`.
+Edit outcome: Not applicable (focused alternative).
+Reflection: Already covered — the learner stated their takeaway; recorded only in the ignored learner profile.
+Activity mode: Focused alternative, discussed from real project evidence (no live code walkthrough). App map: `devpost/app-map.html`, checked offline in Edge at desktop (light) and phone (dark) widths, no network requests, no overflow.
 
 ## Revisions
 

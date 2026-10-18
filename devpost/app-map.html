@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ApplyProof App Map</title>
+<style>
+  :root {
+    --oat: #fbf5eb; --ink: #302b40; --muted: #6b6580; --primary: #7861cf; --lilac: #eae2ff;
+    --sage: #ddebdd; --sage-ink: #3d6a49; --butter: #fae9b9; --butter-ink: #7a5a12; --peach: #f4d8d0; --line: #e9dfcf; --card: #fff;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --oat: #1d1a26; --ink: #ece8f6; --muted: #b3acc8; --lilac: #3a3155; --sage: #24392b; --sage-ink: #a9d6b5; --butter: #463a18; --butter-ink: #f1d690; --peach: #4a2c27; --line: #3a3448; --card: #272233; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--oat); color: var(--ink); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 32px 16px 64px; }
+  h1, h2 { font-family: Georgia, "Times New Roman", serif; line-height: 1.2; }
+  h1 { font-size: 2.2rem; margin: 0 0 8px; }
+  h1 span { color: var(--primary); }
+  h2 { font-size: 1.4rem; margin: 40px 0 12px; }
+  p.lead { color: var(--muted); margin-top: 0; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 18px; margin: 12px 0; }
+  code { font-family: ui-monospace, Consolas, monospace; font-size: .9em; background: var(--lilac); border-radius: 6px; padding: 1px 6px; overflow-wrap: anywhere; }
+  .pieces { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+  .pieces .card { margin: 0; }
+  .pieces strong { display: block; }
+  ol.route { padding-left: 0; list-style: none; counter-reset: stop; }
+  ol.route li { counter-increment: stop; position: relative; padding-left: 44px; }
+  ol.route li::before { content: counter(stop); position: absolute; left: 0; top: 16px; width: 30px; height: 30px; border-radius: 50%; background: var(--primary); color: #fff; display: grid; place-items: center; font-weight: 700; }
+  .tag { display: inline-block; font-size: .8rem; font-weight: 600; border-radius: 999px; padding: 1px 10px; background: var(--butter); color: var(--butter-ink); }
+  table { width: 100%; border-collapse: collapse; }
+  td { border-top: 1px solid var(--line); padding: 10px 8px; vertical-align: top; }
+  td:first-child { width: 42%; }
+  details { margin-top: 8px; }
+  summary { cursor: pointer; color: var(--primary); font-weight: 600; }
+  summary:focus-visible, a:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: 4px; }
+  .practice { background: var(--sage); border-color: transparent; }
+  .practice h3 { margin-top: 0; color: var(--sage-ink); }
+  svg { width: 100%; height: auto; }
+  svg text { font: 13px system-ui, sans-serif; fill: #302b40; } /* boxes stay light in both themes */
+  svg text.on-card { fill: var(--ink); }
+  footer { margin-top: 40px; color: var(--muted); font-size: .9rem; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Apply<span>Proof</span> App Map</h1>
+  <p class="lead">A one-page guide to how ApplyProof works, where its pieces live, and where to start when you want to change something.</p>
+
+  <h2>What it does</h2>
+  <p>ApplyProof checks an applicant's real files against an official application guideline. Gemini reads only the guideline and lists its requirements, each with an exact quote; plain code confirms every quote and then measures your files (pages, words, document counts, eligibility details). Every finding shows its evidence, and anything the app can't confirm is <em>Needs Verification</em>, never a guess. Everything is stored in your browser.</p>
+
+  <div class="pieces">
+    <div class="card"><strong>Pages you see</strong>Landing, dashboard, calendar, and each application, in <code>app/</code> and <code>components/</code>.</div>
+    <div class="card"><strong>Browser storage</strong>Applications, files, and results in IndexedDB, via <code>lib/db.ts</code>. Clearing browser data removes them.</div>
+    <div class="card"><strong>Local helper routes</strong><code>app/api/parse</code> reads PDFs; <code>app/api/extract</code> asks Gemini about the guideline only.</div>
+    <div class="card"><strong>The checker</strong>Plain code in <code>lib/checks.ts</code> turns each requirement into a finding. No AI.</div>
+  </div>
+
+  <h2>One action, end to end: “Run Readiness Check”</h2>
+  <div class="card" role="img" aria-label="Diagram: the Run Readiness Check button calls runCheck, which reuses saved requirements or asks the extract route and Gemini once; then runChecks compares them with your files and details; the results are saved in the browser and shown in the Results panel.">
+    <svg viewBox="0 0 820 230" aria-hidden="true">
+      <defs><marker id="a" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 10 5 0 10z" fill="#7861CF"/></marker></defs>
+      <g fill="none" stroke="#7861CF" stroke-width="1.6">
+        <rect x="10" y="20" width="150" height="56" rx="12" fill="#EAE2FF"/>
+        <rect x="200" y="20" width="170" height="56" rx="12" fill="#EAE2FF"/>
+        <rect x="410" y="20" width="180" height="56" rx="12" fill="#FAE9B9"/>
+        <rect x="630" y="20" width="180" height="56" rx="12" fill="#F4D8D0" stroke-dasharray="5 4"/>
+        <rect x="200" y="140" width="170" height="56" rx="12" fill="#DDEBDD"/>
+        <rect x="410" y="140" width="180" height="56" rx="12" fill="#EAE2FF"/>
+        <rect x="630" y="140" width="180" height="56" rx="12" fill="#DDEBDD"/>
+        <path d="M160 48h36" marker-end="url(#a)"/>
+        <path d="M370 48h36" marker-end="url(#a)"/>
+        <path d="M590 48h36" marker-end="url(#a)"/>
+        <path d="M285 76v60" marker-end="url(#a)"/>
+        <path d="M370 168h36" marker-end="url(#a)"/>
+        <path d="M590 168h36" marker-end="url(#a)"/>
+      </g>
+      <text x="85" y="44" text-anchor="middle" font-weight="600">Run button</text>
+      <text x="85" y="62" text-anchor="middle">application page</text>
+      <text x="285" y="44" text-anchor="middle" font-weight="600">runCheck</text>
+      <text x="285" y="62" text-anchor="middle">lib/runCheck.ts</text>
+      <text x="500" y="44" text-anchor="middle" font-weight="600">Saved requirements?</text>
+      <text x="500" y="62" text-anchor="middle">else /api/extract (once)</text>
+      <text x="720" y="44" text-anchor="middle" font-weight="600">Gemini</text>
+      <text x="720" y="62" text-anchor="middle">guideline text only</text>
+      <text x="285" y="164" text-anchor="middle" font-weight="600">runChecks</text>
+      <text x="285" y="182" text-anchor="middle">lib/checks.ts</text>
+      <text x="500" y="164" text-anchor="middle" font-weight="600">Save results</text>
+      <text x="500" y="182" text-anchor="middle">browser (lib/db.ts)</text>
+      <text x="720" y="164" text-anchor="middle" font-weight="600">Results panel</text>
+      <text x="720" y="182" text-anchor="middle">fix-first cards</text>
+      <text class="on-card" x="300" y="112">your files + details</text>
+    </svg>
+  </div>
+
+  <h2>Code route <span class="tag">reference route, not a completed tour</span></h2>
+  <p>Open the project in your editor and use search (<code>Ctrl+Shift+F</code> in VS Code) for each anchor below.</p>
+  <ol class="route">
+    <li class="card"><strong>The button</strong>, <code>app/applications/[id]/page.tsx</code>, search <code>async function run()</code>. Clicking <em>Run Readiness Check</em> calls <code>runCheck</code> with the latest saved details and documents, then reloads the page data.</li>
+    <li class="card"><strong>Reuse or read the guideline</strong>, <code>lib/runCheck.ts</code>, search <code>export async function getExtraction</code>. If this exact guideline was read before, its saved requirements are reused, which is why reruns are instant and free. Otherwise only the guideline's page texts go to <code>app/api/extract/route.ts</code> (Gemini prompt: <code>const PROMPT</code> in <code>lib/ai/gemini.ts</code>), and code verifies every quote.</li>
+    <li class="card"><strong>The checker</strong>, <code>lib/checks.ts</code>, search <code>export function runChecks</code>. Each requirement becomes Passed, Action Needed, or Needs Verification by plain code. <code>readEligibility</code> re-reads GPA numbers or a degree level from the verified quote when the AI mislabels a rule. The results appear through <code>components/ResultsPanel.tsx</code>.</li>
+  </ol>
+
+  <h2>To change this, start here</h2>
+  <div class="card">
+    <table>
+      <tr><td>Wording of findings and next steps</td><td><code>lib/checks.ts</code> (each check returns its explanation and correction)</td></tr>
+      <tr><td>What Gemini is told to extract</td><td><code>const PROMPT</code> in <code>lib/ai/gemini.ts</code>; free models in <code>GEMINI_MODEL</code> in <code>.env.local</code></td></tr>
+      <tr><td>Degree names and fields that count as equal</td><td><code>lib/degrees.ts</code> (<code>FIELD_FAMILIES</code>, level patterns)</td></tr>
+      <tr><td>Colors and fonts</td><td><code>@theme</code> in <code>app/globals.css</code></td></tr>
+      <tr><td>Landing page headline and text</td><td><code>app/page.tsx</code> (<code>function Headline</code>)</td></tr>
+      <tr><td>Calendar reminder timing (7 days, 1 day)</td><td><code>-P7D</code> / <code>-P1D</code> in <code>lib/calendar.ts</code></td></tr>
+      <tr><td>Fix-first card layout</td><td><code>export function ActionCard</code> in <code>components/FindingCard.tsx</code></td></tr>
+    </table>
+  </div>
+
+  <h2>A practice to reuse</h2>
+  <div class="card practice">
+    <h3>Let the AI propose, let code verify, and test the interpretation, not just the finding</h3>
+    <p><strong>What happened:</strong> the open question in planning was whether a free model reads requirements well enough. <code>samples/expected-requirements.json</code> and <code>npm run test:extraction</code> turned “good enough” into a test, and Gemini scored 10/10 with every quote verified. Real use still exposed interpretation errors the test didn't cover: a “3.0 on a 4.0 scale” rule labeled unclear, missing degree details, and EU work authorization filed as nationality.</p>
+    <p><strong>What fixed it:</strong> plain code re-reads the verified quote instead of trusting the AI's label (<code>readEligibility</code> in <code>lib/checks.ts</code>), and each real failure got a test (search <code>mislabeled by the AI</code> and <code>EU work authorization</code> in <code>tests/checks.test.ts</code>).</p>
+    <p><strong>Next time:</strong> write the expected output as a test before trusting an AI step, include varied real-world samples, check how results are interpreted as well as whether they're found, and add a test every time real use breaks an assumption.</p>
+  </div>
+
+  <h2>Run it again</h2>
+  <div class="card">
+    <ol>
+      <li><code>npm install</code></li>
+      <li>Copy <code>.env.example</code> to <code>.env.local</code> and add your free <code>GEMINI_API_KEY</code></li>
+      <li><code>npm run dev</code>, then open <code>http://localhost:3000</code></li>
+      <li>Checks: <code>npm test</code> (unit tests), <code>npm run test:extraction</code> (live accuracy test, one free Gemini request)</li>
+    </ol>
+    <details><summary>Where the sample files are</summary><p><code>samples/</code> has the fictional scholarship (guideline, 3-page and 2-page CVs, letters, transcript); <code>samples/job/</code> has the fictional job posting (PDF and pasted-text versions) with a résumé, cover letter, and references.</p></details>
+  </div>
+
+  <footer>Snapshot of the code at commit <code>7508554</code> (October 2026). The app may change after this; the anchors above are search terms, so they keep working longer than line numbers.</footer>
+</main>
+</body>
+</html>

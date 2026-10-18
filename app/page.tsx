@@ -95,24 +95,38 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Phones and small tablets: text first, then the illustration, so nothing sits on busy artwork. */}
-      <div className="px-4 md:hidden">
-        <header className="flex items-center justify-between gap-4 py-5">
-          <Logo />
-          <Link href="/applications" className="btn-primary">Get Started</Link>
-        </header>
-        <Headline className="mt-4 text-[15vw]" />
-        <p className="mt-5 text-lg text-ink">Turn official application guidelines into a clear checklist. Find missing documents, catch issues, and see the evidence behind every finding.</p>
-        <div className="mt-6 flex flex-wrap gap-3">
-          <Link href="/applications" className="btn-primary px-5 py-3 text-base">Get Started <ArrowRight className="h-4 w-4" aria-hidden /></Link>
-          <a href="#how" className="btn-secondary px-5 py-3 text-base">See how it works</a>
+      {/* Phones and small tablets: one composed scene, like desktop. Text sits on paper at the top and
+          the painting rises up behind it, its light sky fading into the paper. */}
+      <section className="relative overflow-hidden md:hidden">
+        <div className="relative z-10 px-4">
+          <header className="flex items-center justify-between gap-4 py-5">
+            <Logo />
+            <Link href="/applications" className="btn-primary">Get Started</Link>
+          </header>
+          <Sparkle className="absolute right-6 top-24 h-6 w-6 animate-[twinkle_3s_ease-in-out_infinite]" />
+          <Headline className="mt-4 text-[15vw]" />
+          <p className="mt-5 text-lg text-ink">Turn official application guidelines into a clear checklist. Find missing documents, catch issues, and see the evidence behind every finding.</p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href="/applications" className="btn-primary px-5 py-3 text-base">Get Started <ArrowRight className="h-4 w-4" aria-hidden /></Link>
+            <a href="#how" className="btn-secondary px-5 py-3 text-base">See how it works</a>
+          </div>
+          <Badges className="mt-7 gap-3 text-xs" />
         </div>
-        <Badges className="mt-7 gap-3 text-xs" />
-        <div className="relative mt-8 rotate-[1.5deg] rounded-[24px] bg-white p-2.5 shadow-[0_24px_50px_-26px_rgba(48,43,64,0.5)]">
-          <Image src="/illustrations/hero-student.webp" alt="" width={776} height={928} sizes="100vw" className="h-auto w-full rounded-[16px]" />
-          <span className="absolute -top-3 left-8 h-6 w-24 -rotate-6 rounded-sm bg-lilac/80" aria-hidden />
+        <div className="relative -mt-3">
+          <Image
+            src="/illustrations/hero-student.webp"
+            alt="A student in a purple hoodie smiles up at a university by a river, a plane flying overhead"
+            width={776}
+            height={928}
+            sizes="100vw"
+            loading="eager"
+            fetchPriority="high"
+            className="h-auto w-full"
+          />
+          <div className="absolute inset-x-0 top-0 h-24 bg-linear-to-b from-oat via-oat/50 to-transparent" aria-hidden />
+          <Sparkle className="absolute left-5 top-28 h-5 w-5 animate-[twinkle_3.4s_ease-in-out_infinite]" />
         </div>
-      </div>
+      </section>
 
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <section id="how" className="scroll-mt-8 py-14">

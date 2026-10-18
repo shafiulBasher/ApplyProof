@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, ClipboardList, FileSearch, FileUp, Lock, Quote, ShieldCheck, Sparkles, Sprout } from "lucide-react";
-import Logo from "@/components/Logo";
+import Logo, { LogoMark, Wordmark } from "@/components/Logo";
 import Intro from "@/components/Intro";
 import { Sparkle } from "@/components/Illustrations";
 import ReplayIntroButton from "@/components/ReplayIntroButton";
@@ -69,11 +69,9 @@ export default function Landing() {
             className="object-cover"
           />
           <header className="absolute inset-x-[10%] top-[2%] flex items-center justify-between text-[1.15cqw]">
-            <Link href="/" className="flex items-center gap-[0.6em] font-semibold text-[#1d1a33]" style={{ fontFamily: "var(--font-marker)", fontSize: "2.3cqw" }}>
-              <span className="grid aspect-square w-[1.25em] place-items-center rounded-[0.25em] bg-primary text-white">
-                <svg viewBox="0 0 16 16" className="h-[0.75em] w-[0.75em]" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M3.5 8.5l3 3 6-7" /></svg>
-              </span>
-              ApplyProof
+            <Link href="/" className="flex items-center gap-[0.45em]" style={{ fontSize: "2.1cqw" }} aria-label="ApplyProof home">
+              <LogoMark className="h-[1.6em] w-[1.6em] drop-shadow-[0_3px_6px_rgba(120,97,207,0.25)]" />
+              <Wordmark />
             </Link>
             <nav className="ml-[6%] mr-auto flex gap-[3em] font-medium text-[#1d1a33]" aria-label="Main">
               {NAV.map((n) => <a key={n.label} href={n.href} className="hover:text-primary">{n.label}</a>)}

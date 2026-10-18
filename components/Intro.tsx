@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { LoopPlane, Sparkle } from "./Illustrations";
+import { LogoMark, Wordmark } from "./Logo";
 
 const SEEN_KEY = "applyproof-intro-seen";
 export const REPLAY_EVENT = "applyproof:replay-intro";
@@ -100,13 +101,11 @@ export default function Intro() {
         {/* Scene 3: the reveal */}
         <div className="absolute inset-0 grid place-items-center" style={{ animation: `fade-up 900ms ${EASE} 5.2s both` }}>
           <div className="ruled rounded-[22px] border border-line bg-[#fffaf1] px-10 py-12 text-center shadow-[0_30px_60px_-30px_rgba(48,43,64,0.45)] sm:px-16">
-            <p className="inline-flex items-center gap-3 font-display text-5xl font-semibold text-ink sm:text-6xl">
-              <span className="grid h-12 w-12 place-items-center rounded-xl bg-primary text-white" style={{ animation: `pop-in 700ms ${EASE} 5.4s both` }}>
-                <svg viewBox="0 0 16 16" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-                  <path d="M3.5 8.5l3 3 6-7" pathLength="1" strokeDasharray="1" style={{ animation: `draw 600ms ${EASE} 5.8s both` }} />
-                </svg>
+            <p className="inline-flex items-center gap-3 text-5xl sm:text-6xl">
+              <span style={{ animation: `pop-in 700ms ${EASE} 5.4s both` }}>
+                <LogoMark className="h-16 w-16 sm:h-20 sm:w-20" checkStyle={{ strokeDasharray: 1, animation: `draw 600ms ${EASE} 5.8s both` }} />
               </span>
-              ApplyProof
+              <Wordmark />
             </p>
             <p className="font-hand mt-3 text-3xl text-primary-ink" style={{ animation: `fade-up 700ms ${EASE} 5.8s both` }}>Turn requirements into clarity.</p>
             <svg viewBox="0 0 240 12" className="mx-auto mt-1 h-3 w-56" fill="none" stroke="#7861CF" strokeWidth="2.4" strokeLinecap="round" aria-hidden>

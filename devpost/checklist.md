@@ -129,6 +129,16 @@ Build mode: fast
   Learner check: Give an application a deadline within a week, see it in Due soon, click Add to calendar, and import the file into your calendar.
   Commit: `Add deadline reminders: Due soon banner and Add to calendar`
 
+- [x] **13. In-app Calendar**
+  Becomes usable: A Calendar page shows every deadline on a monthly grid, color-coded; clicking a date lists what's due and opens it; month navigation, Today, and Upcoming deadlines (with the guideline's exact time when stated).
+  Why now: Learner request during the final review, kept small.
+  PRD ref: `prd.md > Features and Behavior > Calendar`, `prd.md > Screens and Layout`
+  Spec ref: `spec.md > Components` (Calendar)
+  Build: `lib/calendarView.ts`, `app/calendar`, Calendar nav item; phone nav shows icons only (labels kept for screen readers).
+  Verify (mechanical): `tests/calendarView.test.ts` (42-day Monday-first grid, month and year edges, grouping); 43/43 Vitest, build. Edge: Calendar nav active, clicking the date lists both applications due that day, Upcoming excludes the submitted one, opening an application from the calendar, the scholarship shows 23:59 CET, mobile without overflow, no errors.
+  Learner check: Open Calendar, click a date with a deadline, and open the application from the list.
+  Commit: `Add an in-app Calendar of application deadlines`
+
 ## Hands-on Checkpoints
 
 - [x] Early usable behavior explored — after slice 3 (the first real findings; your feedback can still shape the What Changed view and the dashboard). Learner tried slices 1–3; feedback (generic "check it yourself" lines, wanted a required-documents list after the guideline upload) became slice 4, which they retried and confirmed in the app (checklist ticks, Next steps, deadline "Submit by October 20, 2027, 23:59 CET.").

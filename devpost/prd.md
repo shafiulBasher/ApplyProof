@@ -42,7 +42,7 @@ Organized top to bottom:
 ### Landing Page (added with the Dream Journal redesign)
 - An expressive headline ("Apply with confidence"), an illustrated desk-and-university scene, **Get started** and **How it works** actions, four illustrated workflow steps, and accurate privacy and evidence messaging. The intro plays here on the first visit.
 
-Movement: Landing → Dashboard (`/applications`) ↔ Single Application Page. A sidebar (desktop) or top bar (mobile) links Home and Applications. There are no other screens.
+Movement: Landing → Dashboard (`/applications`) ↔ Single Application Page, plus Calendar (`/calendar`). A sidebar (desktop) or top bar (mobile, icons only) links Home, Applications, and Calendar. There are no other screens.
 
 ## Look and Feel
 "Dream Journal": a warm, illustrated, paper-inspired indie SaaS look that carries the applicant's ambitions while keeping trust, evidence, and usability first (learner's design brief and visual reference, added during the final review).
@@ -139,6 +139,14 @@ Added during the final review (learner request). Local and free: no emails, push
 - [ ] **Hide until tomorrow** hides it for today only, and a newly urgent application brings it back; the cards' deadline pills always stay visible.
 - [ ] **Add to calendar** on each unsubmitted application with a deadline downloads a standard .ics file (Google Calendar, Outlook, Apple Calendar) with reminders 7 days and 1 day before.
 - [ ] A date-only deadline becomes an all-day event. A time and timezone are used only when the guideline states them (verified in its quote) and the deadline date still matches the guideline's; they're converted exactly (23:59 CET → 22:59 UTC). An unknown timezone falls back to all-day, never an invented time.
+
+### Calendar
+Added during the final review (learner request, kept small).
+- [ ] A **Calendar** item in the navigation opens a monthly calendar (weeks start Monday) with each application's deadline on its date, color-coded with a legend: upcoming (lilac), due within 7 days (butter), missed (red), submitted (green).
+- [ ] Clicking a date lists the applications due that day; each opens its application. Previous / Next month and **Today**.
+- [ ] **Upcoming deadlines** below lists unsubmitted applications due today or later, soonest first.
+- [ ] The exact time (for example "23:59 CET") shows only when the guideline states it and the deadline date still matches it.
+- [ ] Local only, no AI calls. The Due soon banner and Add to calendar stay as they are.
 
 ### Confirmed by You
 Added during the final review (learner request), for rules ApplyProof can't verify (for example "strong English proficiency").

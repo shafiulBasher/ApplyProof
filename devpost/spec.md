@@ -154,6 +154,9 @@ PRD ref: `prd.md > Required-Documents Checklist`.
 ### Deadline Reminders
 `lib/calendar.ts` builds an RFC 5545 .ics (all-day `VALUE=DATE` or exact UTC from a known timezone abbreviation or "UTC±h", VALARMs -P7D and -P1D, escaping and 75-octet folding). `guidelineDeadlineParts` (`lib/tracking.ts`) keeps the date, time, and timezone only when each appears in the verified quote. `dueSoon(apps)` picks the banner items; `components/DueSoonBanner.tsx` stores a per-day, per-set dismissal in localStorage. Tested in `tests/calendar.test.ts` and `tests/tracking.test.ts`.
 
+### Calendar
+`app/calendar/page.tsx` (inside the App Shell): `monthGrid` and `byDeadline` from `lib/calendarView.ts` (tested in `tests/calendarView.test.ts`), colors from `trackingOf`, exact times from each application's cached extraction via `guidelineDeadlineParts`. Rendered only in the browser so "today" is the user's date, not the build's.
+
 ### Confirmed by You
 `application.confirmations`: requirement ID → `{ quote, note?, at }`. `confirmationFor(app, finding)` (`lib/tracking.ts`) returns it only when the stored quote equals the finding's quote. The **CheckNote** card's ConfirmBox adds, edits, or undoes it through the page's `updateApp`. The stored results and the input fingerprint ignore confirmations; only the readiness summary counts them, separately. Tested in `tests/tracking.test.ts`.
 

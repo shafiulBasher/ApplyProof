@@ -1,13 +1,14 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { FolderOpen, Home } from "lucide-react";
+import { CalendarDays, FolderOpen, Home } from "lucide-react";
 import Logo from "./Logo";
 import { PaperPlane } from "./Illustrations";
 
 const NAV = [
   { href: "/", label: "Home", icon: Home, active: (p: string) => p === "/" },
   { href: "/applications", label: "Applications", icon: FolderOpen, active: (p: string) => p.startsWith("/applications") },
+  { href: "/calendar", label: "Calendar", icon: CalendarDays, active: (p: string) => p.startsWith("/calendar") },
 ];
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
@@ -19,7 +20,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
       aria-current={n.active(path) ? "page" : undefined}
       className={`flex items-center gap-2.5 rounded-xl px-3 py-2 text-sm font-medium transition ${n.active(path) ? "bg-lilac text-primary-ink" : "text-muted hover:bg-lilac/50 hover:text-ink"}`}
     >
-      <n.icon className="h-4 w-4" aria-hidden /> {n.label}
+      <n.icon className="h-4 w-4" aria-hidden /> <span className="max-sm:sr-only">{n.label}</span>
     </Link>
   ));
   return (

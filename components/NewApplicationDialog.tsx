@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { db, save } from "@/lib/db";
+import { nextSketch } from "./Illustrations";
 
 export default function NewApplicationDialog({ onClose }: { onClose: () => void }) {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function NewApplicationDialog({ onClose }: { onClose: () => void 
     e.preventDefault();
     if (!name.trim()) return;
     const id = crypto.randomUUID();
+    const sketch = nextSketch((await db.applications.toArray()).map((a) => a.sketch));
     try {
       await save("the new application", () =>
         db.applications.add({
@@ -23,6 +25,7 @@ export default function NewApplicationDialog({ onClose }: { onClose: () => void 
           deadline: deadline || undefined,
           applicant: {},
           disclosureAccepted: false,
+          sketch,
           createdAt: Date.now(),
         }),
       );

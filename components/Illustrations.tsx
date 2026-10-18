@@ -50,10 +50,18 @@ export function DottedPath(p: P & { d?: string }) {
   );
 }
 
-// Three university sketches so cards look different from each other.
+export const SKETCH_COUNT = 6;
+
+// The first sketch no other application uses (cycles once all are taken).
+export function nextSketch(used: (number | undefined)[]): number {
+  const free = Array.from({ length: SKETCH_COUNT }, (_, i) => i).find((i) => !used.includes(i));
+  return free ?? used.length % SKETCH_COUNT;
+}
+
+// Six building sketches so each application card gets its own.
 export function University({ variant = 0, ...p }: P & { variant?: number }) {
   const id = `wob-u${variant}`;
-  const v = ((variant % 3) + 3) % 3;
+  const v = ((variant % SKETCH_COUNT) + SKETCH_COUNT) % SKETCH_COUNT;
   return (
     <svg viewBox="0 0 220 120" {...base(p)} strokeWidth={1.5}>
       <defs><Wobble id={id} /></defs>
@@ -93,6 +101,46 @@ export function University({ variant = 0, ...p }: P & { variant?: number }) {
             <path d="M88 82h10v12H88zM122 82h10v12h-10z" />
             <path d="M104 112V94a6 6 0 0 1 12 0v18" fill="#EAE2FF" />
             <path d="M20 112c4-26 22-26 26 0M178 112c4-20 18-20 22 0" fill="#DDEBDD" />
+          </>
+        )}
+        {v === 3 && (
+          <>
+            {/* Office tower: suits job applications */}
+            <path d="M84 112V28h52v84" fill="#fff" />
+            <path d="M110 28V16M106 16h8" />
+            {[38, 52, 66, 80].flatMap((y) => [92, 106, 120].map((x) => <path key={`${x}-${y}`} d={`M${x} ${y}h8v8h-8z`} fill="#EAE2FF" />))}
+            <path d="M136 112V58h42v54" fill="#FAE9B9" />
+            <path d="M144 68h8v8h-8zM160 68h8v8h-8zM144 84h8v8h-8zM160 84h8v8h-8z" />
+            <path d="M42 112V78h42v34" fill="#DDEBDD" />
+            <path d="M50 88h8v8h-8zM66 88h8v8h-8z" />
+            <path d="M102 112V96h16v16" fill="#EAE2FF" />
+          </>
+        )}
+        {v === 4 && (
+          <>
+            {/* Clock-tower castle */}
+            <path d="M98 112V40h24v72" fill="#fff" />
+            <path d="M94 40l16-26 16 26z" fill="#EAE2FF" />
+            <circle cx="110" cy="56" r="8" fill="#FAE9B9" />
+            <path d="M110 51v5l3 2" />
+            <path d="M46 112V72h52v40M122 112V72h52v40" fill="#fff" />
+            <path d="M46 72v-8h8v8M62 72v-8h8v8M78 72v-8h8v8M134 72v-8h8v8M150 72v-8h8v8M166 72v-8h8v8" />
+            <path d="M58 84h10v12H58zM76 84h10v12H76zM134 84h10v12h-10zM152 84h10v12h-10z" fill="#EAE2FF" />
+            <path d="M103 112V98a7 7 0 0 1 14 0v14" fill="#FAE9B9" />
+          </>
+        )}
+        {v === 5 && (
+          <>
+            {/* Library with steps and trees */}
+            <path d="M58 112h104M64 106h92M70 100h80" />
+            <path d="M74 100V60h72v40" fill="#fff" />
+            <path d="M68 60l42-24 42 24z" fill="#FAE9B9" />
+            <path d="M98 100V78a12 12 0 0 1 24 0v22" fill="#EAE2FF" />
+            <path d="M82 70h10v16H82zM128 70h10v16h-10z" fill="#EAE2FF" />
+            <circle cx="34" cy="90" r="15" fill="#DDEBDD" />
+            <path d="M34 112V100" />
+            <circle cx="186" cy="86" r="17" fill="#DDEBDD" />
+            <path d="M186 112V100" />
           </>
         )}
         <path d="M14 32l2 4 4 1-4 2-1 4-2-4-4-1 4-2z" fill="#FAE9B9" />

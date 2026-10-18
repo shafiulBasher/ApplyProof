@@ -144,7 +144,7 @@ export default function ApplicationPage() {
       <Link href="/applications" className="btn-ghost -ml-2.5"><ArrowLeft className="h-4 w-4" aria-hidden /> All applications</Link>
 
       <header className="card relative overflow-hidden p-5 sm:p-6">
-        <University variant={1} className="pointer-events-none absolute -bottom-2 right-2 hidden h-28 w-52 opacity-60 md:block" />
+        <University variant={app.sketch ?? 1} className="pointer-events-none absolute -bottom-2 right-2 hidden h-28 w-52 opacity-60 md:block" />
         <div className="relative flex flex-wrap items-start justify-between gap-4">
           <div className="min-w-0">
             <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{app.name}</h1>

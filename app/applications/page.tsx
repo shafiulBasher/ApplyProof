@@ -5,7 +5,7 @@ import { db } from "@/lib/db";
 import type { Application, StoredResults } from "@/lib/types";
 import ApplicationCard from "@/components/ApplicationCard";
 import NewApplicationDialog from "@/components/NewApplicationDialog";
-import { Notebook, Sparkle } from "@/components/Illustrations";
+import { nextSketch, Notebook, Sparkle } from "@/components/Illustrations";
 import type { OverallStatus } from "@/components/StatusBadge";
 import { summaryFor, trackingOf } from "@/lib/tracking";
 
@@ -35,7 +35,13 @@ export default function Dashboard() {
   useEffect(() => {
     setHello(greeting());
     (async () => {
-      setApps(await db.applications.orderBy("createdAt").reverse().toArray());
+      const all = await db.applications.orderBy("createdAt").toArray();
+      // Older applications have no sketch yet: give each a distinct one, once, oldest first.
+      for (const a of all.filter((x) => x.sketch === undefined)) {
+        a.sketch = nextSketch(all.map((x) => x.sketch));
+        await db.applications.update(a.id, { sketch: a.sketch }).catch(() => {});
+      }
+      setApps(all.reverse());
       setResults(new Map((await db.results.toArray()).map((r) => [r.applicationId, r])));
     })();
   }, []);

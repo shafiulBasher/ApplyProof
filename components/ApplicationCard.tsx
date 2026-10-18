@@ -22,7 +22,7 @@ export default function ApplicationCard({ app, result }: { app: Application; res
       className="card group flex flex-col overflow-hidden transition hover:-translate-y-1 hover:shadow-[0_18px_40px_-18px_rgba(48,43,64,0.35)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
       <div className={`relative h-28 border-b border-line ${SKY[status]}`}>
-        <University variant={variantOf(app.id)} className="absolute inset-x-4 bottom-0 h-24 transition group-hover:scale-[1.02]" />
+        <University variant={app.sketch ?? variantOf(app.id)} className="absolute inset-x-4 bottom-0 h-24 transition group-hover:scale-[1.02]" />
       </div>
       <div className="flex flex-1 flex-col gap-3 p-5">
         <div>

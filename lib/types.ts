@@ -30,6 +30,8 @@ export interface Application {
   deadline?: string;
   applicant: ApplicantFacts;
   disclosureAccepted: boolean;
+  // Which building sketch its card shows; chosen once so each application keeps its own.
+  sketch?: number;
   // Set when the user marks the application as submitted.
   submittedAt?: number;
   // The applicant's own confirmations of rules ApplyProof can't verify, by requirement ID.

@@ -100,6 +100,7 @@ Each extracted requirement becomes a finding. The finding list is the checklist.
   - [ ] Degree level and field are compared separately. Equivalent terms count as the same (BSc, B.Sc., Bachelor of Science → bachelor's; CSE, Computer Science, Computer Science and Engineering → the same field family). A higher degree meets a lower requirement.
   - [ ] A subject alone never implies a level. If the level or completion status is unclear (for example "must hold" with no status given), the app asks instead of guessing.
   - [ ] A field not on the list is Needs Verification when the rule also accepts "a related field", otherwise Action Needed.
+  - [ ] "Authorized to work in the EU": an EU-country nationality (country or adjective, e.g. Germany / German) passes, since every EU citizen may work in any EU country. Any other nationality is Needs Verification (a permit may exist), never Action Needed; a missing nationality is asked for.
   - [ ] When a check needs a detail that wasn't entered, its card offers **Add missing detail**, which scrolls to, highlights, and focuses that field.
   - [ ] A clearly stated rule the user meets is **Passed**, and one they don't meet is **Action Needed**.
   - [ ] A rule that's ambiguous, or that can't be compared with the facts given (for example a different grading scale with no stated conversion), is **Needs Verification**.

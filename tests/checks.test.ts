@@ -150,3 +150,17 @@ test("missing or unclear details are asked for, with the form field to fill in",
   expect(one(gpa, [], {}).missingField).toBe("gpa");
   expect(one(gpa, [], { gpa: 3.5 }).missingField).toBe("gpaScale");
 });
+
+test("EU work authorization: EU citizens pass, others are asked, never failed", () => {
+  const rule = { category: "eligibility" as const, quote: "Candidates must be legally authorized to work in the European Union.", eligibility: { field: "other" as const, clear: false } };
+  for (const nationality of ["Germany", "German", "french", "Czech Republic", "Dutch"]) {
+    const f = one(rule, [], { nationality });
+    expect(f.status, nationality).toBe("passed");
+    expect(f.evidence).toContain("EU citizens");
+  }
+  expect(one(rule, [], { nationality: "Bangladesh" }).status).toBe("needs_verification"); // may hold a permit
+  expect(one(rule, [], { nationality: "Norway" }).status).toBe("needs_verification"); // EEA, not EU: ask
+  expect(one(rule, [], {}).missingField).toBe("nationality");
+  // Other unclear rules are untouched.
+  expect(one({ ...rule, quote: "Applicants must demonstrate strong English proficiency." }, [], { nationality: "Germany" }).status).toBe("needs_verification");
+});

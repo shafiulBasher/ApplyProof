@@ -138,6 +138,8 @@ function eligibility(req: Requirement, facts: ApplicantFacts): Verdict {
     explanation: "The quoted rule doesn't state a measurable standard or what proof is accepted.",
     correction: "Confirm the accepted evidence with the program organizer.",
   };
+  const euWork = euWorkAuthorization(req.quote, facts);
+  if (euWork) return euWork;
   if (!e || !e.clear) return unclear;
 
   if (e.field === "gpa") {
@@ -166,6 +168,29 @@ function eligibility(req: Requirement, facts: ApplicantFacts): Verdict {
   }
 
   return unclear;
+}
+
+// EU member states, by country name and nationality adjective.
+const EU = [
+  "austria austrian", "belgium belgian", "bulgaria bulgarian", "croatia croatian", "cyprus cypriot", "czechia czech republic czech",
+  "denmark danish dane", "estonia estonian", "finland finnish finn", "france french", "germany german", "greece greek",
+  "hungary hungarian", "ireland irish", "italy italian", "latvia latvian", "lithuania lithuanian", "luxembourg luxembourgish luxembourger",
+  "malta maltese", "netherlands the netherlands holland dutch", "poland polish pole", "portugal portuguese", "romania romanian",
+  "slovakia slovak", "slovenia slovenian slovene", "spain spanish spaniard", "sweden swedish swede",
+];
+const isEuNational = (n: string) => {
+  const v = n.trim().toLowerCase();
+  return EU.some((names) => names === v || ` ${names} `.includes(` ${v} `));
+};
+
+// "Authorized to work in the EU": every EU citizen has that right, so an EU nationality settles it.
+// Anyone else may still hold a permit the app can't see, so they're asked, never failed.
+function euWorkAuthorization(quote: string, facts: ApplicantFacts): Verdict | undefined {
+  if (!/\b(authori[sz]ed|eligible|permitted|right) to work\b|\bwork (permit|authori[sz]ation)\b/i.test(quote) || !/\b(european union|EU)\b/i.test(quote)) return undefined;
+  const n = facts.nationality?.trim();
+  if (!n) return { status: "needs_verification", explanation: "EU citizens can work in any EU country; other applicants need a valid permit.", correction: "Add your nationality in Your details.", missingField: "nationality" };
+  if (isEuNational(n)) return { status: "passed", explanation: "As an EU citizen, you have the right to work in any EU country.", evidence: `EU citizens have the right to work in any EU country · Yours: ${n}` };
+  return { status: "needs_verification", explanation: "Your nationality isn't an EU country, so you'd need a valid EU work permit or residence right.", evidence: `Yours: ${n}`, correction: "Confirm that you hold a valid EU work permit, or check with the employer." };
 }
 
 // Degree rules: level and field are compared separately; a missing or unclear detail is asked for, never guessed.

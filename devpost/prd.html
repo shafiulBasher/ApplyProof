@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ApplyProof PRD</title>
+<style>
+  :root {
+    --bg: #faf8f3; --surface: #ffffff; --ink: #14193a; --muted: #5d6480; --line: #e6e3da;
+    --navy: #14193a; --accent: #5b4cf0; --accent-soft: #ecebfe;
+    --pass: #138a62; --pass-soft: #dff5ec;
+    --act: #b8443f; --act-soft: #f8e4e2;
+    --ver: #b7791f; --ver-soft: #fbf0d9;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1226; --surface: #181c36; --ink: #eceefa; --muted: #9ba1c2; --line: #2a2f52;
+      --navy: #eceefa; --accent: #9c92ff; --accent-soft: #262457;
+      --pass: #56d3a3; --pass-soft: #163a30;
+      --act: #ef8d87; --act-soft: #3d2124;
+      --ver: #f1bd62; --ver-soft: #3b3018;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 40px 16px 80px; }
+  .eyebrow { font-size: 12px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  h1 { font-size: 40px; margin: 4px 0; letter-spacing: -.02em; }
+  h1 .grad { background: linear-gradient(90deg, var(--accent), var(--pass)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .tagline { font-size: 19px; color: var(--muted); margin: 0 0 8px; }
+  .badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; background: var(--ver-soft); color: var(--ver); vertical-align: middle; margin-left: 8px; }
+  h2 { font-size: 21px; margin: 44px 0 12px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 10px; padding: 14px 18px; margin: 18px 0 0; }
+  .muted { color: var(--muted); }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { font-family: inherit; fill: var(--ink); }
+  .steps { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 12px; }
+  .steps button { font: inherit; font-weight: 600; font-size: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    border-radius: 999px; padding: 6px 14px; cursor: pointer; transition: background .15s, border-color .15s; }
+  .steps button:hover { border-color: var(--accent); }
+  .steps button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  #stepPanel h3 { margin: 0 0 6px; font-size: 18px; }
+  #stepPanel p { margin: 0; }
+  .chip { display: inline-block; padding: 2px 10px; border-radius: 6px; font-weight: 700; font-size: 13px; }
+  .chip.pass { background: var(--pass-soft); color: var(--pass); }
+  .chip.act { background: var(--act-soft); color: var(--act); }
+  .chip.ver { background: var(--ver-soft); color: var(--ver); }
+  .chip.nc { background: var(--line); color: var(--muted); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; }
+  .mock { border: 1px dashed var(--line); border-radius: 10px; padding: 10px 12px; margin: 8px 0; font-size: 14px; }
+  .mock b { display: block; }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
+  summary { cursor: pointer; padding: 15px 20px; font-weight: 600; list-style: none; display: flex; gap: 10px; align-items: center; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; margin-left: auto; color: var(--muted); font-size: 20px; }
+  details[open] summary::after { content: "\2212"; }
+  .src { font-size: 12px; color: var(--muted); font-weight: 500; }
+  details .body { padding: 0 20px 16px; }
+  details ul { margin: 6px 0; padding-left: 20px; }
+  .crit { list-style: none; padding-left: 0; }
+  .crit li { padding-left: 26px; position: relative; margin: 6px 0; }
+  .crit li::before { content: ""; position: absolute; left: 0; top: 5px; width: 14px; height: 14px; border: 2px solid var(--accent); border-radius: 4px; }
+  .assume { font-size: 12px; font-weight: 700; color: var(--ver); background: var(--ver-soft); padding: 1px 7px; border-radius: 5px; margin-left: 4px; }
+  .changed { border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; background: var(--surface); }
+  .changed li { margin: 4px 0; }
+  .swatches { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+  .sw { display: flex; align-items: center; gap: 8px; font-size: 13px; }
+  .sw i { width: 22px; height: 22px; border-radius: 6px; border: 1px solid var(--line); display: inline-block; }
+  footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Product requirements · Build With AI: Basics</div>
+  <h1><span class="grad">ApplyProof</span> <span class="badge" id="status" style="background:var(--pass-soft);color:var(--pass)">Approved</span></h1>
+  <p class="tagline">Know what's missing before you submit.</p>
+  <div class="callout"><strong>From scope to product.</strong> Scope said "run the readiness check, read the findings, fix, rerun." Now we know exactly what that means: two screens, three fix-first groups, quoted evidence on every finding, and a <em>What Changed</em> summary that proves the fix worked.</div>
+
+  <h2>The core journey</h2>
+  <div class="card">
+    <svg viewBox="0 0 860 210" role="img" aria-label="Journey: Dashboard, New application, Upload and confirm types, Enter facts, Run check, Fix-first results, Fix and re-upload, rerun shows What Changed, back to dashboard.">
+      <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+      <g font-size="13" text-anchor="middle">
+        <rect x="10" y="20" width="120" height="56" rx="12" fill="var(--accent-soft)" stroke="var(--accent)"/><text x="70" y="44" font-weight="700">Dashboard</text><text x="70" y="62" font-size="11" fill="var(--muted)">cards + status</text>
+        <rect x="160" y="20" width="120" height="56" rx="12" fill="var(--surface)" stroke="var(--line)"/><text x="220" y="44" font-weight="600">New app</text><text x="220" y="62" font-size="11" fill="var(--muted)">name required</text>
+        <rect x="310" y="20" width="120" height="56" rx="12" fill="var(--surface)" stroke="var(--line)"/><text x="370" y="44" font-weight="600">Upload</text><text x="370" y="62" font-size="11" fill="var(--muted)">filename hint, you confirm</text>
+        <rect x="460" y="20" width="120" height="56" rx="12" fill="var(--surface)" stroke="var(--line)"/><text x="520" y="44" font-weight="600">Enter facts</text><text x="520" y="62" font-size="11" fill="var(--muted)">GPA · degree · nation.</text>
+        <rect x="610" y="20" width="120" height="56" rx="12" fill="var(--accent)" stroke="var(--accent)"/><text x="670" y="44" font-weight="700" style="fill:#fff">Run check</text><text x="670" y="62" font-size="11" style="fill:#fff">guideline → AI</text>
+        <rect x="610" y="130" width="120" height="60" rx="12" fill="var(--surface)" stroke="var(--line)"/><text x="670" y="154" font-weight="600">Results</text><text x="670" y="172" font-size="11" fill="var(--muted)">fix-first + evidence</text>
+        <rect x="430" y="130" width="140" height="60" rx="12" fill="var(--surface)" stroke="var(--line)"/><text x="500" y="154" font-weight="600">Fix &amp; replace</text><text x="500" y="172" font-size="11" fill="var(--muted)">file or facts</text>
+        <rect x="190" y="130" width="190" height="60" rx="12" fill="var(--pass-soft)" stroke="var(--pass)"/><text x="285" y="154" font-weight="700" style="fill:var(--pass)">What Changed</text><text x="285" y="172" font-size="11" fill="var(--muted)">Action Needed → Passed</text>
+      </g>
+      <g stroke="var(--muted)" stroke-width="2" fill="none" marker-end="url(#a)">
+        <path d="M130,48 L158,48"/><path d="M280,48 L308,48"/><path d="M430,48 L458,48"/><path d="M580,48 L608,48"/>
+        <path d="M670,76 L670,128"/><path d="M610,160 L572,160"/>
+      </g>
+      <path d="M500,130 C520,100 600,95 640,78" stroke="var(--accent)" stroke-width="2.2" stroke-dasharray="6 5" fill="none" marker-end="url(#a)"/>
+      <text x="560" y="110" font-size="11" font-weight="700" style="fill:var(--accent)">rerun</text>
+      <path d="M190,160 C100,160 70,120 70,78" stroke="var(--pass)" stroke-width="2" fill="none" marker-end="url(#a)"/>
+      <text x="95" y="135" font-size="11" fill="var(--muted)">card updates</text>
+    </svg>
+    <div class="steps" id="steps" role="group" aria-label="Journey steps"></div>
+    <div id="stepPanel" class="callout" aria-live="polite"></div>
+  </div>
+
+  <h2>Screens</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="eyebrow">Screen 1</div>
+      <h3 style="margin:4px 0 8px">Application Dashboard</h3>
+      <div class="mock"><b>Erasmus Mundus Scholarship · Uni X</b>Deadline Oct 20 · <span class="chip act">Action Needed</span> · 3 issues</div>
+      <div class="mock"><b>MSc Data Science</b>No deadline · <span class="chip nc">Not Checked</span></div>
+      <p class="muted" style="margin:8px 0 0;font-size:14px">The prominent <strong>+ New Application</strong> button asks for a name (required), plus organization and deadline (optional). <em>Example data is illustrative.</em></p>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Screen 2</div>
+      <h3 style="margin:4px 0 8px">Single Application Page</h3>
+      <div class="mock"><b>Header</b>Name · deadline · status · Run Readiness Check</div>
+      <div class="mock"><b>Documents</b>Guideline + files · type dropdown · replace / remove</div>
+      <div class="mock"><b>Applicant Information</b>GPA · grading scale · degree · nationality</div>
+      <div class="mock"><b>Results</b>What Changed → Action Needed → Needs Verification → Passed</div>
+    </div>
+  </div>
+
+  <h2>The demo moment</h2>
+  <div class="changed">
+    <div class="eyebrow">What changed since your last check</div>
+    <ul>
+      <li>CV length: <span class="chip act">Action Needed</span> → <span class="chip pass">Passed</span></li>
+      <li>CV pages: 3 → 2</li>
+      <li>Outstanding issues: 3 → 2</li>
+    </ul>
+    <p class="muted" style="margin:6px 0 0;font-size:14px">Only changes that can be matched reliably across both checks are shown, and unresolved issues stay visible below.</p>
+  </div>
+
+  <h2>Features &amp; acceptance criteria</h2>
+  <details open>
+    <summary>Readiness checks <span class="src">· scope › POC Boundary</span></summary>
+    <div class="body">
+      <ul class="crit">
+        <li>2 recommendation letters required, 1 uploaded → <span class="chip act">Action Needed</span> "Two required; only one uploaded"</li>
+        <li>3-page CV vs. a 2-page limit → <span class="chip act">Action Needed</span>, "Official limit: 2 pages · Uploaded CV: 3 pages"</li>
+        <li>620-word letter vs. a 500–800 limit → <span class="chip pass">Passed</span></li>
+        <li>Eligibility rule clearly met → Passed; clearly not met → Action Needed</li>
+        <li>Ambiguous rule, different grading scale, or a missing fact → <span class="chip ver">Needs Verification</span>, naming the field to fill in</li>
+        <li>Formatting, quality, and deadlines → Needs Verification, with the source quote</li>
+        <li>Page and word counts are measured exactly in code, not by AI</li>
+      </ul>
+    </div>
+  </details>
+  <details>
+    <summary>Evidence-linked findings <span class="src">· scope › Unique Kernel</span></summary>
+    <div class="body"><ul class="crit">
+      <li>Each finding: the requirement, an explanation, the exact guideline quote, and the page number</li>
+      <li>Evidence from the applicant's side where relevant ("Uploaded CV: 3 pages")</li>
+      <li>Every Action Needed finding has a recommended correction</li>
+      <li>No finding without a source quote, and no requirement is ever invented</li>
+    </ul></div>
+  </details>
+  <details>
+    <summary>Fix-first results</summary>
+    <div class="body"><ul class="crit">
+      <li>Order: Action Needed (expanded) → Needs Verification (expanded if it has items) → Passed (collapsed)</li>
+      <li>Each group shows its count, and any group can be expanded or collapsed</li>
+      <li>Overall status: Action Needed if any exist, else Needs Verification, else Passed</li>
+      <li>Not Checked until a check completes successfully; never Passed while a required criterion is unverified</li>
+    </ul></div>
+  </details>
+  <details>
+    <summary>Recheck &amp; What Changed <span class="src">· scope › "oh, that's cool"</span></summary>
+    <div class="body"><ul class="crit">
+      <li>Rerun after replacing a file or editing applicant info</li>
+      <li>The summary sits at the top: status changes, value changes, issue-count change</li>
+      <li>Never claims an improvement it can't compare</li>
+      <li>A satisfying transition when a finding changes to Passed</li>
+    </ul></div>
+  </details>
+  <details>
+    <summary>Upload &amp; file identification</summary>
+    <div class="body"><ul class="crit">
+      <li>The type is suggested from the filename (CV, motivation letter, transcript, recommendation letter, other), with no AI, and the user confirms it with a dropdown</li>
+      <li>If unsure, it asks the user and doesn't pre-select a guess</li>
+      <li>Several files of the same type are allowed</li>
+      <li>Replace and remove update the list immediately</li>
+    </ul></div>
+  </details>
+  <details>
+    <summary>Applications, extraction &amp; AI disclosure</summary>
+    <div class="body"><ul class="crit">
+      <li>New Application requires a name, and the new card shows Not Checked</li>
+      <li>Each application shows only its own files, info, and results</li>
+      <li>Extraction covers required documents and counts, page and word limits, eligibility, deadlines, and formatting, each with its quote and page</li>
+      <li>Before the first upload, the user is told that only the guideline's text goes to Google's Gemini API at check time, that free-tier data may be used to improve Google's products, and that applicant documents are never sent. Proceed or cancel.</li>
+    </ul></div>
+  </details>
+
+  <h2>States &amp; what-ifs</h2>
+  <details>
+    <summary>Empty, error &amp; persistence states</summary>
+    <div class="body"><ul>
+      <li><strong>Empty dashboard:</strong> explains ApplyProof, with + New Application</li>
+      <li><strong>No guideline:</strong> Run is disabled. "Upload an official application guideline first."</li>
+      <li><strong>Unreadable PDF:</strong> "We couldn't extract readable text from this PDF. It may be scanned or image-based." The file stays visible for replacing, and nothing is checked from it.</li>
+      <li><strong>Unreadable guideline:</strong> treated as missing, so Run stays disabled</li>
+      <li><strong>Checking:</strong> progress indicator, no double-run</li>
+      <li><strong>Inputs changed since the check:</strong> a clear notice, and the old results are labeled <em>Outdated</em> until rerun</li>
+      <li><strong>Check fails:</strong> previous successful results are kept, the error is shown separately, and the Outdated notice stays if inputs changed</li>
+      <li><strong>Persistence:</strong> everything survives closing and reopening on the same browser. Clearing browser data removes it, and the user is told so.</li>
+      <li><strong>Can't save (for example a very large file):</strong> the user is told clearly. Nothing is lost silently.</li>
+    </ul></div>
+  </details>
+
+  <h2>Look &amp; feel</h2>
+  <div class="card">
+    <p style="margin:0"><strong>"Colorful and memorable on the surface, precise and trustworthy at the core."</strong> A premium indie-hacker SaaS look: Inter, bold headings, subtle gradients, custom icons, rounded cards where they help.</p>
+    <div class="swatches">
+      <span class="sw"><i style="background:#14193a"></i>Deep navy</span>
+      <span class="sw"><i style="background:#5b4cf0"></i>Electric violet</span>
+      <span class="sw"><i style="background:#3ccf9a"></i>Mint · Passed</span>
+      <span class="sw"><i style="background:#e0a23a"></i>Amber · Verify</span>
+      <span class="sw"><i style="background:#c0544e"></i>Muted red · Action</span>
+      <span class="sw"><i style="background:#faf8f3"></i>Warm off-white</span>
+    </div>
+    <p class="muted" style="margin:12px 0 0;font-size:14px"><strong>Avoid:</strong> generic AI landing pages, excessive gradients, glassmorphism everywhere, unnecessary animation, cluttered dashboards.</p>
+  </div>
+
+  <h2>Boundary</h2>
+  <details>
+    <summary><span class="chip pass">Building</span> What the POC must do</summary>
+    <div class="body"><ul>
+      <li>Dashboard + Single Application Page</li><li>PDF upload, with types suggested from the filename and confirmed by the user</li>
+      <li>Requirement extraction with quotes and pages</li><li>Missing-document, page, and word checks; basic eligibility</li>
+      <li>Fix-first evidence-linked findings</li><li>Recheck + What Changed</li><li>AI disclosure, empty and error states, persistence on the device</li>
+    </ul></div>
+  </details>
+  <details>
+    <summary><span class="chip ver">Deferred</span> Implied, but not now</summary>
+    <div class="body"><ul>
+      <li><strong>Sign-up and login:</strong> right after the MVP works</li>
+      <li><strong>Sync and backup across devices:</strong> needs accounts</li>
+      <li><strong>Full check history:</strong> latest + previous is enough for What Changed</li>
+      <li><strong>Exportable report:</strong> not needed to prove the loop</li>
+    </ul></div>
+  </details>
+  <details>
+    <summary><span class="chip act">Non-goals</span> Won't do</summary>
+    <div class="body"><ul>
+      <li>Finding programs or jobs · writing essays · predicting admission</li>
+      <li>Reading eligibility from the CV · judging writing quality</li>
+      <li>Non-PDF uploads and OCR (scanned PDFs get a clear error)</li>
+    </ul></div>
+  </details>
+
+  <h2>Open questions</h2>
+  <div class="card"><p style="margin:0">None. All four assumptions were confirmed. <strong>Build priority:</strong> the demo path first: upload → run → 3-page CV flagged → upload the corrected CV → rerun → <span class="chip act">Action Needed</span> → <span class="chip pass">Passed</span>. Multiple applications and persistence follow, if feasible, without delaying it.</p></div>
+
+  <footer>Companion view of <code>devpost/prd.md</code>, which is the main version.</footer>
+</main>
+<script>
+  const steps = [
+    ["Arrive", "The Application Dashboard. On first use it's empty, with a prompt to create an application."],
+    ["Create", "+ New Application: program name (required), organization and deadline (optional). The new application opens."],
+    ["Upload", "Before the first upload, the AI disclosure. Upload the guideline PDF and your documents. ApplyProof suggests each file's type from its filename, and you confirm or change it. If it's unsure, it asks."],
+    ["Enter facts", "Fill in Applicant Information: GPA, grading scale, degree, nationality."],
+    ["Run", "Click Run Readiness Check. Only the guideline's text goes to the AI; your documents stay on your device."],
+    ["Read results", "Fix-first: Action Needed, then Needs Verification, then Passed (collapsed). Every finding shows the requirement, an explanation, the exact quote, the page, and a correction."],
+    ["Fix", "Replace the 3-page CV with a 2-page version, or update your applicant info."],
+    ["Rerun", "Run again. 'What changed since your last check' appears at the top: CV length Action Needed → Passed."],
+    ["Success", "You see what's resolved, what remains, and what to verify. The dashboard card shows the new status and issue count."]
+  ];
+  const wrap = document.getElementById("steps"), panel = document.getElementById("stepPanel");
+  function show(i) {
+    [...wrap.children].forEach((b, j) => b.setAttribute("aria-pressed", j === i));
+    panel.innerHTML = "<h3>" + (i + 1) + " · " + steps[i][0] + "</h3><p>" + steps[i][1] + "</p>";
+  }
+  steps.forEach((s, i) => { const b = document.createElement("button"); b.textContent = (i + 1) + " " + s[0]; b.onclick = () => show(i); wrap.appendChild(b); });
+  show(0);
+</script>
+<noscript><p>Journey steps: Arrive, Create, Upload, Enter facts, Run, Read results, Fix, Rerun, Success. See devpost/prd.md.</p></noscript>
+</body>
+</html>

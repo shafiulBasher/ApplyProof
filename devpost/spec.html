@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ApplyProof Technical Spec</title>
+<style>
+  :root {
+    --bg: #faf8f3; --surface: #ffffff; --ink: #14193a; --muted: #5d6480; --line: #e6e3da;
+    --accent: #5b4cf0; --accent-soft: #ecebfe;
+    --pass: #138a62; --pass-soft: #dff5ec;
+    --act: #b8443f; --act-soft: #f8e4e2;
+    --ver: #b7791f; --ver-soft: #fbf0d9;
+    --g: #2b6cb0; --g-soft: #e3eefa;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f1226; --surface: #181c36; --ink: #eceefa; --muted: #9ba1c2; --line: #2a2f52;
+      --accent: #9c92ff; --accent-soft: #262457;
+      --pass: #56d3a3; --pass-soft: #163a30;
+      --act: #ef8d87; --act-soft: #3d2124;
+      --ver: #f1bd62; --ver-soft: #3b3018;
+      --g: #7fb3ec; --g-soft: #1b2a40;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 920px; margin: 0 auto; padding: 40px 16px 80px; }
+  .eyebrow { font-size: 12px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+  h1 { font-size: 38px; margin: 4px 0; letter-spacing: -.02em; }
+  h1 .grad { background: linear-gradient(90deg, var(--accent), var(--pass)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .badge { display: inline-block; font-size: 12px; font-weight: 700; padding: 2px 10px; border-radius: 999px; background: var(--ver-soft); color: var(--ver); vertical-align: middle; margin-left: 8px; }
+  h2 { font-size: 21px; margin: 44px 0 12px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; }
+  .callout { border-left: 4px solid var(--accent); background: var(--accent-soft); border-radius: 10px; padding: 14px 18px; }
+  .muted { color: var(--muted); }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { font-family: inherit; fill: var(--ink); }
+  .steps { display: flex; flex-wrap: wrap; gap: 8px; margin: 14px 0 12px; }
+  .steps button { font: inherit; font-weight: 600; font-size: 14px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+  .steps button:hover { border-color: var(--accent); }
+  .steps button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
+  #panel h3 { margin: 0 0 6px; font-size: 18px; }
+  #panel p { margin: 0 0 6px; }
+  .tag { display: inline-block; font-size: 12px; font-weight: 600; padding: 1px 8px; border-radius: 6px; margin: 2px 4px 2px 0; }
+  .t-ui { background: var(--accent-soft); color: var(--accent); }
+  .t-db { background: var(--pass-soft); color: var(--pass); }
+  .t-srv { background: var(--g-soft); color: var(--g); }
+  .t-ai { background: var(--ver-soft); color: var(--ver); }
+  .t-code { background: var(--act-soft); color: var(--act); }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+  .tablewrap { overflow-x: auto; }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 10px; overflow: hidden; }
+  summary { cursor: pointer; padding: 14px 20px; font-weight: 600; list-style: none; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; margin-left: auto; color: var(--muted); font-size: 20px; }
+  details[open] summary::after { content: "\2212"; }
+  .body { padding: 0 20px 16px; }
+  .body ul { margin: 6px 0; padding-left: 20px; }
+  code { font-family: ui-monospace, "Cascadia Code", Consolas, monospace; font-size: 13px; background: var(--accent-soft); padding: 1px 5px; border-radius: 4px; }
+  pre { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 16px; overflow-x: auto; font-size: 13px; line-height: 1.5; }
+  .ref { font-size: 13px; color: var(--muted); }
+  .flag { border-left: 4px solid var(--ver); background: var(--ver-soft); border-radius: 10px; padding: 12px 16px; margin-top: 12px; }
+  footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Technical spec · Build With AI: Basics</div>
+  <h1><span class="grad">ApplyProof</span> <span class="badge" style="background:var(--pass-soft);color:var(--pass)">Approved</span></h1>
+  <p class="muted" style="margin:0 0 18px">A local web app (Next.js) · browser storage · free Gemini Flash · plain-code checker</p>
+
+  <div class="callout"><strong>In plain language:</strong> ApplyProof runs on your laptop and opens in your browser. Your files and results live in the browser's own filing cabinet. A small helper on your laptop reads PDFs and holds the secret AI key. Gemini's only job is to <em>list the guideline's requirements with quotes</em>, and <strong>only the guideline's text is ever sent to it</strong>. Your own documents never leave your laptop. Plain code then verifies every quote and makes every pass/fail decision. A guideline is read once and remembered, so reruns are instant, free, and compare the same rules.</div>
+
+  <h2>Architecture</h2>
+  <div class="card">
+    <svg viewBox="0 0 880 330" role="img" aria-label="Architecture: in the browser, the pages, the checker, and IndexedDB storage; on the laptop, a helper with parse and extract routes and the secret key; Google Gemini free tier outside. Upload goes to the parse route; first run sends guideline text to the extract route, which calls Gemini and verifies quotes.">
+      <defs><marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/></marker></defs>
+      <rect x="10" y="10" width="420" height="310" rx="16" fill="none" stroke="var(--accent)" stroke-dasharray="5 5"/>
+      <text x="26" y="34" font-size="12" font-weight="700" style="fill:var(--accent)">YOUR BROWSER</text>
+      <rect x="30" y="50" width="380" height="64" rx="12" fill="var(--accent-soft)" stroke="var(--accent)"/>
+      <text x="220" y="76" text-anchor="middle" font-weight="700" font-size="14">Pages</text>
+      <text x="220" y="96" text-anchor="middle" font-size="12" fill="var(--muted)">Dashboard · Application page · Results · What Changed</text>
+      <rect x="30" y="140" width="180" height="78" rx="12" fill="var(--act-soft)" stroke="var(--act)"/>
+      <text x="120" y="166" text-anchor="middle" font-weight="700" font-size="14">Checker</text>
+      <text x="120" y="184" text-anchor="middle" font-size="11" fill="var(--muted)">plain code: counts, rules,</text>
+      <text x="120" y="200" text-anchor="middle" font-size="11" fill="var(--muted)">status, What Changed</text>
+      <rect x="230" y="140" width="180" height="160" rx="12" fill="var(--pass-soft)" stroke="var(--pass)"/>
+      <text x="320" y="166" text-anchor="middle" font-weight="700" font-size="14">IndexedDB</text>
+      <text x="320" y="186" text-anchor="middle" font-size="11" fill="var(--muted)">applications</text>
+      <text x="320" y="204" text-anchor="middle" font-size="11" fill="var(--muted)">documents (PDF + text)</text>
+      <text x="320" y="222" text-anchor="middle" font-size="11" fill="var(--muted)">extractions (cached)</text>
+      <text x="320" y="240" text-anchor="middle" font-size="11" fill="var(--muted)">results: current + previous</text>
+      <text x="320" y="276" text-anchor="middle" font-size="11" font-weight="600" style="fill:var(--pass)">survives closing the browser</text>
+
+      <rect x="470" y="10" width="230" height="310" rx="16" fill="none" stroke="var(--g)" stroke-dasharray="5 5"/>
+      <text x="486" y="34" font-size="12" font-weight="700" style="fill:var(--g)">HELPER ON YOUR LAPTOP</text>
+      <rect x="490" y="56" width="190" height="70" rx="12" fill="var(--g-soft)" stroke="var(--g)"/>
+      <text x="585" y="82" text-anchor="middle" font-weight="700" font-size="14">Parse route</text>
+      <text x="585" y="102" text-anchor="middle" font-size="11" fill="var(--muted)">PDF → page texts, counts · no AI</text>
+      <rect x="490" y="150" width="190" height="80" rx="12" fill="var(--g-soft)" stroke="var(--g)"/>
+      <text x="585" y="176" text-anchor="middle" font-weight="700" font-size="14">Extract route</text>
+      <text x="585" y="196" text-anchor="middle" font-size="11" fill="var(--muted)">asks Gemini, then</text>
+      <text x="585" y="212" text-anchor="middle" font-size="11" fill="var(--muted)">verifies every quote</text>
+      <rect x="490" y="252" width="190" height="48" rx="10" fill="var(--surface)" stroke="var(--line)"/>
+      <text x="585" y="281" text-anchor="middle" font-size="12">🔒 .env.local: secret key</text>
+
+      <rect x="740" y="120" width="130" height="90" rx="14" fill="var(--ver-soft)" stroke="var(--ver)"/>
+      <text x="805" y="152" text-anchor="middle" font-weight="700" font-size="14">Gemini</text>
+      <text x="805" y="170" text-anchor="middle" font-size="11" fill="var(--muted)">Flash · free tier</text>
+      <text x="805" y="188" text-anchor="middle" font-size="11" fill="var(--muted)">Google's servers</text>
+
+      <g stroke="var(--muted)" stroke-width="2" fill="none" marker-end="url(#a)">
+        <path d="M410,80 L488,88"/>
+        <path d="M410,100 C450,130 460,175 488,185"/>
+        <path d="M680,180 L738,170"/>
+        <path d="M220,114 L140,138"/>
+        <path d="M220,114 L300,138"/>
+      </g>
+      <text x="440" y="72" font-size="11" fill="var(--muted)">upload</text>
+      <text x="400" y="150" font-size="11" fill="var(--muted)">first run</text>
+      <text x="690" y="230" font-size="10" fill="var(--muted)">guideline text only</text>
+    </svg>
+    <p class="ref" style="margin:10px 0 0"><span class="tag t-ui">page</span><span class="tag t-db">storage</span><span class="tag t-srv">helper</span><span class="tag t-ai">AI</span><span class="tag t-code">plain code</span>. Reruns with the same guideline never leave your laptop.</p>
+  </div>
+
+  <h2>The journey through the system</h2>
+  <div class="card">
+    <div class="steps" id="steps" role="group" aria-label="Journey steps"></div>
+    <div id="panel" class="callout" aria-live="polite"></div>
+  </div>
+
+  <h2>Components</h2>
+  <p class="muted" style="margin-top:-4px">Each one links to the PRD behavior it serves and the file where it lives.</p>
+  <div id="comps"></div>
+
+  <h2>Data: where everything lives</h2>
+  <div class="card tablewrap">
+    <table>
+      <tr><th>Table</th><th>Holds</th><th>Updated when</th><th>Come back later</th></tr>
+      <tr><td><b>applications</b></td><td>name, organization, deadline, GPA / scale / degree / nationality, disclosure accepted</td><td>create, type in the form, accept the disclosure</td><td>still there</td></tr>
+      <tr><td><b>documents</b></td><td>the PDF itself, its <b>content hash</b>, page texts, page and word counts, readable?, filename-suggested and confirmed type</td><td>upload, confirm type, replace, remove</td><td>still there</td></tr>
+      <tr><td><b>extractions</b></td><td>verified requirements <b>plus the exact page texts</b> they were verified against</td><td>first run with a new guideline</td><td>reused, with no AI call</td></tr>
+      <tr><td><b>results</b></td><td>current + previous check, last error</td><td>each run (failure only sets the error)</td><td>still there</td></tr>
+    </table>
+  </div>
+
+  <h2>Look &amp; feel, made buildable</h2>
+  <div class="card">
+    <p style="margin:0 0 8px">Tailwind tokens: <span class="tag" style="background:#14193a;color:#fff">navy</span><span class="tag" style="background:#5b4cf0;color:#fff">violet</span><span class="tag" style="background:#3ccf9a;color:#0b2b20">mint · Passed</span><span class="tag" style="background:#e0a23a;color:#2b1d05">amber · Verify</span><span class="tag" style="background:#c0544e;color:#fff">rose · Action</span><span class="tag" style="background:#faf8f3;color:#14193a;border:1px solid var(--line)">paper</span></p>
+    <ul style="margin:0;padding-left:20px">
+      <li>Inter, bold tight headings, tabular numbers for counts</li>
+      <li>White rounded cards with a status-colored left bar and a pill badge, no glass effects</li>
+      <li>Highlighted quote block with "Guideline · p. 3"</li>
+      <li>CSS-only motion (150–250ms), a mint pulse plus checkmark on Passed, respects reduced motion</li>
+      <li>Plain, calm copy</li>
+    </ul>
+  </div>
+
+  <h2>Files</h2>
+<pre>app/
+  page.tsx                     Dashboard
+  applications/[id]/page.tsx   Single Application Page
+  api/parse/route.ts           PDF → pages, counts (no AI)
+  api/extract/route.ts         guideline → verified requirements
+components/                    cards, dialogs, documents, form, results, What Changed
+lib/
+  db.ts         storage (Dexie)       pdf.ts      unpdf helpers
+  docTypes.ts   filename → type hint  hash.ts     SHA-256 fingerprints
+  ai/provider.ts  swappable AI        ai/gemini.ts  Gemini version
+  quotes.ts     quote verifier        checks.ts   checker
+  status.ts     status + Outdated     diff.ts     What Changed
+  runCheck.ts   check orchestrator
+scripts/  make-samples.ts · test-extraction.ts
+samples/  synthetic PDFs + expected-requirements.json
+tests/    Vitest for checker, quotes, diff, status
+devpost/  scope · prd · spec · checklist
+.env.example  (no real key, .env.local is git-ignored)</pre>
+
+  <h2>Run it &amp; record it</h2>
+  <div class="card">
+    <ol style="margin:0;padding-left:20px">
+      <li><code>npm install</code></li>
+      <li>Copy <code>.env.example</code> → <code>.env.local</code>, then add the free <code>GEMINI_API_KEY</code> and <code>GEMINI_MODEL</code> from AI Studio</li>
+      <li><code>npm run samples</code>, then <code>npm run dev</code>, then open <b>http://localhost:3000</b></li>
+      <li>Record: create the "Global Future Scholars Scholarship" application, upload the samples, run, see the CV <span class="tag t-code">Action Needed</span>, replace it with the 2-page CV, rerun, and see What Changed → <span class="tag t-db">Passed</span></li>
+    </ol>
+  </div>
+
+  <h2>Where it could break</h2>
+  <details><summary>Free quota reached / Gemini down</summary><div class="body">A plain message, previous results unchanged, no paid fallback ever. The demo rerun doesn't need Gemini.</div></details>
+  <details><summary>Wrong quote or bad JSON from the AI</summary><div class="body">The quote verifier turns that finding into Needs Verification. Bad JSON gets one retry, then a plain error with previous results kept.</div></details>
+  <details><summary>Scanned PDF</summary><div class="body">The PRD error message, and the file stays listed for replacing. A scanned guideline keeps Run disabled.</div></details>
+  <details><summary>Browser storage full</summary><div class="body">It names the item that wasn't saved, so nothing is lost silently.</div></details>
+
+  <h2>Decisions &amp; the open question</h2>
+  <div class="card">
+    <ul style="margin:0;padding-left:20px">
+      <li><b>Yours:</b> Gemini Flash free tier, swappable, stops gracefully when the quota ends · JS PDF reading, no OCR · local + video · synthetic docs · key server-side only · demo path first</li>
+      <li><b>Recommended &amp; accepted:</b> Next.js + TypeScript, Tailwind, quote verification in code</li>
+      <li><b>Your useful unknown:</b> "Is a free model good enough?" It gets tested first with <code>test-extraction</code>: every expected requirement found and every quote verified. If not: tighten the prompt → another Flash variant → Groq via the adapter.</li>
+    </ul>
+    <div class="flag" style="border-color:var(--pass);background:var(--pass-soft)"><b>Changes made in review:</b> the disclosure appears before the first upload and says accurately that only the guideline's text goes to Google · document types come from the filename (no AI) · the Outdated fingerprint uses content hashes + the page-by-page guideline text, so it catches a replaced file even with identical counts · cached requirements keep their page texts.</div>
+  </div>
+
+  <footer>Companion view of <code>devpost/spec.md</code>, which is the main version.</footer>
+</main>
+<script>
+  const J = [
+    ["Arrive", "The Dashboard reads all applications from IndexedDB and shows cards, or the empty state.", "t-ui page.tsx · t-db applications"],
+    ["Create", "The New Application dialog saves a record (Not Checked), then opens /applications/[id].", "t-ui NewApplicationDialog · t-db applications"],
+    ["Upload", "Before the first upload, the AI disclosure. Each PDF → the parse route: page texts, page and word counts, readable? (no AI). The page hashes the file's contents and suggests a type from the filename. Saved to IndexedDB, and you confirm the type.", "t-srv api/parse · t-code docTypes.ts · hash.ts · t-db documents"],
+    ["Enter facts", "GPA, scale, degree, and nationality save as you type.", "t-ui ApplicantInfoForm · t-db applications"],
+    ["Run", "New guideline (by its page-by-page fingerprint)? Its page texts → the extract route → Gemini lists requirements with quote + page → the quote verifier checks each one against those same pages. Saved together with the page texts. The only data that goes to Google.", "t-srv api/extract · t-ai Gemini · t-code quotes.ts · t-db extractions"],
+    ["Evaluate", "In the browser, the checker compares requirements with confirmed file types, exact page and word counts, and your facts. That gives findings and a status.", "t-code checks.ts · status.ts"],
+    ["Show", "Previous ← current, current ← new. Results show fix-first: Action Needed → Needs Verification → Passed.", "t-db results · t-ui ResultsPanel"],
+    ["Fix & rerun", "Replace the CV (now 2 pages): its content hash changes, so Outdated appears. Rerun: same guideline, so no AI call. The checker reruns, and What Changed shows CV length Action Needed → Passed.", "t-code diff.ts · t-ui WhatChanged"],
+    ["Back home", "The card shows the new status, issue count, and progress.", "t-ui ApplicationCard"]
+  ];
+  function tags(s){return s.split(" · ").map(x=>{const [c,...r]=x.split(" ");return '<span class="tag '+c+'">'+r.join(" ")+'</span>'}).join("")}
+  const S=document.getElementById("steps"),P=document.getElementById("panel");
+  function show(i){[...S.children].forEach((b,j)=>b.setAttribute("aria-pressed",j===i));P.innerHTML="<h3>"+(i+1)+" · "+J[i][0]+"</h3><p>"+J[i][1]+"</p>"+tags(J[i][2])}
+  J.forEach((s,i)=>{const b=document.createElement("button");b.textContent=(i+1)+" "+s[0];b.onclick=()=>show(i);S.appendChild(b)});show(0);
+
+  const C = [
+    ["Quote Verifier","lib/quotes.ts","Evidence-Linked Findings · Unique Kernel","Normalizes text and confirms each AI quote is on the claimed page (or corrects the page). If it's not found, the finding is forced to Needs Verification: \"We couldn't confirm this quote in the guideline.\""],
+    ["Checker","lib/checks.ts","Readiness Checks","Plain code. Document counts vs. required counts · exact pages vs. limit · words vs. range · GPA only on the same scale · degree and nationality vs. listed values · deadlines, formatting, and unclear rules → Needs Verification · a correction on every Action Needed finding."],
+    ["What Changed","lib/diff.ts","Recheck and What Changed","Matches findings by requirement ID, which is stable because the extraction is reused. Lists status, value, and issue-count changes. If the guideline changed, it claims no improvements."],
+    ["Status Rules + Fingerprint","lib/status.ts · hash.ts","Fix-First Results · States","Not Checked → Action Needed → Needs Verification → Passed precedence. Never Passed with anything unverified. Input fingerprint = guideline page-text hash + each document's content hash and confirmed type + applicant facts. Any change shows Outdated, even with identical counts."],
+    ["Check Orchestrator","lib/runCheck.ts","Recheck · States","Extract if needed → check → previous←current. On error, results stay unchanged and the error is shown separately."],
+    ["Extract Route","app/api/extract/route.ts","Requirement Extraction","Page-labeled guideline text → Gemini JSON (temperature 0, schema) → quote verifier against the same pages → returned with those page texts so the cache keeps page boundaries. On a 429 quota error, a plain error and no fallback."],
+    ["Parse Route","app/api/parse/route.ts","Document Upload and Identification","unpdf page texts + exact page count + word count. Unreadable if under about 20 characters per page. No AI call."],
+    ["Document Type Hints","lib/docTypes.ts","Document Upload and Identification","Filename keywords (cv/resume, motivation/statement/essay, transcript/grades, recommendation/reference). Suggests only when exactly one type matches, otherwise the user is asked."],
+    ["AI Provider Adapter","lib/ai/provider.ts · gemini.ts","Product Decisions","One operation: extractRequirements. Swapping providers means one new file."],
+    ["Document Manager","components/DocumentManager.tsx","Document Upload and Identification","Guideline slot + documents list, type dropdown (\"Choose type…\" when unsure), counts, Replace / Remove, unreadable error."],
+    ["Run Button + Disclosure","components/RunButton.tsx · DisclosureDialog.tsx","AI Disclosure · States","Disabled until there's a readable guideline, and while running. The disclosure appears before the first upload: only the guideline's text is sent to Google at check time, free-tier data may be used to improve Google's products, and your documents are never sent."],
+    ["Results Panel + Finding Card","components/ResultsPanel.tsx · FindingCard.tsx","Fix-First Results","Outdated → error → What Changed → three groups with counts. Each card: requirement, explanation, highlighted quote + page, your evidence, correction."],
+    ["Dashboard + Cards + New Application","app/page.tsx · components/…","Application Management","Card grid with status pill, issue count, progress bar, empty state, name-required dialog."],
+    ["Storage Layer","lib/db.ts","States and Boundaries (persistence)","Dexie tables. A failed save names the item that wasn't kept."],
+    ["Samples + Extraction Test","scripts/ · samples/","Requirement Extraction","A synthetic 3-page scholarship guideline + 3-page and 2-page CVs, etc. The test reports found, missing, and extra requirements, and verified quotes."]
+  ];
+  const host=document.getElementById("comps");
+  C.forEach(c=>{const d=document.createElement("details");d.innerHTML='<summary>'+c[0]+' <span class="tag t-srv" style="font-weight:500">'+c[1]+'</span></summary><div class="body"><p style="margin:0 0 6px">'+c[3]+'</p><div class="ref">Implements prd.md › '+c[2]+'</div></div>';host.appendChild(d)});
+</script>
+<noscript><p>Journey and component details are in devpost/spec.md.</p></noscript>
+</body>
+</html>

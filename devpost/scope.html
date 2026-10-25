@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ApplyProof Scope</title>
+<style>
+  :root {
+    --bg: #f7f6f2; --surface: #ffffff; --ink: #1d2330; --muted: #5b6474; --line: #e2e0d8;
+    --accent: #2f5bd3; --accent-soft: #e8eefc;
+    --pass: #1f7a4d; --pass-soft: #e3f3ea;
+    --warn: #b4540a; --warn-soft: #fbeedd;
+    --verify: #6b4bb8; --verify-soft: #efe9fb;
+    --cut: #a3312f; --cut-soft: #f9e5e4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171d; --surface: #1c2029; --ink: #e8eaf0; --muted: #9aa3b4; --line: #2c3240;
+      --accent: #7f9ff0; --accent-soft: #232c45;
+      --pass: #5fc493; --pass-soft: #1b3229;
+      --warn: #f0a35c; --warn-soft: #3a2a1a;
+      --verify: #b39cf0; --verify-soft: #2b2440;
+      --cut: #ef8a86; --cut-soft: #3b2222;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 860px; margin: 0 auto; padding: 40px 16px 80px; }
+  .eyebrow { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  h1 { font-size: 40px; margin: 4px 0 4px; letter-spacing: -.02em; }
+  .tagline { font-size: 20px; color: var(--muted); margin: 0 0 28px; }
+  .badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 2px 10px; border-radius: 999px;
+    background: var(--warn-soft); color: var(--warn); vertical-align: middle; margin-left: 8px; }
+  h2 { font-size: 20px; margin: 40px 0 12px; }
+  .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 20px 22px; }
+  .kernel { border-left: 4px solid var(--accent); }
+  .kernel strong { color: var(--accent); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+  .muted { color: var(--muted); }
+  blockquote { margin: 0; padding: 14px 18px; background: var(--accent-soft); border-radius: 10px; font-style: italic; }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { font-family: inherit; fill: var(--ink); }
+  .demo { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .chip { padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: 14px; }
+  .chip.warn { background: var(--warn-soft); color: var(--warn); }
+  .chip.pass { background: var(--pass-soft); color: var(--pass); }
+  .chip.verify { background: var(--verify-soft); color: var(--verify); }
+  details { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; margin-bottom: 12px; overflow: hidden; }
+  summary { cursor: pointer; padding: 16px 20px; font-weight: 600; font-size: 17px; list-style: none; display: flex; align-items: center; gap: 10px; }
+  summary::-webkit-details-marker { display: none; }
+  summary::after { content: "+"; margin-left: auto; color: var(--muted); font-size: 20px; }
+  details[open] summary::after { content: "\2212"; }
+  .dot { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+  details ul { margin: 0; padding: 0 20px 18px 40px; }
+  details li { margin: 6px 0; }
+  .note { font-size: 14px; color: var(--muted); }
+  footer { margin-top: 48px; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Scope · Build With AI: Basics</div>
+  <h1>ApplyProof <span class="badge" style="background:var(--pass-soft);color:var(--pass)">Approved</span></h1>
+  <p class="tagline">Know what's missing before you submit.</p>
+
+  <div class="card kernel">
+    <div class="eyebrow">The unique kernel</div>
+    <p style="margin:6px 0 0">ApplyProof checks the <strong>applicant's real files</strong> against the <strong>official rules</strong>, and every finding shows its evidence: the exact rule, a quote, and the source page. When it can't confirm something, it says <em>Needs Verification</em> instead of guessing.</p>
+  </div>
+
+  <h2>How it fits together</h2>
+  <div class="card">
+    <svg viewBox="0 0 800 380" role="img" aria-label="Diagram: the applicant opens an application, uploads the guideline and documents, runs the readiness check, reviews evidence-linked findings, then fixes and re-uploads, looping back to the check until the status shows Passed.">
+      <defs>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--muted)"/>
+        </marker>
+      </defs>
+      <!-- User -->
+      <rect x="20" y="140" width="140" height="100" rx="14" fill="var(--accent-soft)" stroke="var(--accent)"/>
+      <text x="90" y="178" text-anchor="middle" font-weight="700" font-size="15">Applicant</text>
+      <text x="90" y="200" text-anchor="middle" font-size="12" fill="var(--muted)">student with a</text>
+      <text x="90" y="216" text-anchor="middle" font-size="12" fill="var(--muted)">scholarship package</text>
+      <!-- Steps -->
+      <rect x="210" y="40" width="170" height="70" rx="12" fill="var(--surface)" stroke="var(--line)"/>
+      <text x="295" y="70" text-anchor="middle" font-weight="600" font-size="14">1 · Open application</text>
+      <text x="295" y="90" text-anchor="middle" font-size="12" fill="var(--muted)">one of several</text>
+
+      <rect x="430" y="40" width="170" height="70" rx="12" fill="var(--surface)" stroke="var(--line)"/>
+      <text x="515" y="70" text-anchor="middle" font-weight="600" font-size="14">2 · Upload PDFs</text>
+      <text x="515" y="90" text-anchor="middle" font-size="12" fill="var(--muted)">guideline + documents</text>
+
+      <rect x="610" y="155" width="170" height="70" rx="12" fill="var(--accent)" stroke="var(--accent)"/>
+      <text x="695" y="185" text-anchor="middle" font-weight="700" font-size="14" style="fill:var(--surface)">3 · Run readiness</text>
+      <text x="695" y="205" text-anchor="middle" font-weight="700" font-size="14" style="fill:var(--surface)">check</text>
+
+      <rect x="430" y="270" width="170" height="80" rx="12" fill="var(--surface)" stroke="var(--line)"/>
+      <text x="515" y="298" text-anchor="middle" font-weight="600" font-size="14">4 · Findings</text>
+      <text x="515" y="318" text-anchor="middle" font-size="12" fill="var(--muted)">fix-first, each with</text>
+      <text x="515" y="334" text-anchor="middle" font-size="12" fill="var(--muted)">rule · quote · page</text>
+
+      <rect x="210" y="270" width="170" height="80" rx="12" fill="var(--surface)" stroke="var(--line)"/>
+      <text x="295" y="298" text-anchor="middle" font-weight="600" font-size="14">5 · Fix &amp; re-upload</text>
+      <text x="295" y="318" text-anchor="middle" font-size="12" fill="var(--muted)">corrected file</text>
+      <!-- Arrows -->
+      <path d="M160,170 C185,120 190,90 208,80" fill="none" stroke="var(--muted)" stroke-width="2" marker-end="url(#arr)"/>
+      <path d="M380,75 L428,75" fill="none" stroke="var(--muted)" stroke-width="2" marker-end="url(#arr)"/>
+      <path d="M600,80 C660,85 690,110 695,153" fill="none" stroke="var(--muted)" stroke-width="2" marker-end="url(#arr)"/>
+      <path d="M695,225 C690,270 650,305 602,308" fill="none" stroke="var(--muted)" stroke-width="2" marker-end="url(#arr)"/>
+      <path d="M430,310 L382,310" fill="none" stroke="var(--muted)" stroke-width="2" marker-end="url(#arr)"/>
+      <!-- Loop back -->
+      <path d="M380,285 C470,230 540,200 608,192" fill="none" stroke="var(--accent)" stroke-width="2.5" stroke-dasharray="6 5" marker-end="url(#arr)"/>
+      <text x="470" y="222" text-anchor="middle" font-size="12" font-weight="600" style="fill:var(--accent)">rerun until ready</text>
+      <!-- Eligibility input -->
+      <rect x="20" y="290" width="150" height="56" rx="10" fill="var(--verify-soft)" stroke="var(--verify)"/>
+      <text x="95" y="314" text-anchor="middle" font-size="12" font-weight="600" style="fill:var(--verify)">Typed-in facts</text>
+      <text x="95" y="331" text-anchor="middle" font-size="11" fill="var(--muted)">GPA · degree · nationality</text>
+      <path d="M170,300 C330,250 520,230 610,212" fill="none" stroke="var(--verify)" stroke-width="1.5" stroke-dasharray="3 4" marker-end="url(#arr)"/>
+    </svg>
+  </div>
+
+  <h2>The proof: what "working" looks like</h2>
+  <blockquote>"The user opens ApplyProof, uploads an official application guideline and their application documents, and clicks 'Run Readiness Check.' ApplyProof generates a checklist, identifies missing documents and rule violations, and links each finding to the exact source passage. The user fixes an issue, uploads the corrected document, and reruns the check to see the status change."</blockquote>
+  <div class="card" style="margin-top:14px">
+    <div class="eyebrow" style="margin-bottom:10px">The "oh, that's cool" beat</div>
+    <div class="demo">
+      <span>CV · 3 pages vs. 2-page limit (guideline p.&nbsp;X)</span>
+      <span class="chip warn">Action Needed</span>
+      <span class="muted">→ upload 2-page CV, rerun →</span>
+      <span class="chip pass">Passed</span>
+    </div>
+    <p class="note" style="margin:12px 0 0">Statuses: <span class="chip pass">Passed</span> <span class="chip warn">Action Needed</span> <span class="chip verify">Needs Verification</span></p>
+  </div>
+
+  <h2>Who it's for &amp; why it matters</h2>
+  <div class="grid">
+    <div class="card">
+      <div class="eyebrow">Who</div>
+      <p style="margin:6px 0 0">Anyone preparing an application with official rules and several documents: students (scholarships, master's, fellowships) and job applicants. The proof of concept is built for one person: a student about to submit a scholarship package.</p>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Today they…</div>
+      <p style="margin:6px 0 0">compare the guide against their files by hand, maybe with a spreadsheet, and hope nothing slipped through.</p>
+    </div>
+    <div class="card">
+      <div class="eyebrow">Why it matters to me</div>
+      <p style="margin:6px 0 0">I'm applying to several programs myself, and I want this for others like me too.</p>
+    </div>
+  </div>
+
+  <h2>Boundary</h2>
+  <details open>
+    <summary><span class="dot" style="background:var(--pass)"></span>Now · in the proof of concept</summary>
+    <ul>
+      <li>Multiple applications for one user (no login yet), each with its own documents and results</li>
+      <li>PDF upload of one official guideline plus the applicant's documents</li>
+      <li>AI extraction of requirements into a checklist (documents, page and word limits, eligibility, deadlines, formatting)</li>
+      <li>Missing-document detection</li>
+      <li>Page and word limits checked with plain code, not AI</li>
+      <li>Basic eligibility: typed-in GPA, degree, and nationality vs. clearly stated rules; anything ambiguous is marked Needs Verification</li>
+      <li>Evidence for every finding: rule, quote, source page</li>
+      <li>Needs Verification whenever something can't be confirmed</li>
+      <li>Fix-first ordering</li>
+      <li>Re-upload and recheck</li>
+      <li>Status view: Passed / Action Needed / Needs Verification</li>
+    </ul>
+  </details>
+  <details>
+    <summary><span class="dot" style="background:var(--warn)"></span>Later · worth doing, not now</summary>
+    <ul>
+      <li><strong>Sign-up and login for many applicants</strong>: each person gets private applications; built right after the MVP works</li>
+      <li><strong>Official source monitoring</strong>: notify when requirements change (a key trust differentiator, but too complex for now)</li>
+      <li>Conflict detection across guide, FAQ, and web page</li>
+      <li>Exportable readiness report</li>
+      <li>Checking for required sections in the CV and essay</li>
+      <li>Deadline tracker, reminders, letter tracker, progress tracker</li>
+      <li>Reusable profile, version comparison, application history</li>
+      <li>Collaboration, counselor dashboard, privacy controls</li>
+      <li>Premium tiers and payments</li>
+    </ul>
+  </details>
+  <details>
+    <summary><span class="dot" style="background:var(--cut)"></span>Cut · with reasons</summary>
+    <ul>
+      <li><strong>Finding programs, jobs, or scholarships</strong>: ApplyProof checks applications, it doesn't find them</li>
+      <li><strong>Essay generation</strong>: it checks documents, it doesn't write them</li>
+      <li><strong>Admission prediction</strong>: it promises readiness, not outcomes</li>
+      <li><strong>Reading eligibility facts from the CV</strong>: too error-prone, so the user types them in</li>
+    </ul>
+  </details>
+
+  <footer>Companion view of <code>devpost/scope.md</code>, which is the main version.</footer>
+</main>
+</body>
+</html>
